@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Success | Cali Clear</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../components/assets/css/components.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <div id="navbar-include"></div>
+
+  <main class="order-success-main" style="min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+    <img src="../assets/images/icons/check-circle.svg" alt="Success" style="width:80px;margin-bottom:1.5rem;">
+    <h1 style="color:#43a047;">Thank you for your order!</h1>
+    <p style="font-size:1.2rem;max-width:400px;text-align:center;">Your order was placed successfully. A confirmation email has been sent to you. You can track your order status in your account.</p>
+    <a href="../shop.html" class="btn" style="margin-top:2rem;">Continue Shopping</a>
+  </main>
+
+  <!-- Toast Container -->
+  <div id="toast-container" style="position:fixed;top:1.5rem;right:1.5rem;z-index:9999;"></div>
+
+  <!-- Footer -->
+  <div id="footer-include"></div>
+
+  <script src="../assets/js/main.js"></script>
+  <script src="../assets/js/toast.js"></script>
+  <script>
+    // Dynamic includes for navbar and footer
+    document.addEventListener('DOMContentLoaded', function() {
+      fetch('../components/navbar.html').then(r=>r.text()).then(html=>{
+        document.getElementById('navbar-include').innerHTML = html;
+      });
+      fetch('../components/footer.html').then(r=>r.text()).then(html=>{
+        document.getElementById('footer-include').innerHTML = html;
+      });
+    });
+  </script>
+</body>
+</html>

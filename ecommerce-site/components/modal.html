@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modal Example</title>
+  <!-- Link to CSS -->
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    /* Modal Styles */
+    .modal {
+      display: none; /* Hidden by default */
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.6);
+      transition: 0.3s ease-in-out;
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 600px;
+      position: relative;
+      animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {transform: translateY(-50px); opacity: 0;}
+      to {transform: translateY(0); opacity: 1;}
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .modal-close:hover {
+      color: #ff6f61;
+    }
+
+    /* Modal Body */
+    .modal-body img {
+      width: 100%;
+      max-height: 300px;
+      object-fit: contain;
+      margin-bottom: 15px;
+    }
+
+    .modal-body h2 {
+      margin-bottom: 10px;
+      font-size: 24px;
+    }
+
+    .modal-body p {
+      margin-bottom: 15px;
+      color: #555;
+    }
+
+    .modal-body .price {
+      font-size: 20px;
+      font-weight: bold;
+      color: #ff6f61;
+      margin-bottom: 15px;
+    }
+
+    .modal-body button {
+      padding: 10px 20px;
+      background-color: #ff6f61;
+      border: none;
+      border-radius: 4px;
+      color: #fff;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .modal-body button:hover {
+      background-color: #e65c50;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Trigger Button for Demo -->
+  <button id="openModalBtn">Open Modal</button>
+
+  <!-- Modal Structure -->
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+      <span class="modal-close">&times;</span>
+      <div class="modal-body">
+        <img src="assets/images/products/product1.jpg" alt="Product Image">
+        <h2>Product Name</h2>
+        <p>Quick product description goes here. Highlight key features and info.</p>
+        <div class="price">$49.99</div>
+        <button>Add to Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal JS -->
+  <script>
+    // Get modal and trigger button
+    const modal = document.getElementById("myModal");
+    const openBtn = document.getElementById("openModalBtn");
+    const closeBtn = document.querySelector(".modal-close");
+
+    // Open modal
+    openBtn.onclick = () => {
+      modal.style.display = "block";
+    }
+
+    // Close modal on X
+    closeBtn.onclick = () => {
+      modal.style.display = "none";
+    }
+
+    // Close modal when clicking outside
+    window.onclick = (event) => {
+      if (event.target === modal) {
+        modal.style.display = "none";
+      }
+    }
+  </script>
+
+</body>
+</html>

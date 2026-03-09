@@ -1,0 +1,37 @@
+<!-- Category page (filtering) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Category | Cali Clear</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../components/assets/css/components.css">
+</head>
+<body>
+  <!-- Navbar include -->
+  <div id="navbar-include"></div>
+
+  <main class="page-main">
+    <h1>Category</h1>
+    <div id="category-products" class="product-grid"></div>
+  </main>
+
+  <!-- Footer include -->
+  <div id="footer-include"></div>
+
+  <script src="../assets/js/main.js"></script>
+  <script>
+    fetch('../components/navbar.html').then(r=>r.text()).then(html=>{document.getElementById('navbar-include').innerHTML=html});
+    fetch('../components/footer.html').then(r=>r.text()).then(html=>{document.getElementById('footer-include').innerHTML=html});
+    // Example: render all products in this category
+    const urlParams = new URLSearchParams(window.location.search);
+    const cat = urlParams.get('cat') || 'Vapes';
+    fetch('../data/products.json').then(r=>r.json()).then(products=>{
+      let filtered = products.filter(p=>p.category===cat);
+      document.getElementById('category-products').innerHTML = filtered.map(product => `
+        <div class=\"product-card\">\n  <div class=\"product-img-wrap\">\n    <img src=\"${product.image}\" alt=\"${product.name}\">\n    ${product.badge ? `<span class=\"badge badge-${product.badge.toLowerCase()}\">${product.badge}</span>` : ''}\n  </div>\n  <div class=\"product-info\">\n    <h3>${product.name}</h3>\n    <div class=\"product-rating\">${'★'.repeat(product.rating||4)}${'☆'.repeat(5-(product.rating||4))}</div>\n    <div class=\"product-price\">$${product.price.toFixed(2)}</div>\n    <p class=\"product-desc\">${product.shortDesc||''}</p>\n    <button class=\"btn\" onclick=\"window.location='product.html?id=${product.id}'\">View</button>\n  </div>\n</div>\n` ).join('');
+    });
+  </script>
+</body>
+</html>

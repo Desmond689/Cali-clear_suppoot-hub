@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <title>Welcome to Cali Clear</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .intro-container {
+      max-width: 600px;
+      width: 100%;
+      background: #121212;
+      border: 1px solid #2a2a2a;
+      border-radius: 20px;
+      padding: 60px 40px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+    
+    .intro-logo {
+      font-size: 64px;
+      margin-bottom: 20px;
+      animation: float 2s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .intro-title {
+      font-size: 42px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #ff6f61 0%, #ff8a7b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .intro-subtitle {
+      font-size: 18px;
+      color: #888;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    
+    .intro-description {
+      color: #666;
+      margin-bottom: 40px;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    
+    .intro-features {
+      text-align: left;
+      margin: 40px 0;
+      padding: 20px 0;
+      border-top: 1px solid #2a2a2a;
+      border-bottom: 1px solid #2a2a2a;
+    }
+    
+    .feature {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      color: #ccc;
+      font-size: 14px;
+    }
+    
+    .feature:last-child { margin-bottom: 0; }
+    
+    .feature-icon {
+      font-size: 20px;
+      color: #ff6f61;
+    }
+    
+    .intro-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 40px;
+      flex-wrap: wrap;
+    }
+    
+    .btn-intro {
+      flex: 1;
+      min-width: 140px;
+      padding: 16px 32px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    .btn-signup {
+      background: linear-gradient(135deg, #ff6f61 0%, #ff8a7b 100%);
+      color: #fff;
+    }
+    
+    .btn-signup:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(255, 111, 97, 0.3);
+    }
+    
+    .btn-login {
+      background: transparent;
+      color: #ff6f61;
+      border: 2px solid #ff6f61;
+    }
+    
+    .btn-login:hover {
+      background: rgba(255, 111, 97, 0.1);
+    }
+    
+    .intro-footer {
+      margin-top: 40px;
+      font-size: 12px;
+      color: #555;
+    }
+    
+    @media (max-width: 600px) {
+      .intro-container {
+        padding: 40px 20px;
+      }
+      
+      .intro-title {
+        font-size: 32px;
+      }
+      
+      .intro-subtitle {
+        font-size: 16px;
+      }
+      
+      .intro-buttons {
+        flex-direction: column;
+      }
+      
+      .btn-intro {
+        min-width: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="intro-container">
+    <div class="intro-logo">🍃</div>
+    <h1 class="intro-title">Cali Clear</h1>
+    <p class="intro-subtitle">Premium Quality, Fast Delivery</p>
+    
+    <p class="intro-description">
+      Experience premium products with unmatched quality and reliability. Join thousands of satisfied customers today.
+    </p>
+    
+    <div class="intro-features">
+      <div class="feature">
+        <span class="feature-icon">✓</span>
+        <span>Premium Quality Products</span>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">✓</span>
+        <span>Fast & Discreet Shipping</span>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">✓</span>
+        <span>24/7 Customer Support</span>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">✓</span>
+        <span>Secure Payments</span>
+      </div>
+    </div>
+    
+    <div class="intro-buttons">
+      <button class="btn-intro btn-signup" onclick="window.location.href='register.html'">
+        Create Account
+      </button>
+      <button class="btn-intro btn-login" onclick="window.location.href='login.html'">
+        Already a Member? Login
+      </button>
+    </div>
+    
+    <div class="intro-footer">
+      By creating an account, you agree to our Terms of Service and Privacy Policy
+    </div>
+  </div>
+  <script>
+    // if already authenticated, send back to homepage
+    (function(){
+      const token = localStorage.getItem('access_token');
+      const user = localStorage.getItem('user');
+      if (token && user) {
+        window.location.href = 'index.html';
+      }
+    })();
+  </script>
+</body>
+</html>

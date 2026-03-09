@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <title>Create Account | Cali Clear</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .register-container {
+      max-width: 450px;
+      width: 100%;
+      background: #121212;
+      border: 1px solid #2a2a2a;
+      border-radius: 20px;
+      padding: 50px 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+    
+    .register-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    
+    .register-logo {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+    
+    .register-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    
+    .register-subtitle {
+      color: #888;
+      font-size: 14px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-label {
+      display: block;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      background: #1e1e1e;
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 14px;
+      font-family: 'Poppins', sans-serif;
+      transition: 0.2s;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: #ff6f61;
+      background: #252525;
+      box-shadow: 0 0 0 3px rgba(255, 111, 97, 0.1);
+    }
+    
+    .form-input::placeholder {
+      color: #555;
+    }
+    
+    .password-group {
+      position: relative;
+    }
+    
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #888;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px 8px;
+      transition: 0.2s;
+    }
+    
+    .password-toggle:hover {
+      color: #ff6f61;
+    }
+    
+    .password-strength {
+      display: flex;
+      gap: 4px;
+      margin-top: 6px;
+    }
+    
+    .strength-bar {
+      height: 4px;
+      flex: 1;
+      background: #2a2a2a;
+      border-radius: 2px;
+      transition: 0.3s;
+    }
+    
+    .strength-text {
+      font-size: 11px;
+      color: #888;
+      margin-top: 4px;
+    }
+    
+    .register-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #ff6f61 0%, #ff8a7b 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    .register-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(255, 111, 97, 0.3);
+    }
+    
+    .register-btn:active {
+      transform: translateY(0);
+    }
+    
+    .register-btn.loading {
+      opacity: 0.8;
+      cursor: not-allowed;
+    }
+    
+    .message {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 13px;
+      display: none;
+    }
+    
+    .message.error {
+      background: rgba(244, 67, 54, 0.1);
+      color: #ff8a80;
+      border: 1px solid rgba(244, 67, 54, 0.2);
+      display: block;
+    }
+    
+    .message.success {
+      background: rgba(76, 175, 80, 0.1);
+      color: #81c784;
+      border: 1px solid rgba(76, 175, 80, 0.2);
+      display: block;
+    }
+    
+    .auth-footer {
+      text-align: center;
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid #2a2a2a;
+    }
+    
+    .auth-footer-text {
+      color: #888;
+      font-size: 14px;
+    }
+    
+    .auth-footer-link {
+      color: #ff6f61;
+      text-decoration: none;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+    
+    .auth-footer-link:hover {
+      color: #ff8a7b;
+    }
+    
+    @media (max-width: 500px) {
+      .register-container {
+        padding: 40px 24px;
+      }
+      
+      .register-title {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="register-container">
+    <div class="register-header">
+      <div class="register-logo">🍃</div>
+      <h1 class="register-title">Create Account</h1>
+      <p class="register-subtitle">Join the Cali Clear community</p>
+    </div>
+    
+    <form id="register-form">
+      <div class="form-group">
+        <label class="form-label" for="register-email">Email Address</label>
+        <input 
+          type="email" 
+          id="register-email" 
+          name="email"
+          class="form-input" 
+          placeholder="you@example.com" 
+          required
+          autocomplete="email"
+        >
+      </div>
+      
+      <div class="form-group password-group">
+        <label class="form-label" for="register-password">Password</label>
+        <input 
+          type="password" 
+          id="register-password" 
+          name="password"
+          class="form-input" 
+          placeholder="••••••••" 
+          required
+          minlength="6"
+          autocomplete="new-password"
+        >
+        <button 
+          type="button" 
+          class="password-toggle" 
+          id="toggle-register-password"
+          aria-label="Show/Hide Password"
+        >👁️</button>
+        <div class="password-strength">
+          <div class="strength-bar" id="strength-1"></div>
+          <div class="strength-bar" id="strength-2"></div>
+          <div class="strength-bar" id="strength-3"></div>
+        </div>
+        <div class="strength-text" id="strength-text">Password strength: Weak</div>
+      </div>
+      
+      <button type="submit" class="register-btn" id="register-submit">Create Account</button>
+      
+      <div class="message" id="register-msg"></div>
+    </form>
+    
+    <div class="auth-footer">
+      <p class="auth-footer-text">
+        Already have an account? 
+        <a href="login.html" class="auth-footer-link">Sign in</a>
+      </p>
+    </div>
+  </div>
+  
+  <!-- Toast container -->
+  <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+  
+  <script src="assets/js/toast.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script>
+    // Password strength indicator
+    const pwInput = document.getElementById('register-password');
+    if (pwInput) {
+      pwInput.addEventListener('input', function() {
+        const pw = this.value;
+        let strength = 0;
+        if (pw.length >= 6) strength++;
+        if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) strength++;
+        if (/[0-9]/.test(pw) || /[^a-zA-Z0-9]/.test(pw)) strength++;
+        
+        const bars = document.querySelectorAll('.strength-bar');
+        bars.forEach((bar, i) => {
+          bar.style.background = i < strength ? '#ff6f61' : '#2a2a2a';
+        });
+        
+        const strengths = ['Weak', 'Fair', 'Strong'];
+        const colors = ['#ff6f61', '#ffa94d', '#4caf50'];
+        document.getElementById('strength-text').textContent = 'Password strength: ' + strengths[strength] || 'Weak';
+        document.getElementById('strength-text').style.color = colors[strength] || '#ff6f61';
+      });
+    }
+  </script>
+</body>
+</html>

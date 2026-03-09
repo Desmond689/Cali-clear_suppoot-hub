@@ -1,0 +1,69 @@
+<!-- Announcement Bar -->
+<div class="announcement-bar">
+  <div class="announcement">Free shipping on orders over $50! | 24/7 Support</div>
+  <div class="lang-currency">
+    <select aria-label="Language">
+      <option>EN</option>
+      <option>ES</option>
+    </select>
+    <select aria-label="Currency">
+      <option>USD</option>
+      <option>EUR</option>
+    </select>
+  </div>
+</div>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="navbar-main">
+    <!-- Logo -->
+    <a href="index.html" class="navbar-logo">
+      <img src="../assets/images/logo.png" alt="Cali Clear Logo">
+      <span class="brand-name">Cali Clear</span>
+    </a>
+
+    <!-- Links -->
+    <ul class="navbar-links" id="navbar-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="product.html">Product</a></li>
+      <li><a href="wishlist.html">Wishlist</a></li>
+      <li><a href="order-history.html">My Orders</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="cart.html">Cart</a></li>
+    </ul>
+
+    <!-- Icons -->
+    <div class="navbar-icons">
+      <a href="cart.html" class="cart-icon" id="cart-icon">
+        <img src="../assets/images/icons/cart.svg" alt="Cart">
+        <span class="cart-count" id="cart-count">0</span>
+      </a>
+      <a href="wishlist.html" class="wishlist-icon">
+        <img src="../assets/images/icons/heart.svg" alt="Wishlist">
+      </a>
+      
+      <!-- Auth Links -->
+      <div id="auth-links" style="display:flex;gap:10px;">
+        <a href="login.html" class="user-icon">
+          <img src="../assets/images/icons/user.svg" alt="Login">
+        </a>
+      </div>
+      
+      <!-- User Links (shown when logged in) -->
+      <div id="user-links" style="display:none;gap:15px;align-items:center;">
+        <span id="user-name" style="color:#222;font-weight:500;font-size:14px;"></span>
+        <a href="order-history.html" style="color:#222;font-size:14px;">Orders</a>
+        <a href="#" onclick="logout();return false;" style="color:#ff6f61;font-size:14px;">Logout</a>
+      </div>
+
+      <!-- Hamburger -->
+      <button class="navbar-toggle" id="navbar-toggle" aria-label="Menu" onclick="toggleNavbar(); return false;">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,22 @@
+{
+  "name": "Cali Clear Admin",
+  "short_name": "Admin",
+  "description": "Cali Clear E-commerce Admin Panel",
+  "start_url": "/admin.html",
+  "display": "standalone",
+  "background_color": "#101417",
+  "theme_color": "#ff6f61",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "assets/images/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/images/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

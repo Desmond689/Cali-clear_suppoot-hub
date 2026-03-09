@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Card</title>
+  <!-- CSS -->
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    /* Product Card Styles */
+    .product-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .product-card {
+      background-color: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: 0.3s;
+      display: flex;
+      flex-direction: column;
+      width: 250px;
+      margin: 10px;
+      position: relative;
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .product-image {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .product-image img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      transition: 0.3s;
+    }
+
+    .product-card:hover .product-image img {
+      transform: scale(1.05);
+    }
+
+    .wishlist-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #fff;
+      border: none;
+      border-radius: 50%;
+      padding: 6px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      transition: 0.3s;
+      z-index: 2;
+    }
+
+    .wishlist-btn img {
+      width: 18px;
+      height: 18px;
+    }
+
+    .wishlist-btn:hover {
+      background-color: #ff6f61;
+    }
+
+    .wishlist-btn:hover img {
+      filter: brightness(0) invert(1);
+    }
+
+    .product-info {
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .product-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0;
+      color: #333;
+    }
+
+    .product-rating {
+      color: #ffbf00;
+      font-size: 14px;
+    }
+
+    .product-price {
+      font-size: 18px;
+      font-weight: bold;
+      color: #ff6f61;
+    }
+
+    .add-to-cart-btn {
+      padding: 10px;
+      background-color: #ff6f61;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: 0.3s;
+    }
+
+    .add-to-cart-btn:hover {
+      background-color: #e65c50;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .product-card {
+        width: 45%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .product-card {
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Product Grid -->
+  <div class="product-grid" id="product-grid">
+    <!-- Dynamic products will be rendered here -->
+  </div>
+
+  <!-- JS: Render products dynamically -->
+  <script>
+    // Example static products array (replace with JSON fetch if needed)
+    const products = [
+      {
+        id: 1,
+        name: "Cali Clear Vape",
+        price: 49.99,
+        rating: 4,
+        image: "assets/images/products/product1.jpg"
+      },
+      {
+        id: 2,
+        name: "Disposable Vape Pen",
+        price: 29.99,
+        rating: 5,
+        image: "assets/images/products/product2.jpg"
+      },
+      {
+        id: 3,
+        name: "Fruit Flavored Vape",
+        price: 39.99,
+        rating: 3,
+        image: "assets/images/products/product3.jpg"
+      },
+      {
+        id: 4,
+        name: "Mint Disposable Vape",
+        price: 24.99,
+        rating: 4,
+        image: "assets/images/products/product4.jpg"
+      }
+    ];
+
+    const productGrid = document.getElementById("product-grid");
+
+    function renderProducts() {
+      products.forEach(product => {
+        const productCard = document.createElement("div");
+        productCard.classList.add("product-card");
+        productCard.innerHTML = `
+          <div class="product-image">
+            <img src="${product.image}" alt="${product.name}">
+            <button class="wishlist-btn" aria-label="Add to Wishlist">
+              <img src="assets/images/icons/heart.svg" alt="Wishlist">
+            </button>
+          </div>
+          <div class="product-info">
+            <h3 class="product-title">${product.name}</h3>
+            <div class="product-rating">${"★".repeat(product.rating)}${"☆".repeat(5-product.rating)}</div>
+            <div class="product-price">$${product.price.toFixed(2)}</div>
+            <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
+          </div>
+        `;
+        productGrid.appendChild(productCard);
+      });
+
+      // Add to cart demo
+      const cartButtons = document.querySelectorAll(".add-to-cart-btn");
+      cartButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          showToast(`Product ID ${btn.dataset.id} added to cart!`);
+          // Here you can add localStorage/cart logic
+        });
+      });
+    }
+
+    renderProducts();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<title>Contact Us - Cali Clear</title>
+
+<!-- CSS -->
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="components/assets/css/components.css">
+
+<style>
+body {
+  background: #f7f7f7;
+  font-family: Arial, sans-serif;
+}
+
+.hero-contact {
+  background: url('assets/images/hero/contact-hero.jpg') center/cover no-repeat;
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  position: relative;
+  text-align: center;
+}
+
+.hero-contact::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.hero-contact h1 {
+  position: relative;
+  font-size: 42px;
+  font-weight: bold;
+}
+
+.contact-container {
+  max-width: 1200px;
+  margin: 40px auto;
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+  padding: 0 20px;
+}
+
+.contact-form, .contact-info {
+  background: #fff;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  flex: 1;
+  min-width: 300px;
+}
+
+.contact-form h2, .contact-info h2 {
+  color: #ff6f61;
+  margin-bottom: 20px;
+}
+
+.contact-form label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.contact-form textarea {
+  resize: vertical;
+  height: 120px;
+}
+
+.contact-form button {
+  background-color: #ff6f61;
+  color: #fff;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.contact-form button:hover {
+  background-color: #e65c50;
+}
+
+.contact-info p {
+  margin: 10px 0;
+  font-size: 14px;
+}
+
+.contact-info i {
+  color: #ff6f61;
+  margin-right: 10px;
+}
+
+/* Map */
+.contact-map iframe {
+  width: 100%;
+  border: none;
+  height: 250px;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+@media (max-width: 768px){
+  .contact-container {
+    flex-direction: column;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<div id="navbar-placeholder"></div>
+<script>
+fetch('components/navbar.html').then(res=>res.text()).then(data=>document.getElementById('navbar-placeholder').innerHTML=data);
+</script>
+
+<!-- Hero Section -->
+<section class="hero-contact">
+  <h1>Contact Us</h1>
+</section>
+
+<!-- Contact Section -->
+<div class="contact-container">
+
+  <!-- Form -->
+  <div class="contact-form">
+    <h2>Send Us a Message</h2>
+    <form id="contactForm">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" required>
+
+      <label for="email">Email</label>
+      <input type="email" id="email" required>
+
+      <label for="subject">Subject</label>
+      <input type="text" id="subject" required>
+
+      <label for="message">Message</label>
+      <textarea id="message" required></textarea>
+
+      <button type="submit">Send Message</button>
+    </form>
+  </div>
+
+  <!-- Info -->
+  <div class="contact-info">
+    <h2>Contact Information</h2>
+    <p><strong>Cali Clear LLC</strong></p>
+    <p>Email: support@caliclear.shop</p>
+    <p>Phone: (555) 123-4567</p>
+    <p>Address: 123 Main Street, Los Angeles, CA 90001</p>
+    <p>Business Hours: Monday to Friday, 9:00 AM – 6:00 PM PST</p>
+    <p>We aim to respond to all inquiries within 24–48 hours.<br>For faster assistance, please include your order details when contacting us.</p>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<div id="footer-placeholder"></div>
+<script>
+fetch('components/footer.html').then(res=>res.text()).then(data=>document.getElementById('footer-placeholder').innerHTML=data);
+</script>
+
+<!-- JS -->
+<script>
+document.getElementById('contactForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  showToast("Thank you! Your message has been sent.");
+  document.getElementById('contactForm').reset();
+});
+</script>
+
+</body>
+</html>

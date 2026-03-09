@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<title>Product – Cali Clear</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="components/assets/css/components.css">
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: #121212;
+  color: #e0e0e0;
+}
+
+/* Toast */
+#toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+/* Layout */
+.product-container {
+  max-width: 1200px;
+  margin: 60px auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: 520px 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+/* Images */
+.product-images img {
+  width: 100%;
+  border-radius: 14px;
+  background: #1e1e1e;
+}
+
+.product-images img.main {
+  height: 420px;
+  object-fit: cover;
+  margin-bottom: 15px;
+}
+
+/* Card */
+.card {
+  background: #1a1a1a;
+  border-radius: 18px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  position: sticky;
+  top: 100px;
+}
+
+/* Text */
+h1 {
+  font-size: 32px;
+  margin: 0 0 10px;
+  color: #ff6f61;
+}
+
+.price {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 15px 0;
+}
+
+.description {
+  color: #ccc;
+  line-height: 1.7;
+  margin-bottom: 25px;
+}
+
+/* Form */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+label {
+  font-size: 14px;
+  color: #aaa;
+  margin-bottom: 6px;
+  display: block;
+}
+
+select,
+input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  background: #222;
+  color: #fff;
+  font-size: 14px;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.actions button {
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.add-cart {
+  background: linear-gradient(135deg, #ff6f61, #ff3d2e);
+  color: #fff;
+}
+
+.add-cart:hover {
+  opacity: 0.9;
+}
+
+.add-wishlist {
+  background: transparent;
+  border: 2px solid #ff6f61;
+  color: #ff6f61;
+}
+
+.add-wishlist:hover {
+  background: #ff6f61;
+  color: #fff;
+}
+
+/* Related */
+.related-products {
+  max-width: 1200px;
+  margin: 80px auto;
+  padding: 0 20px;
+}
+
+.related-products h2 {
+  margin-bottom: 25px;
+  color: #ff6f61;
+}
+
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px,1fr));
+  gap: 20px;
+}
+
+.product-card {
+  background: #1e1e1e;
+  padding: 15px;
+  border-radius: 14px;
+  text-align: center;
+  transition: 0.3s;
+}
+
+.product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 25px rgba(255,111,97,0.25);
+}
+
+.product-card img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.product-card button {
+  margin-top: 10px;
+  padding: 8px 18px;
+  border-radius: 6px;
+  border: none;
+  background: #ff6f61;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* Mobile */
+@media (max-width: 900px) {
+  .product-container {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    position: static;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="navbar-placeholder"></div>
+<script>
+fetch('components/navbar.html')
+  .then(r => r.text())
+  .then(d => document.getElementById('navbar-placeholder').innerHTML = d);
+</script>
+
+
+<div id="toast-container"></div>
+
+<!-- PRODUCT -->
+<div class="product-container">
+  <div class="product-images">
+    <img id="main-product-img" class="main" src="" alt="">
+    <!-- Optionally, add a gallery here -->
+  </div>
+  <div class="card">
+    <h1 id="product-name"></h1>
+    <div class="price" id="product-price"></div>
+    <div id="product-rating"></div>
+    <div id="product-stock"></div>
+    <p class="description" id="product-desc"></p>
+    <div class="form-grid">
+      <div>
+        <label>Qty</label>
+        <input type="number" id="qty" value="1" min="1">
+      </div>
+    </div>
+    <div class="actions">
+      <button class="add-cart" id="add-to-cart">Add to Cart</button>
+      <button class="add-wishlist" id="add-to-wishlist">Add to Wishlist</button>
+    </div>
+    <div id="product-specs"></div>
+  </div>
+</div>
+
+
+<!-- RELATED -->
+<div class="related-products">
+  <h2>Related Products</h2>
+  <div class="related-grid" id="related-products-grid">
+    <!-- Related products will be rendered here -->
+  </div>
+</div>
+
+<script src="assets/js/products.js"></script>
+
+<script>
+// Load footer with chat
+document.addEventListener('DOMContentLoaded', () => {
+  fetch('components/footer.html')
+    .then(res => res.text())
+    .then(html => {
+      const footer = document.createElement('footer');
+      footer.innerHTML = html;
+      document.body.appendChild(footer);
+      initChat();
+    })
+    .catch(err => console.error('Error loading footer:', err));
+});
+
+function initChat() {
+  const bubble = document.getElementById('chat-bubble');
+  const panel = document.getElementById('chat-panel');
+  const input = document.getElementById('chat-input');
+  const messages = document.getElementById('chat-messages');
+
+  if (!bubble || !panel || !input || !messages) return;
+
+  bubble.addEventListener('click', () => {
+    panel.classList.toggle('hidden');
+    if (!panel.classList.contains('hidden')) {
+      input.focus();
+    }
+  });
+
+  input.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    const text = e.target.value.trim();
+    if (!text) return;
+    messages.innerHTML += `<div class="user-msg">${text}</div>`;
+    e.target.value = '';
+    let reply = "Sorry, I didn't understand that. Type \"agent\" to contact us.";
+    const lc = text.toLowerCase();
+    if (lc.includes('return')) reply = 'You can return items within 30 days. Check our FAQ for details.';
+    else if (lc.includes('shipping')) reply = 'Standard shipping takes 5–7 business days.';
+    else if (lc.includes('order')) reply = 'Your order is being processed. Use the tracking page with your order number.';
+    else if (lc.includes('agent') || lc.includes('human')) {
+      reply = 'Click here to email support: <a href="mailto:support@caliclear.shop">support@caliclear.shop</a>';
+    }
+    messages.innerHTML += `<div class="bot-msg">${reply}</div>`;
+    messages.scrollTop = messages.scrollHeight;
+  });
+}
+</script>
+
+</body>
+</html>

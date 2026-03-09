@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <title>Reset Password | Cali Clear</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 450px;
+      width: 100%;
+      background: #121212;
+      border: 1px solid #2a2a2a;
+      border-radius: 20px;
+      padding: 50px 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      text-align: center;
+    }
+    h2 {
+      color: #fff;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      color: #ccc;
+    }
+    input[type="password"] {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #333;
+      border-radius: 8px;
+      background: #1e1e1e;
+      color: #fff;
+      font-size: 14px;
+    }
+    .password-toggle {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 18px;
+      color: #888;
+      transition: 0.2s;
+    }
+    .password-toggle:hover {
+      color: #ff6f61;
+    }
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #ff6f61 0%, #ff8a7b 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+      font-family: 'Poppins', sans-serif;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(255, 111, 97, 0.3);
+    }
+    .message {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 13px;
+      display: none;
+    }
+    .message.error {
+      background: rgba(244, 67, 54, 0.1);
+      color: #ff8a80;
+      border: 1px solid rgba(244, 67, 54, 0.2);
+      display: block;
+    }
+    .message.success {
+      background: rgba(76, 175, 80, 0.1);
+      color: #81c784;
+      border: 1px solid rgba(76, 175, 80, 0.2);
+      display: block;
+    }
+    .back-link {
+      margin-top: 20px;
+      color: #888;
+      font-size: 14px;
+    }
+    .back-link a {
+      color: #ff6f61;
+      text-decoration: none;
+    }
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+    .input-wrapper {
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Reset Password</h2>
+    <form id="reset-form">
+      <div class="form-group input-wrapper">
+        <label for="reset-password">New Password</label>
+        <input type="password" id="reset-password" name="password" required>
+        <span class="password-toggle" id="toggle-reset-password">👁️</span>
+      </div>
+      <div class="form-group input-wrapper">
+        <label for="reset-password-confirm">Confirm Password</label>
+        <input type="password" id="reset-password-confirm" required>
+        <span class="password-toggle" id="toggle-reset-password-confirm">👁️</span>
+      </div>
+      <button type="submit" class="btn" id="reset-submit">Update Password</button>
+      <div class="message" id="reset-msg"></div>
+    </form>
+    <div class="back-link">
+      <a href="login.html">← Back to sign in</a>
+    </div>
+  </div>
+  <script src="assets/js/auth.js"></script>
+  <script>
+    // redirect if already logged in
+    (function(){
+      const token = localStorage.getItem('access_token');
+      const user = localStorage.getItem('user');
+      if (token && user) {
+        window.location.href = 'index.html';
+      }
+    })();
+    // parse token from query string
+    function getQueryParam(name) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(name);
+    }
+    const token = getQueryParam('token');
+
+    document.addEventListener('DOMContentLoaded', function() {
+      togglePassword('reset-password', 'toggle-reset-password');
+      togglePassword('reset-password-confirm', 'toggle-reset-password-confirm');
+    });
+
+    document.getElementById('reset-form').onsubmit = async function(e) {
+      e.preventDefault();
+      const pw = document.getElementById('reset-password').value;
+      const pw2 = document.getElementById('reset-password-confirm').value;
+      const msgEl = document.getElementById('reset-msg');
+      const submitBtn = document.getElementById('reset-submit');
+      if (!token) {
+        msgEl.textContent = '✗ Missing reset token.';
+        msgEl.className = 'message error';
+        return;
+      }
+      if (pw.length < 6) {
+        msgEl.textContent = '✗ Password must be at least 6 characters.';
+        msgEl.className = 'message error';
+        return;
+      }
+      if (pw !== pw2) {
+        msgEl.textContent = '✗ Passwords do not match.';
+        msgEl.className = 'message error';
+        return;
+      }
+      try {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Updating...';
+        msgEl.className = '';
+        const res = await fetch('/api/reset-password', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ token, password: pw })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          msgEl.textContent = '✓ Password updated! Redirecting to login...';
+          msgEl.className = 'message success';
+          setTimeout(() => window.location.href = 'login.html', 1500);
+        } else {
+          msgEl.textContent = '✗ ' + (data.message || 'Unable to reset password.');
+          msgEl.className = 'message error';
+        }
+      } catch (err) {
+        console.error(err);
+        msgEl.textContent = '✗ Network error. Please try again.';
+        msgEl.className = 'message error';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Update Password';
+      }
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+/* Responsive styles for Cali Clear ecommerce site */
+
+/* Tablet */
+@media (max-width: 900px) {
+  .navbar {
+    position: relative;
+    z-index: 1000;
+  }
+  .navbar-main {
+    position: relative;
+  }
+  .navbar-links {
+    display: none !important;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    flex-direction: column;
+    gap: 0;
+    padding: 1rem 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1001;
+  }
+  .navbar-links.active {
+    display: flex !important;
+  }
+  .navbar-links li {
+    width: 100%;
+  }
+  .navbar-links li a {
+    display: block;
+    padding: 0.8rem 1.5rem;
+    width: 100%;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .navbar-toggle {
+    display: flex;
+    z-index: 1002;
+    position: relative;
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .navbar {
+    position: relative;
+    z-index: 1000;
+  }
+  .navbar-main {
+    position: relative;
+    width: 100%;
+  }
+  .navbar-links {
+    display: none !important;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    flex-direction: column;
+    gap: 0;
+    padding: 1rem 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1001;
+  }
+  .navbar-links.active {
+    display: flex !important;
+  }
+  .navbar-links li {
+    width: 100%;
+  }
+  .navbar-links li a {
+    display: block;
+    padding: 0.8rem 1.5rem;
+    width: 100%;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .navbar-toggle {
+    display: flex;
+    z-index: 1002;
+    position: relative;
+  }
+}

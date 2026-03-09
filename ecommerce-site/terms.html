@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<title>Terms & Conditions - Cali Clear</title>
+
+<!-- CSS -->
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="assets/css/animations.css">
+<link rel="stylesheet" href="assets/css/responsive.css">
+<link rel="stylesheet" href="components/assets/css/components.css">
+
+<style>
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #121212;
+  color: #e0e0e0;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 900px;
+  margin: 50px auto;
+  padding: 0 20px;
+}
+
+h1, h2 {
+  color: #ff6f61;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+h2 {
+  margin-top: 30px;
+  margin-bottom: 15px;
+}
+
+p, li {
+  line-height: 1.6;
+  color: #ddd;
+}
+
+ul {
+  padding-left: 20px;
+}
+
+a {
+  color: #ff6f61;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<div id="navbar-placeholder"></div>
+<script>
+fetch('components/navbar.html')
+  .then(res => res.text())
+  .then(data => document.getElementById('navbar-placeholder').innerHTML = data)
+  .catch(err => console.error('Error loading navbar:', err));
+</script>
+
+<!-- Terms Content -->
+<div class="container">
+  <h1>Terms & Conditions</h1>
+  <p>Welcome to <strong>Cali Clear LLC</strong>. By accessing or using our website, you agree to comply with these Terms & Conditions. Please read them carefully.</p>
+
+  <p><strong>Last Updated:</strong> February 13, 2026</p>
+
+  <h2>1. Use of Website</h2>
+  <p>You agree to use this website only for lawful purposes and in accordance with these Terms & Conditions. You must not:</p>
+  <ul>
+    <li>Use the website for any illegal or unauthorized purpose.</li>
+    <li>Attempt to access restricted areas of the website.</li>
+    <li>Upload harmful or malicious content.</li>
+  </ul>
+
+  <h2>2. Products & Orders</h2>
+  <p>All products listed on this website are subject to availability. Prices and descriptions may change without notice. We reserve the right to refuse or cancel any order at our discretion.</p>
+
+  <h2>3. Payment</h2>
+  <p>Payment must be made through the available payment methods on checkout. All transactions are processed securely. We are not responsible for issues arising from third-party payment providers.</p>
+
+  <h2>4. Shipping & Delivery</h2>
+  <p>We will make every effort to deliver your order within the estimated timeframe. Delivery times may vary due to external factors. We are not responsible for delays caused by shipping companies.</p>
+
+  <h2>5. Returns & Refunds</h2>
+  <p>Returns and refunds are subject to our Return Policy. Products must be unused and in original packaging. Please contact our support team for assistance with returns.</p>
+
+  <h2>6. Intellectual Property</h2>
+  <p>All content on this website, including text, images, logos, and design, is owned by Cali Clear and protected by copyright and intellectual property laws.</p>
+
+  <h2>7. Limitation of Liability</h2>
+  <p>Cali Clear is not liable for any direct, indirect, or consequential damages arising from the use of this website, including product use or inability to access the site.</p>
+
+  <h2>8. Changes to Terms</h2>
+  <p>We reserve the right to modify these Terms & Conditions at any time. Changes will be posted on this page, and continued use of the website constitutes acceptance of the updated terms.</p>
+
+  <h2>9. Contact Us</h2>
+  <p>If you have any questions about these Terms & Conditions, please contact us at <a href="mailto:support@caliclear.shop">support@caliclear.shop</a>.</p>
+</div>
+
+<!-- Footer -->
+<div id="footer-placeholder"></div>
+<script>
+fetch('components/footer.html')
+  .then(res => res.text())
+  .then(data => document.getElementById('footer-placeholder').innerHTML = data)
+  .catch(err => console.error('Error loading footer:', err));
+</script>

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <title>About Us - Cali Clear</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="components/assets/css/components.css">
+  <style>
+    /* Hero Section */
+    .about-hero {
+      background: url('assets/images/hero/about-hero.jpg') center/cover no-repeat;
+      height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      text-align: center;
+      position: relative;
+    }
+
+    .about-hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-color: rgba(0,0,0,0.5);
+    }
+
+    .about-hero h1 {
+      position: relative;
+      font-size: 48px;
+      font-weight: bold;
+      z-index: 1;
+    }
+
+    /* About Section */
+    .about-section {
+      max-width: 1200px;
+      margin: 50px auto;
+      padding: 0 20px;
+      display: flex;
+      gap: 40px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .about-text {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .about-text h2 {
+      font-size: 32px;
+      margin-bottom: 20px;
+      color: #ff6f61;
+    }
+
+    .about-text p {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #555;
+    }
+
+    .about-text ul {
+      margin: 1rem 0;
+      padding-left: 1.5rem;
+      color: #555;
+    }
+
+    .about-text li {
+      margin-bottom: 0.5rem;
+    }
+
+    .about-image {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .about-image img {
+      width: 100%;
+      border-radius: 12px;
+    }
+
+    /* Business Info Box */
+    .business-info-box {
+      background: #f5f5f5;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-top: 1.5rem;
+      border-left: 4px solid #ff6f61;
+    }
+
+    .business-info-box h3 {
+      margin-top: 0;
+      color: #ff6f61;
+    }
+
+    .business-info-box p {
+      margin: 0.5rem 0;
+    }
+
+    /* Trust Badge */
+    .trust-badge-large {
+      display: inline-block;
+      background: #4caf50;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+    }
+
+    /* Team Section */
+    .team-section {
+      background-color: #f9f9f9;
+      padding: 50px 20px;
+      text-align: center;
+    }
+
+    .team-section h2 {
+      font-size: 32px;
+      margin-bottom: 30px;
+      color: #ff6f61;
+    }
+
+    .team-cards {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+    }
+
+    .team-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      width: 250px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      transition: 0.3s;
+    }
+
+    .team-card img {
+      width: 100%;
+      border-radius: 50%;
+      margin-bottom: 15px;
+    }
+
+    .team-card h3 {
+      margin: 0 0 10px 0;
+      font-size: 20px;
+      color: #333;
+    }
+
+    .team-card p {
+      margin: 0;
+      font-size: 14px;
+      color: #777;
+    }
+
+    /* Values Section */
+    .values-section {
+      padding: 50px 20px;
+      text-align: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .values-section h2 {
+      font-size: 32px;
+      margin-bottom: 30px;
+      color: #ff6f61;
+    }
+
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+    }
+
+    .value-card {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .value-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .value-card h3 {
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+
+    .value-card p {
+      color: #777;
+      font-size: 14px;
+    }
+
+    /* CTA Section */
+    .about-cta {
+      text-align: center;
+      padding: 40px 20px;
+      background: #f5f5f5;
+    }
+
+    .about-cta h2 {
+      font-size: 28px;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .about-cta a {
+      background-color: #ff6f61;
+      color: #fff;
+      padding: 12px 30px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: 0.3s;
+      display: inline-block;
+    }
+
+    .about-cta a:hover {
+      background-color: #e65c50;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .about-section {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div id="navbar-placeholder"></div>
+  <script>
+    // Load navbar.html dynamically
+    fetch('components/navbar.html')
+      .then(response => response.text())
+      .then(data => document.getElementById('navbar-placeholder').innerHTML = data);
+  </script>
+
+  <!-- Hero Section -->
+  <section class="about-hero">
+    <h1>About Cali Clear</h1>
+  </section>
+
+  <!-- About Section -->
+  <section class="about-section">
+    <div class="about-text">
+      <h2>About Cali Clear</h2>
+      <p><strong>Cali Clear LLC</strong> is a registered business based in California, USA. We are dedicated to providing premium quality products with honesty, transparency, and exceptional customer service.</p>
+      <p>Founded in 2024, we have built a reputation for reliability and quality. Every product we offer goes through rigorous quality control to ensure it meets our high standards.</p>
+      <p><strong>Our Commitment to You:</strong></p>
+      <ul>
+        <li>Premium quality products</li>
+        <li>Secure payment processing</li>
+        <li>Fast & reliable shipping</li>
+        <li>100% customer satisfaction</li>
+        <li>Dedicated support team</li>
+      </ul>
+      
+      <!-- Business Info -->
+      <div class="business-info-box">
+        <h3>Business Information</h3>
+        <p><strong>Company:</strong> Cali Clear LLC</p>
+        <p><strong>Location:</strong> Los Angeles, California, USA</p>
+        <p><strong>Email:</strong> support@caliclear.shop</p>
+        <p><strong>Phone:</strong> (555) 123-4567</p>
+        <p><strong>Hours:</strong> Mon-Fri 9am-6pm PST</p>
+        <p><strong>Registration:</strong> Registered in California, USA</p>
+      </div>
+    </div>
+    <div class="about-image">
+      <img src="assets/images/hero/about-hero.jpg" alt="About Cali Clear">
+      <div style="text-align: center;">
+        <span class="trust-badge-large">Licensed & Registered Business</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Values Section -->
+  <section class="values-section">
+    <h2>Why Choose Cali Clear?</h2>
+    <div class="values-grid">
+      <div class="value-card">
+        <div class="value-icon">🔒</div>
+        <h3>Secure Payments</h3>
+        <p>All transactions are encrypted and processed securely through Stripe</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon">✓</div>
+        <h3>Quality Guaranteed</h3>
+        <p>Every product is quality tested before shipping</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon">🚚</div>
+        <h3>Fast Shipping</h3>
+        <p>Quick and reliable delivery to your doorstep</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon">💬</div>
+        <h3>24/7 Support</h3>
+        <p>Our team is here to help anytime</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="about-cta">
+    <h2>Ready to Shop Our Products?</h2>
+    <a href="shop.html">Visit Shop</a>
+  </section>
+
+  <!-- Footer -->
+  <div id="footer-placeholder"></div>
+  <script>
+    // Load footer.html dynamically
+    fetch('components/footer.html')
+      .then(response => response.text())
+      .then(data => document.getElementById('footer-placeholder').innerHTML = data);
+  </script>
+
+</body>
+</html>

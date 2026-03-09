@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toast Notification Demo</title>
+
+  <!-- CSS -->
+  <style>
+    /* Toast Container */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Individual Toast */
+    .toast {
+      min-width: 250px;
+      max-width: 300px;
+      padding: 15px 20px;
+      background-color: #1a1a1a;
+      color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      animation: slideIn 0.5s ease forwards;
+      opacity: 0;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+
+    .toast.success {
+      border-left: 5px solid #4CAF50;
+    }
+
+    .toast.error {
+      border-left: 5px solid #ff4d4d;
+    }
+
+    .toast-info {
+      border-left: 5px solid #2196F3;
+    }
+
+    .toast-message {
+      flex: 1;
+      font-size: 14px;
+    }
+
+    .toast-close {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+    /* Animation */
+    @keyframes slideIn {
+      0% { transform: translateX(100%); opacity: 0; }
+      100% { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes slideOut {
+      0% { transform: translateX(0); opacity: 1; }
+      100% { transform: translateX(100%); opacity: 0; }
+    }
+
+    /* Demo Product Cards */
+    .product-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .product-card {
+      background-color: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: 0.3s;
+      display: flex;
+      flex-direction: column;
+      width: 250px;
+      position: relative;
+    }
+
+    .product-image img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .wishlist-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #fff;
+      border: none;
+      border-radius: 50%;
+      padding: 6px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .product-info {
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .product-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0;
+      color: #333;
+    }
+
+    .product-price {
+      font-size: 18px;
+      font-weight: bold;
+      color: #ff6f61;
+    }
+
+    .add-to-cart-btn {
+      padding: 10px;
+      background-color: #ff6f61;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: 0.3s;
+    }
+
+    .add-to-cart-btn:hover {
+      background-color: #e65c50;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Demo Product Grid -->
+  <div class="product-grid" id="product-grid">
+    <!-- Dynamic product cards will render here -->
+  </div>
+
+  <!-- JS -->
+  <script>
+    // Toast Function
+    function showToast(message, type = "success", duration = 3000) {
+      const container = document.getElementById("toast-container");
+
+      const toast = document.createElement("div");
+      toast.classList.add("toast", type);
+      toast.innerHTML = `
+        <div class="toast-message">${message}</div>
+        <button class="toast-close">&times;</button>
+      `;
+
+      container.appendChild(toast);
+
+      // Show toast
+      setTimeout(() => toast.classList.add("show"), 50);
+
+      // Remove toast
+      const hideToast = () => {
+        toast.style.animation = "slideOut 0.5s forwards";
+        setTimeout(() => container.removeChild(toast), 500);
+      };
+
+      toast.querySelector(".toast-close").addEventListener("click", hideToast);
+      setTimeout(hideToast, duration);
+    }
+
+    // Demo Products Array
+    const products = [
+      { id: 1, name: "Cali Clear Vape", price: 49.99, image: "assets/images/products/product1.jpg" },
+      { id: 2, name: "Disposable Vape Pen", price: 29.99, image: "assets/images/products/product2.jpg" },
+      { id: 3, name: "Fruit Flavored Vape", price: 39.99, image: "assets/images/products/product3.jpg" },
+      { id: 4, name: "Mint Disposable Vape", price: 24.99, image: "assets/images/products/product4.jpg" }
+    ];
+
+    const productGrid = document.getElementById("product-grid");
+
+    // Render Product Cards
+    function renderProducts() {
+      products.forEach(product => {
+        const card = document.createElement("div");
+        card.classList.add("product-card");
+        card.innerHTML = `
+          <div class="product-image">
+            <img src="${product.image}" alt="${product.name}">
+            <button class="wishlist-btn" aria-label="Add to Wishlist">
+              <img src="assets/images/icons/heart.svg" alt="Wishlist">
+            </button>
+          </div>
+          <div class="product-info">
+            <h3 class="product-title">${product.name}</h3>
+            <div class="product-price">$${product.price.toFixed(2)}</div>
+            <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
+          </div>
+        `;
+        productGrid.appendChild(card);
+      });
+
+      // Add to Cart & Wishlist Events
+      document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          showToast("Product added to cart!", "success");
+        });
+      });
+
+      document.querySelectorAll(".wishlist-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          showToast("Product added to wishlist!", "info");
+        });
+      });
+    }
+
+    renderProducts();
+  </script>
+</body>
+</html>

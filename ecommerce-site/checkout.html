@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Checkout - Cali Clear</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="components/assets/css/components.css">
+
+<style>
+body{
+  background:#121212;
+  color:#eee;
+  font-family:Poppins,Arial,sans-serif;
+ }
+
+.checkout-container{
+  max-width:1200px;
+  margin:50px auto;
+  padding:20px;
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:30px;
+ }
+
+.box{
+  background:#1e1e1e;
+  padding:25px;
+  border-radius:12px;
+ }
+
+h2{
+  color:#ff6f61;
+  margin-bottom:20px;
+ }
+
+label{font-size:14px;font-weight:600;display:block;margin-bottom:5px}
+input{
+  width:100%;
+  padding:12px;
+  margin:8px 0 15px;
+  background:#2a2a2a;
+  border:none;
+  border-radius:8px;
+  color:#fff;
+  box-sizing:border-box;
+ }
+
+.row{display:flex;gap:15px}
+.row > div{flex:1}
+
+.payment-option{
+  border:1px solid #333;
+  padding:12px;
+  border-radius:8px;
+  margin-bottom:10px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:10px;
+ }
+
+.payment-option.active{
+  border-color:#ff6f61;
+  background:#2a1c1a;
+ }
+
+.payment-option input{accent-color:#ff6f61;width:auto;margin:0}
+
+.pay-section{margin-top:15px}
+.hidden{display:none}
+
+.btn{
+  background:#ff6f61;
+  color:#fff;
+  border:none;
+  padding:14px;
+  width:100%;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:16px;
+  transition:0.3s;
+ }
+
+.btn:hover{background:#ff4a3b}
+.btn:disabled{background:#666;cursor:not-allowed}
+
+.apple{background:#000}
+.google{background:#4285f4}
+
+.crypto-box{text-align:center}
+.crypto-box img{width:150px;margin:10px auto}
+
+.summary p{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:10px;
+ }
+
+.summary strong{font-size:18px}
+
+#toast-container{
+  position:fixed;
+  top:20px;
+  right:20px;
+  z-index:9999;
+ }
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  display:none;
+  align-items:center;
+  justify-content:center;
+ }
+
+.modal-content{
+  background:#1e1e1e;
+  padding:30px;
+  border-radius:12px;
+  text-align:center;
+  max-width:400px;
+ }
+.modal-content h2{color:#4CAF50}
+
+.order-items-list{
+  text-align:left;
+  margin:15px 0;
+  padding:10px;
+  background:#2a2a2a;
+  border-radius:8px;
+ }
+.order-items-list p{
+  display:flex;
+  justify-content:space-between;
+  margin:5px 0;
+ }
+
+@media (max-width: 768px) {
+  .checkout-container{grid-template-columns:1fr}
+ }
+</style>
+</head>
+
+<body>
+
+<!-- SSL Notice Banner -->
+<div style="background:#4caf50;color:#fff;padding:8px;text-align:center;font-size:13px;">
+  🔒 <strong>Secure Checkout</strong> - Your connection is SSL encrypted and PCI compliant
+</div>
+
+<!-- TOAST -->
+<div id="toast-container"></div>
+
+<!-- NAVBAR -->
+<div id="navbar-placeholder"></div>
+<script>
+fetch('components/navbar.html')
+  .then(r => r.text())
+  .then(d => {
+    document.getElementById('navbar-placeholder').innerHTML = d;
+    if (typeof updateAuthUI === 'function') updateAuthUI();
+  });
+</script>
+
+<div class="checkout-container">
+
+<!-- LEFT -->
+<form id="checkout-form" class="box">
+<h2>Billing Details</h2>
+
+<label>Full Name</label>
+<input type="text" id="fullName" required placeholder="John Doe">
+
+<label>Email</label>
+<input type="email" id="email" required placeholder="john@example.com">
+
+<label>Address</label>
+<input type="text" id="address" required placeholder="123 Main St">
+
+<div class="row">
+  <div>
+    <label>City</label>
+    <input type="text" id="city" required placeholder="City">
+  </div>
+  <div>
+    <label>ZIP Code</label>
+    <input type="text" id="zip" required placeholder="12345">
+  </div>
+</div>
+
+<h2>Payment Method</h2>
+
+<!-- Payment Icons Row -->
+<div class="payment-icons" style="display:flex;gap:8px;margin-bottom:15px;flex-wrap:wrap;">
+  <img src="assets/images/payments/visa.png" alt="Visa" title="Visa" style="height:24px;" onerror="this.style.display='none'">
+  <img src="assets/images/payments/mastercard.png" alt="Mastercard" title="Mastercard" style="height:24px;" onerror="this.style.display='none'">
+  <img src="assets/images/payments/amex.png" alt="American Express" title="American Express" style="height:24px;" onerror="this.style.display='none'">
+  <img src="assets/images/payments/discover.png" alt="Discover" title="Discover" style="height:24px;" onerror="this.style.display='none'">
+  <img src="assets/images/payments/paypal.png" alt="PayPal" title="PayPal" style="height:24px;" onerror="this.style.display='none'">
+  <img src="assets/images/payments/applepay.png" alt="Apple Pay" title="Apple Pay" style="height:24px;" onerror="this.style.display='none'">
+</div>
+
+<!-- Payment Method Options -->
+<div class="payment-methods">
+  <div class="payment-option active" data-pay="card">
+    <input type="radio" name="pay" value="card" checked> Credit / Debit Card
+  </div>
+  
+  <div class="payment-option" data-pay="paypal">
+    <input type="radio" name="pay" value="paypal"> PayPal
+  </div>
+  
+  <div class="payment-option" data-pay="applepay">
+    <input type="radio" name="pay" value="applepay"> Apple Pay
+  </div>
+  
+  <div class="payment-option" data-pay="googlepay">
+    <input type="radio" name="pay" value="googlepay"> Google Pay
+  </div>
+  
+  <div class="payment-option" data-pay="afterpay">
+    <input type="radio" name="pay" value="afterpay"> Afterpay / Clearpay
+  </div>
+  
+  <div class="payment-option" data-pay="klarna">
+    <input type="radio" name="pay" value="klarna"> Klarna
+  </div>
+  
+  <div class="payment-option" data-pay="bank">
+    <input type="radio" name="pay" value="bank"> Bank Transfer (ACH / SEPA)
+  </div>
+
+
+<!-- CARD PAYMENT SECTION -->
+<div id="card" class="pay-section">
+  <label>Card Number</label>
+  <input type="text" id="cardNumber" placeholder="4242 4242 4242 4242" maxlength="19">
+  
+  <label>Name on Card</label>
+  <input type="text" id="cardName" placeholder="John Doe">
+  
+  <div class="row">
+    <div>
+      <label>Expiry (MM/YY)</label>
+      <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5">
+    </div>
+    <div>
+      <label>CVV</label>
+      <input type="text" id="cardCvc" placeholder="123" maxlength="4">
+    </div>
+  </div>
+  <p id="cardBrand" style="color:#ff6f61;font-size:14px;"></p>
+  <p style="font-size:12px;color:#888;margin-top:10px;">We accept: Visa, Mastercard, American Express, Discover</p>
+</div>
+
+<div id="paypal" class="pay-section hidden">
+  <p>You will be redirected to PayPal to complete your payment securely.</p>
+  <img src="assets/images/payments/paypal.png" alt="PayPal" style="height:40px;margin-top:10px;" onerror="this.style.display='none'">
+</div>
+
+<div id="applepay" class="pay-section hidden">
+  <p>Click the button below to pay with Apple Pay.</p>
+  <button type="button" class="btn apple" onclick="processApplePay()">Pay with Apple Pay</button>
+  <img src="assets/images/payments/applepay.png" alt="Apple Pay" style="height:40px;margin-top:10px;" onerror="this.style.display='none'">
+</div>
+
+<div id="googlepay" class="pay-section hidden">
+  <p>Click the button below to pay with Google Pay.</p>
+  <button type="button" class="btn google" onclick="processGooglePay()">Pay with Google Pay</button>
+</div>
+
+<div id="afterpay" class="pay-section hidden">
+  <p>Pay in 4 interest-free installments of <strong id="afterpay-amount">$0.00</strong></p>
+  <p style="font-size:12px;color:#888;">Afterpay is available for orders between $35-$1,500</p>
+</div>
+
+<div id="klarna" class="pay-section hidden">
+  <p>Pay later with Klarna - Pay in 30 days or installments.</p>
+  <p style="font-size:12px;color:#888;">Klarna is available for orders between $35-$1,000</p>
+</div>
+
+<div id="bank" class="pay-section hidden">
+  <p>Pay directly from your bank account.</p>
+  <label>Select Bank Region:</label>
+  <select id="bank-region" style="width:100%;padding:12px;margin:8px 0 15px;background:#2a2a2a;border:none;border-radius:8px;color:#fff;">
+    <option value="ach">ACH (US Banks)</option>
+    <option value="sepa">SEPA (European Banks)</option>
+    <option value="bacs">BACS (UK Banks)</option>
+  </select>
+  <p style="font-size:12px;color:#888;">Bank transfers may take 2-5 business days to process.</p>
+</div>
+
+
+
+<h2>Coupon Code</h2>
+<input id="coupon" placeholder="SAVE10">
+<button type="button" class="btn" id="applyCoupon" style="margin-top:10px;">Apply Coupon</button>
+<p id="couponMsg" style="font-size:14px;margin-top:10px;"></p>
+
+<button type="submit" class="btn" id="placeOrder" style="margin-top:20px;">Place Order & Pay</button>
+</form>
+
+<!-- RIGHT -->
+<div class="box summary">
+<h2>Order Summary</h2>
+<div id="order-summary">
+  <p>Loading...</p>
+</div>
+<hr style="border-color:#333;margin:15px 0;">
+<p><span>Subtotal</span><span id="subtotal">$0.00</span></p>
+<p><span>Tax (10%)</span><span id="tax">$0.00</span></p>
+<p><span>Discount</span><span id="discount" style="color:#43a047;">$0.00</span></p>
+<hr style="border-color:#333;margin:15px 0;">
+<p><strong>Total</strong><strong id="total">$0.00</strong></p>
+</div>
+
+</div>
+
+</div>
+
+<!-- FOOTER -->
+<div id="footer-placeholder"></div>
+<script>
+fetch('components/footer.html')
+  .then(r => r.text())
+  .then(d => document.getElementById('footer-placeholder').innerHTML = d);
+</script>
+
+<!-- SUCCESS MODAL -->
+<div class="modal" id="successModal">
+  <div class="modal-content">
+    <h2>Payment Successful 🎉</h2>
+    <div id="orderConfirmDetails"></div>
+    <button class="btn" onclick="window.location.href='order-success.html'">View Order</button>
+  </div>
+</div>
+
+<!-- SCRIPTS -->
+<script src="https://js.stripe.com/v3/"></script>
+<script src="assets/js/toast.js"></script>
+<script src="assets/js/payment.js"></script>
+<script src="assets/js/checkout.js"></script>
+<script>
+// Global checkout functionality
+const API_URL = '/api';
+
+let cartItems = [];
+let discount = 0;
+let couponApplied = false;
+
+// Initialize Stripe config on page load
+async function initPayment() {
+    if (typeof initStripeConfig === 'function') {
+        await initStripeConfig();
+        console.log('Stripe config initialized');
+    }
+}
+
+// Run on page load
+initPayment();
+
+// Get authentication headers
+function getAuthHeaders() {
+    const token = localStorage.getItem('access_token');
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': token ? `Bearer ${token}` : ''
+    };
+}
+
+// Load cart from API or localStorage
+async function loadCart() {
+  try {
+    const response = await fetch(`${API_URL}/cart`);
+    if (response.ok) {
+      const data = await response.json();
+      cartItems = data.data || [];
+    }
+  } catch (error) {
+    // Fallback to localStorage
+    cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
+  }
+  renderOrderSummary();
+}
+
+// Render order summary
+function renderOrderSummary() {
+  const orderItems = document.getElementById('order-summary');
+  
+  if (!cartItems.length) {
+    orderItems.innerHTML = '<p>Your cart is empty</p>';
+    document.getElementById('subtotal').textContent = '$0.00';
+    document.getElementById('tax').textContent = '$0.00';
+    document.getElementById('total').textContent = '$0.00';
+    return;
+  }
+  
+  let subtotal = 0;
+  let html = '<div class="order-items-list">';
+  
+  cartItems.forEach(item => {
+    const itemTotal = item.price * item.quantity;
+    subtotal += itemTotal;
+    html += `<p><span>${item.name} x${item.quantity}</span><span>$${itemTotal.toFixed(2)}</span></p>`;
+  });
+  
+  html += '</div>';
+  orderItems.innerHTML = html;
+  
+  const tax = subtotal * 0.10;
+  const total = subtotal - discount + tax;
+  
+  document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
+  document.getElementById('tax').textContent = `$${tax.toFixed(2)}`;
+  document.getElementById('total').textContent = `$${total.toFixed(2)}`;
+  
+  // Update order-total for payment
+  window.orderTotal = total;
+  
+  // Update Afterpay amount
+  const afterpayEl = document.getElementById('afterpay-amount');
+  if (afterpayEl) {
+    afterpayEl.textContent = '$' + (total / 4).toFixed(2) + ' x4';
+  }
+}
+
+// Apply coupon
+document.getElementById('applyCoupon')?.addEventListener('click', function() {
+  const code = document.getElementById('coupon').value.trim().toUpperCase();
+  const couponMsg = document.getElementById('couponMsg');
+  
+  if (code === 'SAVE10') {
+    discount = 10;
+    couponApplied = true;
+    couponMsg.textContent = '10% discount applied!';
+    couponMsg.style.color = 'green';
+  } else {
+    discount = 0;
+    couponApplied = false;
+    couponMsg.textContent = 'Invalid coupon code';
+    couponMsg.style.color = 'red';
+  }
+  renderOrderSummary();
+});
+
+// Payment method switching
+document.querySelectorAll('.payment-option').forEach(opt => {
+  opt.onclick = () => {
+    document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('active'));
+    opt.classList.add('active');
+    opt.querySelector('input').checked = true;
+    
+    document.querySelectorAll('.pay-section').forEach(s => s.classList.add('hidden'));
+    const payType = opt.dataset.pay;
+    const section = document.getElementById(payType);
+    if (section) section.classList.remove('hidden');
+  };
+});
+
+// Card number formatting
+document.getElementById('cardNumber')?.addEventListener('input', function(e) {
+  let value = e.target.value.replace(/\s/g, '').replace(/\D/g, '');
+  value = value.match(/.{1,4}/g)?.join(' ') || value;
+  e.target.value = value;
+  
+  const brand = document.getElementById('cardBrand');
+  if (value.startsWith('4')) brand.textContent = 'Visa';
+  else if (value.startsWith('5')) brand.textContent = 'Mastercard';
+  else if (value.startsWith('3')) brand.textContent = 'Amex';
+  else brand.textContent = '';
+});
+
+// Expiry formatting
+document.getElementById('cardExpiry')?.addEventListener('input', function(e) {
+  let value = e.target.value.replace(/\D/g, '');
+  if (value.length >= 2) {
+    value = value.substring(0, 2) + '/' + value.substring(2, 4);
+  }
+  e.target.value = value;
+});
+
+// Clear cart and show success modal
+function clearCartAndShowSuccess(orderId) {
+  localStorage.removeItem('cart');
+  document.cookie = 'cart_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+  
+  document.getElementById('successModal').style.display = 'flex';
+  document.getElementById('orderConfirmDetails').innerHTML = `
+    <p>Order ID: ${orderId}</p>
+    <p>Amount: $${window.orderTotal?.toFixed(2) || '0.00'}</p>
+    <p style="color:#43a047;">Payment successful!</p>
+  `;
+}
+
+// Form submission
+document.getElementById('checkout-form')?.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const submitBtn = document.getElementById('placeOrder');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Processing...';
+  
+  try {
+    const email = document.getElementById('email').value.trim();
+    const fullName = document.getElementById('fullName').value.trim();
+    const address = document.getElementById('address').value.trim();
+    const city = document.getElementById('city').value.trim();
+    const zip = document.getElementById('zip').value.trim();
+    const paymentMethod = document.querySelector('input[name="pay"]:checked').value;
+    
+    // Create order payload with cart items
+    const orderPayload = {
+      email: email,
+      customer_name: fullName,
+      shipping_address: address,
+      city: city,
+      zip_code: zip,
+      items: cartItems.map(item => ({
+        product_id: item.id || item.product_id,
+        quantity: item.quantity || item.qty,
+        price: item.price
+      })),
+      total: window.orderTotal || 0
+    };
+    
+    // Create order with auth headers
+    const orderResponse = await fetch(`${API_URL}/orders`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(orderPayload)
+    });
+    
+    if (!orderResponse.ok) {
+      throw new Error('Failed to create order');
+    }
+    
+    const orderData = await orderResponse.json();
+    const orderId = orderData.data.order_id;
+    
+    // Process payment based on method
+    switch (paymentMethod) {
+      case 'card': {
+        const cardNumber = document.getElementById('cardNumber').value;
+        const expiry = document.getElementById('cardExpiry').value;
+        const cvc = document.getElementById('cardCvc').value;
+        const name = document.getElementById('cardName').value;
+        
+        const paymentResult = await PaymentUtils.processPayment({
+          cardNumber: cardNumber,
+          expiry: expiry,
+          cvc: cvc,
+          name: name,
+          amount: window.orderTotal
+        });
+        
+        if (paymentResult.success) {
+          clearCartAndShowSuccess(orderId);
+        } else {
+          throw new Error(paymentResult.message || 'Payment failed');
+        }
+        break;
+      }
+      
+      case 'paypal': {
+        showToast('Redirecting to PayPal...');
+        // For demo, simulate success
+        const paymentResult = await PaymentUtils.simulatePayment('demo_secret', { method: 'paypal' });
+        if (paymentResult.success) {
+          clearCartAndShowSuccess(orderId);
+        }
+        break;
+      }
+      
+      case 'applepay': {
+        const paymentResult = await PaymentUtils.processApplePay();
+        if (paymentResult.success) {
+          clearCartAndShowSuccess(orderId);
+        }
+        break;
+      }
+      
+      case 'googlepay': {
+        const paymentResult = await PaymentUtils.processGooglePay();
+        if (paymentResult.success) {
+          clearCartAndShowSuccess(orderId);
+        }
+        break;
+      }
+      
+      case 'afterpay': {
+        const paymentResult = await PaymentUtils.processAfterpay();
+        if (paymentResult.success) {
+          clearCartAndShowSuccess(orderId);
+        }
+        break;
+      }
+      
+      case 'klarna': {
+        const paymentResult = await PaymentUtils.processKlarna();
+        if (paymentResult.success) {
+          clearCartAndShowSuccess(orderId);
+        }
+        break;
+      }
+      
+      case 'bank': {
+        const paymentResult = await PaymentUtils.processBankTransfer();
+        if (paymentResult.success) {
+          clearCartAndShowSuccess(orderId);
+        }
+        break;
+      }
+      
+      default:
+        throw new Error('Unsupported payment method');
+    }
+  } catch (error) {
+    showToast(error.message || 'An error occurred');
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Place Order & Pay';
+  }
+});
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+  loadCart();
+  
+  // Load footer with chat
+  fetch('components/footer.html')
+    .then(res => res.text())
+    .then(html => {
+      const footer = document.createElement('footer');
+      footer.innerHTML = html;
+      document.body.appendChild(footer);
+      // Initialize chat after footer loads
+      initChat();
+    })
+    .catch(err => console.error('Error loading footer:', err));
+});
+
+// Chat initialization function
+function initChat() {
+  const bubble = document.getElementById('chat-bubble');
+  const panel = document.getElementById('chat-panel');
+  const input = document.getElementById('chat-input');
+  const messages = document.getElementById('chat-messages');
+
+  if (!bubble || !panel || !input || !messages) return;
+
+  bubble.addEventListener('click', () => {
+    panel.classList.toggle('hidden');
+    if (!panel.classList.contains('hidden')) {
+      input.focus();
+    }
+  });
+
+  input.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    const text = e.target.value.trim();
+    if (!text) return;
+    messages.innerHTML += `<div class="user-msg">${text}</div>`;
+    e.target.value = '';
+    let reply = "Sorry, I didn't understand that. Type \"agent\" to contact us.";
+    const lc = text.toLowerCase();
+    if (lc.includes('return')) reply = 'You can return items within 30 days. Check our FAQ for details.';
+    else if (lc.includes('shipping')) reply = 'Standard shipping takes 5–7 business days.';
+    else if (lc.includes('order')) reply = 'Your order is being processed. Use the tracking page with your order number.';
+    else if (lc.includes('agent') || lc.includes('human')) {
+      reply = 'Click here to email support: <a href="mailto:support@caliclear.shop">support@caliclear.shop</a>';
+    }
+    messages.innerHTML += `<div class="bot-msg">${reply}</div>`;
+    messages.scrollTop = messages.scrollHeight;
+  });
+}
+</script>
+
+</body>
+</html>

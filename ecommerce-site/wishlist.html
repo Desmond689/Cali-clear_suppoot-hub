@@ -1,0 +1,187 @@
+    <script src="assets/js/toast.js"></script>
+  <div id="footer-include"></div>
+
+  <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<title>Wishlist - Cali Clear</title>
+
+<!-- CSS -->
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="assets/css/animations.css">
+<link rel="stylesheet" href="assets/css/responsive.css">
+<link rel="stylesheet" href="components/assets/css/components.css">
+
+<style>
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #121212;
+  color: #e0e0e0;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 50px auto;
+  padding: 0 20px;
+}
+
+/* Wishlist Heading */
+h1 {
+  color: #ff6f61;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+/* Wishlist Grid */
+.wishlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+/* Product Card */
+.product-card {
+  background: #1e1e1e;
+  border-radius: 12px;
+  padding: 15px;
+  text-align: center;
+  transition: 0.3s;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 20px rgba(255,111,97,0.3);
+}
+
+.product-card img {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.product-card h3 {
+  font-size: 16px;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.product-card p.price {
+  color: #ff6f61;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+/* Buttons */
+.product-card button {
+  background: #ff6f61;
+  color: #fff;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin: 5px 0;
+  width: 100%;
+  transition: 0.3s;
+}
+
+.product-card button:hover {
+  background: #ff4a3b;
+}
+
+.product-card .remove-btn {
+  background: transparent;
+  border: 2px solid #ff6f61;
+  color: #ff6f61;
+}
+
+.product-card .remove-btn:hover {
+  background: #ff6f61;
+  color: #fff;
+}
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<div id="navbar-placeholder"></div>
+<script>
+fetch('components/navbar.html')
+  .then(res => res.text())
+  .then(data => document.getElementById('navbar-placeholder').innerHTML = data)
+  .catch(err => console.error('Error loading navbar:', err));
+</script>
+
+<!-- Wishlist Content -->
+<div class="container">
+  <h1>My Wishlist</h1>
+
+  <div class="wishlist-grid" id="wishlist-grid">
+    <!-- Wishlist items rendered here -->
+  </div>
+</div>
+
+<!-- Footer -->
+<div id="footer-placeholder"></div>
+<script>
+fetch('components/footer.html')
+  .then(res => res.text())
+  .then(data => document.getElementById('footer-placeholder').innerHTML = data)
+  .catch(err => console.error('Error loading footer:', err));
+</script>
+
+<!-- JS: Wishlist Logic -->
+<script>
+// Mock wishlist data
+let wishlist = [
+  {id:1, name:"Cart Flavor 1", price:15, img:"assets/images/products/product1.jpg"},
+  {id:2, name:"Cart Flavor 2", price:18, img:"assets/images/products/product2.jpg"},
+  {id:3, name:"Cart Flavor 3", price:20, img:"assets/images/products/product3.jpg"}
+];
+
+// Render Wishlist Items
+function renderWishlist() {
+  const grid = document.getElementById('wishlist-grid');
+  grid.innerHTML = '';
+  if(wishlist.length === 0){
+    grid.innerHTML = `<p style="text-align:center; color:#aaa;">Your wishlist is empty.</p>`;
+    return;
+  }
+  wishlist.forEach(item => {
+    grid.innerHTML += `
+      <div class="product-card">
+        <img src="${item.img}" alt="${item.name}">
+        <h3>${item.name}</h3>
+        <p class="price">$${item.price.toFixed(2)}</p>
+        <button onclick="moveToCart('${item.name}')">Move to Cart</button>
+        <button class="remove-btn" onclick="removeFromWishlist('${item.name}')">Remove</button>
+      </div>
+    `;
+  });
+}
+
+// Remove Item
+function removeFromWishlist(name){
+  wishlist = wishlist.filter(item => item.name !== name);
+  renderWishlist();
+  showToast(`${name} removed from wishlist!`);
+}
+
+// Move to Cart (UI only)
+function moveToCart(name){
+  showToast(`${name} moved to cart!`);
+  removeFromWishlist(name);
+}
+
+// Initial render
+renderWishlist();
+</script>
+
+</body>
+</html>

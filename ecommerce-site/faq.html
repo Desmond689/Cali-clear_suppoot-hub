@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<title>FAQ - Cali Clear</title>
+
+<!-- CSS -->
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="components/assets/css/components.css">
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background: #f7f7f7;
+    margin:0;
+    padding:0;
+}
+
+.hero-faq{
+    background: url('assets/images/hero/hero1.jpg') center/cover no-repeat;
+    height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    position: relative;
+    text-align: center;
+}
+
+.hero-faq::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.hero-faq h1{
+    position: relative;
+    font-size: 42px;
+    font-weight:bold;
+}
+
+.faq-container{
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.accordion{
+    background:#fff;
+    border-radius:8px;
+    margin-bottom:15px;
+    padding:15px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.1);
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.accordion:hover{
+    background:#fff3f1;
+}
+
+.accordion h3{
+    margin:0;
+    font-size:18px;
+    color:#ff6f61;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.accordion h3::after{
+    content:'+';
+    font-size:22px;
+    color:#ff6f61;
+}
+
+.accordion.active h3::after{
+    content:'-';
+}
+
+.panel{
+    max-height:0;
+    overflow:hidden;
+    transition: max-height 0.3s ease;
+    font-size:14px;
+    margin-top:10px;
+    color:#333;
+}
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<div id="navbar-placeholder"></div>
+<script>
+fetch('components/navbar.html').then(res=>res.text()).then(data=>{
+    document.getElementById('navbar-placeholder').innerHTML=data;
+});
+</script>
+
+<!-- Hero Section -->
+<section class="hero-faq">
+<h1>Frequently Asked Questions</h1>
+</section>
+
+<!-- FAQ Content -->
+<div class="faq-container">
+
+<div class="accordion">
+    <h3>How do I place an order?</h3>
+    <div class="panel">
+        <p>To place an order, browse products, add them to your cart, and proceed to checkout. Fill in your shipping and payment details, then confirm your order.</p>
+    </div>
+</div>
+
+<div class="accordion">
+    <h3>What payment methods do you accept?</h3>
+    <div class="panel">
+        <p>We accept Credit/Debit Cards, PayPal, Apple Pay, Google Pay, Crypto (BTC, ETH, USDT), and Bank Transfer.</p>
+    </div>
+</div>
+
+<div class="accordion">
+    <h3>Can I track my order?</h3>
+    <div class="panel">
+        <p>Yes! Once your order is confirmed, you will receive a tracking number via email to track your shipment.</p>
+    </div>
+</div>
+
+<div class="accordion">
+    <h3>What is your return policy?</h3>
+    <div class="panel">
+        <p>You can return products within 14 days of delivery. The items must be unused and in original packaging. Contact support for a return authorization.</p>
+    </div>
+</div>
+
+<div class="accordion">
+    <h3>Do you offer international shipping?</h3>
+    <div class="panel">
+        <p>Currently, we ship only within the USA. International shipping will be available soon.</p>
+    </div>
+</div>
+
+<div class="accordion">
+    <h3>How can I apply a coupon code?</h3>
+    <div class="panel">
+        <p>On checkout, enter your coupon code in the gift card/coupon field and click Apply. If valid, your discount will be applied to your order summary.</p>
+    </div>
+</div>
+
+</div>
+
+<!-- Footer -->
+<div id="footer-placeholder"></div>
+<script>
+fetch('components/footer.html').then(res=>res.text()).then(data=>{
+    document.getElementById('footer-placeholder').innerHTML=data;
+});
+</script>
+
+<script>
+// Accordion functionality
+const accordions = document.querySelectorAll(".accordion");
+accordions.forEach(acc=>{
+    acc.addEventListener("click", ()=>{
+        acc.classList.toggle("active");
+        const panel = acc.querySelector(".panel");
+        if(acc.classList.contains("active")){
+            panel.style.maxHeight = panel.scrollHeight + "px";
+        } else {
+            panel.style.maxHeight = null;
+        }
+    });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,4 @@
+- [x] Remove hardcoded product cards from index.html Featured Products section
+- [x] Add id="products-grid" to the products-grid div in index.html
+- [x] Add script to index.html to fetch all products from product.json and render them dynamically, removing flavor parts from names
+- [x] Test the changes by running the site

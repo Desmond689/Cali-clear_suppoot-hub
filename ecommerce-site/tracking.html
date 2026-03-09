@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <title>Track Your Order - Cali Clear</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="components/assets/css/components.css">
+    
+    <style>
+        :root {
+            --primary: #ff6f61;
+            --success: #43A047;
+            --warning: #FF9800;
+            --error: #f44336;
+            --info: #2196F3;
+            --dark: #121212;
+            --card: #1e1e1e;
+            --border: #333;
+            --text: #e0e0e0;
+            --text-muted: #888;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--dark);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        /* Container */
+        .tracking-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .tracking-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .tracking-header h1 {
+            color: var(--primary);
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        
+        .tracking-header p {
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+        
+        /* Alert Messages */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert.error {
+            background: rgba(244, 67, 54, 0.15);
+            border: 1px solid var(--error);
+            color: #ff8a80;
+        }
+        
+        .alert.warning {
+            background: rgba(255, 152, 0, 0.15);
+            border: 1px solid var(--warning);
+            color: #ffb74d;
+        }
+        
+        .alert.success {
+            background: rgba(67, 160, 71, 0.15);
+            border: 1px solid var(--success);
+            color: #81c784;
+        }
+        
+        .alert-icon {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        
+        /* Search Section */
+        .tracking-search {
+            background: var(--card);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+        }
+        
+        .tracking-search h3 {
+            margin-bottom: 20px;
+            color: #fff;
+            font-size: 18px;
+        }
+        
+        .search-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .search-row input {
+            flex: 1;
+            min-width: 200px;
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #2a2a2a;
+            color: #fff;
+            font-size: 15px;
+            transition: border-color 0.2s;
+        }
+        
+        .search-row input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .search-row input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .search-row button {
+            padding: 14px 28px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .search-row button:hover {
+            background: #ff4a3b;
+            transform: translateY(-1px);
+        }
+        
+        .search-row button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .search-row button .spinner {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .tracking-hint {
+            margin-top: 12px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        
+        /* Order Result */
+        .order-result {
+            display: none;
+        }
+        
+        /* Order Overview Card */
+        .order-overview {
+            background: var(--card);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+        }
+        
+        .order-header {
+            background: #252525;
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .order-header-left h3 {
+            margin: 0 0 5px 0;
+            color: #fff;
+            font-size: 20px;
+        }
+        
+        .order-date {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-badge.processing { background: var(--warning); color: #000; }
+        .status-badge.packed { background: #9C27B0; color: #fff; }
+        .status-badge.shipped { background: #3F51B5; color: #fff; }
+        .status-badge.in_transit { background: #2196F3; color: #fff; }
+        .status-badge.out_for_delivery { background: #FF9800; color: #000; }
+        .status-badge.delivered { background: var(--success); color: #fff; }
+        .status-badge.delayed { background: var(--error); color: #fff; }
+        .status-badge.failed_delivery { background: var(--error); color: #fff; }
+        
+        /* Overview Grid */
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1px;
+            background: var(--border);
+        }
+        
+        .overview-item {
+            background: var(--card);
+            padding: 20px;
+        }
+        
+        .overview-item label {
+            display: block;
+            color: var(--text-muted);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        
+        .overview-item .value {
+            color: #fff;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        
+        .overview-item .value.clickable {
+            color: var(--info);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        
+        .overview-item .value.clickable:hover {
+            color: var(--primary);
+        }
+        
+        .carrier-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .carrier-logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        /* Progress Bar */
+        .progress-section {
+            background: var(--card);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+        }
+        
+        .progress-title {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            padding-top: 10px;
+        }
+        
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--border);
+            z-index: 1;
+        }
+        
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            flex: 1;
+        }
+        
+        .step-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        
+        .step-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+            max-width: 70px;
+        }
+        
+        .progress-step.completed .step-icon {
+            background: var(--success);
+            color: #fff;
+        }
+        
+        .progress-step.current .step-icon {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 0 0 5px rgba(255, 111, 97, 0.3);
+        }
+        
+        .progress-step.completed .step-label,
+        .progress-step.current .step-label {
+            color: #fff;
+        }
+        
+        /* Delay Alert */
+        .delay-alert {
+            background: rgba(255, 152, 0, 0.12);
+            border: 1px solid var(--warning);
+            border-left: 4px solid var(--warning);
+            border-radius: 8px;
+            padding: 18px 20px;
+            margin-bottom: 25px;
+            display: none;
+        }
+        
+        .delay-alert-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            color: #ffb74d;
+            margin-bottom: 8px;
+        }
+        
+        .delay-alert-message {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .delay-alert-action {
+            color: var(--info);
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        /* Exception Alert */
+        .exception-alert {
+            background: rgba(244, 67, 54, 0.12);
+            border: 1px solid var(--error);
+            border-left: 4px solid var(--error);
+            border-radius: 8px;
+            padding: 18px 20px;
+            margin-bottom: 25px;
+            display: none;
+        }
+        
+        .exception-alert-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            color: #ff8a80;
+            margin-bottom: 8px;
+        }
+        
+        /* Package Selector */
+        .package-selector {
+            background: var(--card);
+            padding: 20px 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+            display: none;
+        }
+        
+        .package-tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .package-tab {
+            padding: 10px 20px;
+            background: #252525;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .package-tab:hover {
+            background: #333;
+            color: #fff;
+        }
+        
+        .package-tab.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+        
+        /* Tracking Timeline */
+        .timeline-section {
+            background: var(--card);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+        }
+        
+        .section-title {
+            font-size: 16px;
+            color: #fff;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 5px;
+            bottom: 5px;
+            width: 2px;
+            background: var(--border);
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-bottom: 25px;
+        }
+        
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: -26px;
+            top: 5px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--border);
+            border: 3px solid var(--card);
+        }
+        
+        .timeline-item.completed::after {
+            background: var(--success);
+        }
+        
+        .timeline-item.current::after {
+            background: var(--primary);
+            box-shadow: 0 0 0 4px rgba(255, 111, 97, 0.3);
+        }
+        
+        .timeline-content {
+            background: #252525;
+            padding: 15px 18px;
+            border-radius: 8px;
+        }
+        
+        .timeline-content h5 {
+            margin: 0 0 8px 0;
+            color: #fff;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .timeline-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        
+        .timeline-location {
+            color: var(--text-muted);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .timeline-location svg {
+            width: 14px;
+            height: 14px;
+            opacity: 0.7;
+        }
+        
+        /* Delivery Details */
+        .delivery-details {
+            background: rgba(67, 160, 71, 0.1);
+            border: 1px solid var(--success);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            display: none;
+        }
+        
+        .delivery-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--success);
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .delivery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .delivery-item label {
+            display: block;
+            color: var(--text-muted);
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        
+        .delivery-item .value {
+            color: #fff;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        
+        .delivery-proof {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(67, 160, 71, 0.3);
+        }
+        
+        .proof-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .proof-item {
+            background: rgba(67, 160, 71, 0.15);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .proof-item .icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .proof-item .label {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+        
+        /* Order Details Expandable */
+        .order-details {
+            background: var(--card);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+        
+        .order-details-header {
+            padding: 20px 25px;
+            background: #252525;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .order-details-header:hover {
+            background: #2a2a2a;
+        }
+        
+        .order-details-title {
+            font-size: 16px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .order-details-toggle {
+            color: var(--text-muted);
+            font-size: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .order-details.expanded .order-details-toggle {
+            transform: rotate(180deg);
+        }
+        
+        .order-details-content {
+            display: none;
+            padding: 0 25px 25px;
+        }
+        
+        .order-details.expanded .order-details-content {
+            display: block;
+        }
+        
+        /* Products List */
+        .products-list {
+            margin-bottom: 20px;
+        }
+        
+        .product-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .product-item:last-child {
+            border-bottom: none;
+        }
+        
+        .product-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            background: #2a2a2a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .product-info {
+            flex: 1;
+        }
+        
+        .product-name {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .product-qty {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+        
+        .product-price {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 15px;
+        }
+        
+        /* Order Summary */
+        .order-summary {
+            background: #252525;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+        
+        .summary-row.subtotal {
+            color: var(--text-muted);
+        }
+        
+        .summary-row.shipping {
+            color: var(--text-muted);
+        }
+        
+        .summary-row.total {
+            border-top: 1px solid var(--border);
+            margin-top: 10px;
+            padding-top: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        .summary-row .value {
+            color: #fff;
+        }
+        
+        .payment-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        
+        /* Customer Support */
+        .support-section {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid var(--border);
+        }
+        
+        .support-title {
+            font-size: 16px;
+            color: #fff;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .support-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .support-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            background: #252525;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .support-link:hover {
+            background: #333;
+            color: #fff;
+            transform: translateY(-2px);
+        }
+        
+        .support-link .icon {
+            font-size: 20px;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .tracking-container {
+                margin: 20px auto;
+                padding: 0 15px;
+            }
+            
+            .tracking-header h1 {
+                font-size: 26px;
+            }
+            
+            .order-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .overview-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .progress-bar {
+                overflow-x: auto;
+                padding-bottom: 10px;
+            }
+            
+            .progress-step {
+                min-width: 70px;
+            }
+            
+            .step-label {
+                font-size: 10px;
+            }
+            
+            .timeline {
+                padding-left: 25px;
+            }
+            
+            .timeline::before {
+                left: 6px;
+            }
+            
+            .timeline-item::after {
+                left: -22px;
+                width: 12px;
+                height: 12px;
+            }
+            
+            .search-row {
+                flex-direction: column;
+            }
+            
+            .search-row input {
+                min-width: 100%;
+            }
+            
+            .search-row button {
+                width: 100%;
+            }
+            
+            .delivery-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .support-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar placeholder - will be replaced with actual navbar -->
+<div id="navbar-placeholder"></div>
+
+<div class="tracking-container">
+    <!-- Header -->
+    <div class="tracking-header">
+        <h1>📦 Track Your Order</h1>
+        <p>Real-time tracking for all your shipments</p>
+    </div>
+    
+    <!-- Error/Success Messages -->
+    <div class="alert error" id="error-alert">
+        <span class="alert-icon">⚠️</span>
+        <span id="error-message"></span>
+    </div>
+    
+    <div class="alert warning" id="warning-alert">
+        <span class="alert-icon">ℹ️</span>
+        <span id="warning-message"></span>
+    </div>
+    
+    <!-- Order Lookup Section -->
+    <div class="tracking-search">
+        <h3>🔍 Track Your Package</h3>
+        <div class="search-row">
+            <input type="text" id="order-number" placeholder="Order Number *" maxlength="50">
+            <input type="email" id="email-address" placeholder="Email Address *" maxlength="100">
+            <button onclick="trackOrder()" id="track-btn">
+                <span class="spinner"></span>
+                <span class="btn-text">Track Order</span>
+            </button>
+        </div>
+        <p class="tracking-hint">Enter your order number and email to track your shipment</p>
+    </div>
+    
+    <!-- Order Result -->
+    <div class="order-result" id="order-result">
+        
+        <!-- Order Overview Card -->
+        <div class="order-overview">
+            <div class="order-header">
+                <div class="order-header-left">
+                    <h3 id="order-number-display">ORD-20260209-1590F9</h3>
+                    <span class="order-date" id="order-date-display">Placed on Feb 9, 2026</span>
+                </div>
+                <span class="status-badge" id="order-status-badge">Processing</span>
+            </div>
+            <div class="overview-grid">
+                <div class="overview-item">
+                    <label>Carrier</label>
+                    <div class="value">
+                        <div class="carrier-info">
+                            <div class="carrier-logo" id="carrier-logo">📦</div>
+                            <span id="carrier-name">FedEx</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="overview-item">
+                    <label>Tracking Number</label>
+                    <div class="value clickable" id="tracking-number-display" onclick="openCarrierTracking()"></div>
+                </div>
+                <div class="overview-item">
+                    <label>Est. Delivery</label>
+                    <div class="value" id="est-delivery">Feb 12, 2026</div>
+                </div>
+                <div class="overview-item">
+                    <label>Shipping Method</label>
+                    <div class="value" id="shipping-method">Express</div>
+                </div>
+                <div class="overview-item">
+                    <label>Destination</label>
+                    <div class="value" id="destination">Los Angeles, CA</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Shipment Progress Bar -->
+        <div class="progress-section">
+            <div class="progress-title">Shipment Progress</div>
+            <div class="progress-bar">
+                <div class="progress-step" data-step="created">
+                    <div class="step-icon">📋</div>
+                    <div class="step-label">Order Placed</div>
+                </div>
+                <div class="progress-step" data-step="paid">
+                    <div class="step-icon">💳</div>
+                    <div class="step-label">Payment Confirmed</div>
+                </div>
+                <div class="progress-step" data-step="packed">
+                    <div class="step-icon">📦</div>
+                    <div class="step-label">Packed</div>
+                </div>
+                <div class="progress-step" data-step="shipped">
+                    <div class="step-icon">🚚</div>
+                    <div class="step-label">Shipped</div>
+                </div>
+                <div class="progress-step" data-step="in_transit">
+                    <div class="step-icon">✈️</div>
+                    <div class="step-label">In Transit</div>
+                </div>
+                <div class="progress-step" data-step="out_for_delivery">
+                    <div class="step-icon">🚙</div>
+                    <div class="step-label">Out for Delivery</div>
+                </div>
+                <div class="progress-step" data-step="delivered">
+                    <div class="step-icon">✅</div>
+                    <div class="step-label">Delivered</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Delay Alert -->
+        <div class="delay-alert" id="delay-alert">
+            <div class="delay-alert-title">
+                <span>⚠️</span>
+                <span id="delay-title">Delivery Delayed</span>
+            </div>
+            <div class="delay-alert-message" id="delay-reason"></div>
+            <div class="delay-alert-message" id="delay-new-date"></div>
+            <div class="delay-alert-action" id="delay-action"></div>
+        </div>
+        
+        <!-- Exception Alert -->
+        <div class="exception-alert" id="exception-alert">
+            <div class="exception-alert-title">
+                <span>❌</span>
+                <span id="exception-title">Delivery Attempt Failed</span>
+            </div>
+            <div class="delay-alert-message" id="exception-reason"></div>
+            <div class="delay-alert-action" id="exception-action"></div>
+        </div>
+        
+        <!-- Package Selector (Multi-Package) -->
+        <div class="package-selector" id="package-selector">
+            <div class="package-tabs" id="package-tabs"></div>
+        </div>
+        
+        <!-- Tracking Timeline -->
+        <div class="timeline-section">
+            <div class="section-title">📍 Tracking History</div>
+            <div class="timeline" id="tracking-timeline"></div>
+        </div>
+        
+        <!-- Delivery Details (After Delivered) -->
+        <div class="delivery-details" id="delivery-details">
+            <div class="delivery-title">
+                <span>✅</span>
+                <span>Package Delivered</span>
+            </div>
+            <div class="delivery-grid">
+                <div class="delivery-item">
+                    <label>Delivered Date</label>
+                    <div class="value" id="delivered-date">Feb 12, 2026</div>
+                </div>
+                <div class="delivery-item">
+                    <label>Delivered Time</label>
+                    <div class="value" id="delivered-time">2:34 PM</div>
+                </div>
+                <div class="delivery-item">
+                    <label>Delivered To</label>
+                    <div class="value" id="delivered-to">Front Door</div>
+                </div>
+                <div class="delivery-item">
+                    <label>Recipient</label>
+                    <div class="value" id="recipient-name">John Smith</div>
+                </div>
+            </div>
+            <div class="delivery-proof" id="proof-section">
+                <div class="proof-grid">
+                    <div class="proof-item" id="signature-proof">
+                        <div class="icon">✍️</div>
+                        <div class="label">Signature</div>
+                        <div class="value" id="signature-value" style="color: #fff; margin-top: 5px;"></div>
+                    </div>
+                    <div class="proof-item" id="photo-proof">
+                        <div class="icon">📷</div>
+                        <div class="label">Delivery Photo</div>
+                        <div class="value" id="photo-value" style="color: #fff; margin-top: 5px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Order Details Expandable -->
+        <div class="order-details" id="order-details">
+            <div class="order-details-header" onclick="toggleOrderDetails()">
+                <div class="order-details-title">
+                    <span>📋</span>
+                    <span>Order Details</span>
+                </div>
+                <div class="order-details-toggle">▼</div>
+            </div>
+            <div class="order-details-content">
+                <div class="products-list" id="products-list"></div>
+                <div class="order-summary">
+                    <div class="summary-row subtotal">
+                        <span>Subtotal</span>
+                        <span class="value" id="subtotal">$99.00</span>
+                    </div>
+                    <div class="summary-row shipping">
+                        <span>Shipping</span>
+                        <span class="value" id="shipping-cost">$9.99</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total Paid</span>
+                        <span class="value" id="total-paid">$108.99</span>
+                    </div>
+                    <div class="payment-info">
+                        <span>Payment Method: </span>
+                        <span id="payment-method">Visa •••• 4242</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Customer Support -->
+        <div class="support-section">
+            <div class="support-title">❓ Need Help?</div>
+            <div class="support-grid">
+                <a href="contact.html" class="support-link">
+                    <span class="icon">📞</span>
+                    <span>Contact Support</span>
+                </a>
+                <a href="faq.html" class="support-link">
+                    <span class="icon">📖</span>
+                    <span>Shipping FAQ</span>
+                </a>
+                <a href="privacy.html" class="support-link">
+                    <span class="icon">↩️</span>
+                    <span>Returns & Refunds</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Tracking state
+    let currentOrder = null;
+    let currentPackage = 0;
+    let trackingAttempts = 0;
+    const MAX_ATTEMPTS = 5;
+    const ATTEMPT_WINDOW = 60000; // 1 minute
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        loadNavbar();
+    });
+    
+    // Load navbar
+    async function loadNavbar() {
+        try {
+            const response = await fetch('components/navbar.html');
+            const html = await response.text();
+            document.getElementById('navbar-placeholder').innerHTML = html;
+        } catch (e) {
+            console.log('Navbar not loaded');
+        }
+    }
+    
+    // Show error message
+    function showError(message) {
+        const alert = document.getElementById('error-alert');
+        document.getElementById('error-message').textContent = message;
+        alert.style.display = 'flex';
+        alert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    
+    // Hide error message
+    function hideError() {
+        document.getElementById('error-alert').style.display = 'none';
+    }
+    
+    // Show warning message
+    function showWarning(message) {
+        const alert = document.getElementById('warning-alert');
+        document.getElementById('warning-message').textContent = message;
+        alert.style.display = 'flex';
+    }
+    
+    // Hide all alerts
+    function hideAlerts() {
+        document.getElementById('error-alert').style.display = 'none';
+        document.getElementById('warning-alert').style.display = 'none';
+        document.getElementById('delay-alert').style.display = 'none';
+        document.getElementById('exception-alert').style.display = 'none';
+    }
+    
+    // Set loading state
+    function setLoading(loading) {
+        const btn = document.getElementById('track-btn');
+        const spinner = btn.querySelector('.spinner');
+        const btnText = btn.querySelector('.btn-text');
+        
+        if (loading) {
+            btn.disabled = true;
+            spinner.style.display = 'inline-block';
+            btnText.textContent = 'Tracking...';
+        } else {
+            btn.disabled = false;
+            spinner.style.display = 'none';
+            btnText.textContent = 'Track Order';
+        }
+    }
+    
+    // Track order
+    async function trackOrder() {
+        hideAlerts();
+        
+        // Rate limiting
+        const now = Date.now();
+        if (trackingAttempts >= MAX_ATTEMPTS) {
+            const timeLeft = Math.ceil((ATTEMPT_WINDOW - (now % ATTEMPT_WINDOW)) / 1000);
+            showError(`Too many attempts. Please try again in ${timeLeft} seconds.`);
+            return;
+        }
+        trackingAttempts++;
+        
+        // Get inputs
+        const orderNumber = document.getElementById('order-number').value.trim();
+        const email = document.getElementById('email-address').value.trim();
+        
+        // Validate
+        if (!orderNumber) {
+            showError('Please enter your order number');
+            return;
+        }
+        
+        if (!email) {
+            showError('Please enter your email address');
+            return;
+        }
+        
+        if (!isValidEmail(email)) {
+            showError('Please enter a valid email address');
+            return;
+        }
+        
+        // Set loading
+        setLoading(true);
+        
+        try {
+            // Make API request
+            const response = await fetch(`/api/orders/${encodeURIComponent(orderNumber)}/tracking?email=${encodeURIComponent(email)}`);
+            const payload = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(payload.error || payload.message || 'Order not found');
+            }
+            
+            // unwrap wrapper; API puts actual object under `data`
+            const data = payload.data || {};
+
+            // Display order
+            currentOrder = data;
+            currentPackage = 0;
+            displayOrder(data);
+            
+        } catch (error) {
+            showError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    }
+    
+    // Validate email
+    function isValidEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+    
+    // Display order data
+    function displayOrder(data) {
+        // Show result section
+        document.getElementById('order-result').style.display = 'block';
+        
+        // Order overview
+        document.getElementById('order-number-display').textContent = data.order_number;
+        document.getElementById('order-date-display').textContent = `Placed on ${formatDate(data.order_date)}`;
+        
+        // Status badge
+        const statusBadge = document.getElementById('order-status-badge');
+        statusBadge.textContent = formatStatus(data.status);
+        statusBadge.className = `status-badge ${data.status}`;
+        
+        // Carrier info
+        document.getElementById('carrier-logo').textContent = getCarrierEmoji(data.carrier);
+        document.getElementById('carrier-name').textContent = data.carrier || 'Unknown';
+        
+        // Tracking number
+        const trackingNum = data.tracking_number || 'N/A';
+        document.getElementById('tracking-number-display').textContent = trackingNum;
+        
+        // Est delivery – calculate if not provided
+        if (data.estimated_delivery) {
+            document.getElementById('est-delivery').textContent = formatDate(data.estimated_delivery);
+        } else {
+            // estimate 5 business days from order date
+            const orderDate = new Date(data.order_date);
+            const estDate = new Date(orderDate.getTime() + 5 * 24 * 60 * 60 * 1000);
+            document.getElementById('est-delivery').textContent = formatDate(estDate.toISOString());
+        }
+        
+        // Shipping method
+        document.getElementById('shipping-method').textContent = data.shipping_method || 'Standard';
+        
+        // Destination (masked or from city/zip)
+        if (data.city && data.zip_code) {
+            document.getElementById('destination').textContent = `${data.city}, ${data.zip_code}`;
+        } else {
+            document.getElementById('destination').textContent = maskAddress(data.shipping_address);
+        }
+        
+        // Update progress bar
+        updateProgressBar(data.status);
+        
+        // Handle delays/exceptions
+        handleDelays(data);
+        
+        // Package selector
+        displayPackageSelector(data.packages);
+        
+        // Timeline
+        displayTimeline(data.tracking_history || [], data.status);
+        
+        // Delivery details (if delivered)
+        if (data.status === 'delivered') {
+            displayDeliveryDetails(data);
+        } else {
+            document.getElementById('delivery-details').style.display = 'none';
+        }
+        
+        // Order details
+        displayOrderDetails(data);
+        
+        // Scroll to result
+        document.getElementById('order-result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    // Update progress bar
+    function updateProgressBar(status) {
+        // use same order as admin ALL_STATUSES for customer view
+        const steps = ['created', 'paid', 'packed', 'shipped', 'in_transit', 'out_for_delivery', 'delivered'];
+        const statusIndex = steps.indexOf(status);
+        
+        document.querySelectorAll('.progress-step').forEach((step, index) => {
+            step.classList.remove('completed', 'current');
+            
+            if (index < statusIndex) {
+                step.classList.add('completed');
+            } else if (index === statusIndex) {
+                step.classList.add('current');
+            }
+        });
+    }
+    
+    // Handle delays and exceptions
+    function handleDelays(data) {
+        const delayAlert = document.getElementById('delay-alert');
+        const exceptionAlert = document.getElementById('exception-alert');
+        
+        delayAlert.style.display = 'none';
+        exceptionAlert.style.display = 'none';
+        
+        if (data.delay) {
+            delayAlert.style.display = 'block';
+            document.getElementById('delay-title').textContent = '⚠️ ' + (data.delay.title || 'Delivery Delayed');
+            document.getElementById('delay-reason').textContent = 'Reason: ' + data.delay.reason;
+            if (data.delay.new_date) {
+                document.getElementById('delay-new-date').textContent = 'New Estimated Date: ' + formatDate(data.delay.new_date);
+            }
+            if (data.delay.action) {
+                document.getElementById('delay-action').textContent = data.delay.action;
+            }
+        } else if (data.exception) {
+            exceptionAlert.style.display = 'block';
+            document.getElementById('exception-title').textContent = '❌ ' + (data.exception.title || 'Delivery Attempt Failed');
+            document.getElementById('exception-reason').textContent = 'Reason: ' + data.exception.reason;
+            if (data.exception.action) {
+                document.getElementById('exception-action').textContent = data.exception.action;
+            }
+        }
+    }
+    
+    // Display package selector
+    function displayPackageSelector(packages) {
+        const selector = document.getElementById('package-selector');
+        const tabs = document.getElementById('package-tabs');
+        
+        if (!packages || packages.length <= 1) {
+            selector.style.display = 'none';
+            return;
+        }
+        
+        selector.style.display = 'block';
+        tabs.innerHTML = '';
+        
+        packages.forEach((pkg, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'package-tab' + (index === currentPackage ? ' active' : '');
+            btn.textContent = `Package ${index + 1} of ${packages.length}`;
+            btn.onclick = () => selectPackage(index);
+            tabs.appendChild(btn);
+        });
+    }
+    
+    // Select package
+    function selectPackage(index) {
+        currentPackage = index;
+        
+        // Update tabs
+        document.querySelectorAll('.package-tab').forEach((tab, i) => {
+            tab.classList.toggle('active', i === index);
+        });
+        
+        // Update display
+        const pkg = currentOrder.packages[index];
+        if (pkg) {
+            document.getElementById('tracking-number-display').textContent = pkg.tracking_number || 'N/A';
+            document.getElementById('carrier-logo').textContent = getCarrierEmoji(pkg.carrier);
+            document.getElementById('carrier-name').textContent = pkg.carrier || 'Unknown';
+            displayTimeline(pkg.tracking_history || [], pkg.status);
+            updateProgressBar(pkg.status);
+            
+            if (pkg.status === 'delivered') {
+                displayDeliveryDetails(pkg);
+            } else {
+                document.getElementById('delivery-details').style.display = 'none';
+            }
+        }
+    }
+    
+    // Display timeline
+    function displayTimeline(events, currentStatus) {
+        const timeline = document.getElementById('tracking-timeline');
+        timeline.innerHTML = '';
+        
+        if (!events || events.length === 0) {
+            timeline.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 20px;">No tracking events yet</p>';
+            return;
+        }
+        
+        // Sort by date (newest first)
+        const sortedEvents = [...events].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        
+        sortedEvents.forEach((event, index) => {
+            const isLast = index === 0;
+            const item = document.createElement('div');
+            item.className = 'timeline-item' + (isLast ? ' current' : ' completed');
+            
+            item.innerHTML = `
+                <div class="timeline-content">
+                    <h5>${getStatusIcon(event.status)} ${formatStatus(event.status)}</h5>
+                    <div class="timeline-meta">
+                        <span>${formatDateTime(event.timestamp)}</span>
+                    </div>
+                    ${event.location ? `
+                        <div class="timeline-location">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                            </svg>
+                            <span>${event.location}</span>
+                        </div>
+                    ` : ''}
+                    ${event.description ? `<p style="color: var(--text-muted); font-size: 13px; margin: 8px 0 0 0;">${event.description}</p>` : ''}
+                </div>
+            `;
+            
+            timeline.appendChild(item);
+        });
+    }
+    
+    // Display delivery details
+    function displayDeliveryDetails(data) {
+        const details = document.getElementById('delivery-details');
+        details.style.display = 'block';
+        
+        document.getElementById('delivered-date').textContent = formatDate(data.delivered_date || new Date());
+        
+        if (data.delivered_time) {
+            document.getElementById('delivered-time').textContent = data.delivered_time;
+        } else {
+            const time = new Date(data.delivered_date || new Date()).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+            document.getElementById('delivered-time').textContent = time;
+        }
+        
+        document.getElementById('delivered-to').textContent = data.delivered_to || 'Front Door';
+        document.getElementById('recipient-name').textContent = data.recipient_name || data.customer_name || 'Customer';
+        
+        // Signature
+        const sigValue = document.getElementById('signature-value');
+        if (data.signature) {
+            sigValue.textContent = data.signature;
+        } else {
+            sigValue.textContent = 'Digital';
+        }
+        
+        // Photo
+        const photoValue = document.getElementById('photo-value');
+        if (data.delivery_photo) {
+            photoValue.textContent = 'Available';
+        } else {
+            photoValue.textContent = 'Not available';
+        }
+    }
+    
+    // Display order details
+    function displayOrderDetails(data) {
+        // Products
+        const productsList = document.getElementById('products-list');
+        productsList.innerHTML = '';
+        
+        if (data.items && data.items.length > 0) {
+            data.items.forEach(item => {
+                const productDiv = document.createElement('div');
+                productDiv.className = 'product-item';
+                productDiv.innerHTML = `
+                    <div class="product-image">📦</div>
+                    <div class="product-info">
+                        <div class="product-name">${item.name}</div>
+                        <div class="product-qty">Qty: ${item.quantity}</div>
+                    </div>
+                    <div class="product-price">$${item.price.toFixed(2)}</div>
+                `;
+                productsList.appendChild(productDiv);
+            });
+        }
+        
+        // Summary
+        document.getElementById('subtotal').textContent = '$' + (data.subtotal || 0).toFixed(2);
+        document.getElementById('shipping-cost').textContent = '$' + (data.shipping_cost || 0).toFixed(2);
+        document.getElementById('total-paid').textContent = '$' + (data.total || 0).toFixed(2);
+        
+        // Payment method
+        const paymentMethod = data.payment_method || 'Card';
+        const lastFour = data.card_last_four || '****';
+        document.getElementById('payment-method').textContent = `${paymentMethod} •••• ${lastFour}`;
+    }
+    
+    // Toggle order details
+    function toggleOrderDetails() {
+        document.getElementById('order-details').classList.toggle('expanded');
+    }
+    
+    // Open carrier tracking
+    function openCarrierTracking() {
+        const trackingNum = currentOrder?.tracking_number;
+        if (!trackingNum || trackingNum === 'N/A') return;
+        
+        const carrier = currentOrder?.carrier?.toLowerCase();
+        let url = '#';
+        
+        if (carrier?.includes('fedex')) {
+            url = `https://www.fedex.com/fedextrack/?trknbr=${trackingNum}`;
+        } else if (carrier?.includes('ups')) {
+            url = `https://www.ups.com/track?tracknum=${trackingNum}`;
+        } else if (carrier?.includes('usps')) {
+            url = `https://tools.usps.com/go/TrackConfirmAction?tLabels=${trackingNum}`;
+        } else if (carrier?.includes('dhl')) {
+            url = `https://www.dhl.com/en/express/tracking.html?AWB=${trackingNum}`;
+        }
+        
+        if (url !== '#') {
+            window.open(url, '_blank');
+        }
+    }
+    
+    // Utility functions
+    function formatDate(dateStr) {
+        if (!dateStr) return 'N/A';
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+    
+    function formatDateTime(dateStr) {
+        if (!dateStr) return 'N/A';
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + 
+               ' • ' + date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    }
+    
+    function formatStatus(status) {
+        const statusMap = {
+            'created': 'Order Placed',
+            'paid': 'Payment Confirmed',
+            'processing': 'Processing',
+            'placed': 'Processing',      // legacy/key alias
+            'packed': 'Packed',
+            'shipped': 'Shipped',
+            'in_transit': 'In Transit',
+            'out_for_delivery': 'Out for Delivery',
+            'delivered': 'Delivered',
+            'delayed': 'Delayed',
+            'failed_delivery': 'Delivery Failed',
+            'cancelled': 'Cancelled',
+            'returned': 'Returned'
+        };
+        return statusMap[status] || status?.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) || 'Unknown';
+    }
+    
+    function getStatusIcon(status) {
+        const iconMap = {
+            'created': '📋',
+            'paid': '💳',
+            'processing': '⏳',
+            'placed': '📋',      // alias for backwards compatibility
+            'packed': '📦',
+            'shipped': '🚚',
+            'in_transit': '✈️',
+            'out_for_delivery': '🚙',
+            'delivered': '✅',
+            'delayed': '⚠️',
+            'failed_delivery': '❌'
+        };
+        return iconMap[status] || '📍';
+    }
+    
+    function getCarrierEmoji(carrier) {
+        const emojiMap = {
+            'fedex': '📦',
+            'ups': '📤',
+            'usps': '📬',
+            'dhl': '✈️'
+        };
+        return emojiMap[carrier?.toLowerCase()] || '📦';
+    }
+    
+    function maskAddress(address) {
+        if (!address) return 'N/A';
+        const parts = address.split(',');
+        if (parts.length >= 2) {
+            return parts.slice(0, -1).join(',').trim() + ', ***';
+        }
+        return '***';
+    }
+    
+    // Load footer with chat
+    document.addEventListener('DOMContentLoaded', () => {
+      fetch('components/footer.html')
+        .then(res => res.text())
+        .then(html => {
+          const footer = document.createElement('footer');
+          footer.innerHTML = html;
+          document.body.appendChild(footer);
+          initChat();
+        })
+        .catch(err => console.error('Error loading footer:', err));
+    });
+    
+    function initChat() {
+      const bubble = document.getElementById('chat-bubble');
+      const panel = document.getElementById('chat-panel');
+      const input = document.getElementById('chat-input');
+      const messages = document.getElementById('chat-messages');
+
+      if (!bubble || !panel || !input || !messages) return;
+
+      bubble.addEventListener('click', () => {
+        panel.classList.toggle('hidden');
+        if (!panel.classList.contains('hidden')) {
+          input.focus();
+        }
+      });
+
+      input.addEventListener('keydown', e => {
+        if (e.key !== 'Enter') return;
+        const text = e.target.value.trim();
+        if (!text) return;
+        messages.innerHTML += `<div class="user-msg">${text}</div>`;
+        e.target.value = '';
+        let reply = "Sorry, I didn't understand that. Type \"agent\" to contact us.";
+        const lc = text.toLowerCase();
+        if (lc.includes('return')) reply = 'You can return items within 30 days. Check our FAQ for details.';
+        else if (lc.includes('shipping')) reply = 'Standard shipping takes 5–7 business days.';
+        else if (lc.includes('order')) reply = 'Your order is being processed. Use the tracking page with your order number.';
+        else if (lc.includes('agent') || lc.includes('human')) {
+          reply = 'Click here to email support: <a href="mailto:support@caliclear.shop">support@caliclear.shop</a>';
+        }
+        messages.innerHTML += `<div class="bot-msg">${reply}</div>`;
+        messages.scrollTop = messages.scrollHeight;
+      });
+    }
+</script>
+
+</body>
+</html>

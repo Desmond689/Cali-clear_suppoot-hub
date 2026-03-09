@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<title>My Orders - Cali Clear</title>
+
+<!-- CSS -->
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="assets/css/animations.css">
+<link rel="stylesheet" href="assets/css/responsive.css">
+<link rel="stylesheet" href="components/assets/css/components.css">
+<!-- Font Awesome removed (no external CDN tracking) -->
+
+<style>
+  /* Replace Font Awesome icons with Unicode symbols - no external dependencies */
+  .fas { font-style: normal; font-weight: normal; margin-right: 4px; font-family: Arial, sans-serif; }
+  .fas.fa-leaf::before { content: "🍃"; font-style: normal; }
+  .fas.fa-sign-in-alt::before { content: "→"; font-style: normal; }
+  .fas.fa-bolt::before { content: "⚡"; font-style: normal; }
+  .fas.fa-info-circle::before { content: "ℹ"; font-style: normal; }
+  .fas.fa-bars::before { content: "☰"; font-style: normal; }
+  .fas.fa-chart-line::before { content: "📈"; font-style: normal; }
+  .fas.fa-box::before { content: "📦"; font-style: normal; }
+  .fas.fa-tags::before { content: "🏷"; font-style: normal; }
+  .fas.fa-shopping-cart::before { content: "🛒"; font-style: normal; }
+  .fas.fa-users::before { content: "👥"; font-style: normal; }
+  .fas.fa-chart-bar::before { content: "📊"; font-style: normal; }
+  .fas.fa-cog::before { content: "⚙"; font-style: normal; }
+  .fas.fa-sign-out-alt::before { content: "↪"; font-style: normal; }
+  .fas.fa-dollar-sign::before { content: "$"; font-style: normal; }
+  .fas.fa-chart-area::before { content: "📉"; font-style: normal; }
+  .fas.fa-exclamation-triangle::before { content: "⚠"; font-style: normal; }
+  .fas.fa-chart-pie::before { content: "📈"; font-style: normal; }
+  .fas.fa-plus::before { content: "+"; font-style: normal; }
+  .fas.fa-spinner::before { content: "⟳"; animation: spin 1s linear infinite; }
+  .fas.fa-user::before { content: "👤"; font-style: normal; }
+  .fas.fa-edit::before { content: "✎"; font-style: normal; }
+  .fas.fa-trash::before { content: "🗑"; font-style: normal; }
+  .fas.fa-download::before { content: "⬇"; font-style: normal; }
+  .fas.fa-search::before { content: "🔍"; font-style: normal; }
+  .fas.fa-save::before { content: "💾"; font-style: normal; }
+  .fas.fa-truck::before { content: "🚚"; font-style: normal; }
+  .fas.fa-bell::before { content: "🔔"; font-style: normal; }
+  .fas.fa-list::before { content: "📋"; font-style: normal; }
+  .fas.fa-store::before { content: "🏪"; font-style: normal; }
+  .fas.fa-map-marker-alt::before { content: "📍"; font-style: normal; }
+  .fas.fa-receipt::before { content: "🧾"; font-style: normal; }
+  .fas.fa-eye::before { content: "👁"; font-style: normal; }
+  .fas.fa-external-link-alt::before { content: "🔗"; font-style: normal; }
+  .fas.fa-exclamation-circle::before { content: "❌"; font-style: normal; }
+  .fas.fa-envelope::before { content: "✉"; font-style: normal; }
+  .fas.fa-lock::before { content: "🔒"; font-style: normal; }
+  .fas.fa-shopping-bag::before { content: "🛍"; font-style: normal; }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #121212;
+    color: #e0e0e0;
+  }
+
+.page-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+/* ---- Page Header ---- */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.page-header h1 {
+  color: #ff6f61;
+  font-size: 28px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #1e1e1e;
+  padding: 10px 16px;
+  border-radius: 30px;
+}
+
+.user-info .user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #ff6f61;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #fff;
+  font-weight: 700;
+}
+
+.user-info .user-email {
+  font-size: 14px;
+  color: #ccc;
+}
+
+.logout-btn {
+  background: transparent;
+  border: 1px solid #f44336;
+  color: #f44336;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.logout-btn:hover {
+  background: #f44336;
+  color: #fff;
+}
+
+/* ---- Tabs ---- */
+.tabs {
+  display: flex;
+  gap: 0;
+  background: #1e1e1e;
+  border-radius: 12px;
+  padding: 6px;
+  margin-bottom: 24px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px 20px;
+  background: transparent;
+  border: none;
+  color: #888;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.tab-btn:hover {
+  color: #fff;
+  background: #252525;
+}
+
+.tab-btn.active {
+  background: #ff6f61;
+  color: #fff;
+}
+
+/* ---- Tab Panels ---- */
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+/* ---- Orders List ---- */
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.order-card {
+  background: #1e1e1e;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #2a2a2a;
+  transition: border-color 0.2s;
+}
+
+.order-card:hover {
+  border-color: #444;
+}
+
+.order-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: #252525;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.order-id {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.status-badge {
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-created    { background: #555; color: #fff; }
+.status-paid       { background: #2196F3; color: #fff; }
+.status-packed     { background: #9C27B0; color: #fff; }
+.status-processing { background: #FF9800; color: #000; }
+.status-shipped    { background: #3F51B5; color: #fff; }
+.status-in_transit { background: #00BCD4; color: #fff; }
+.status-out_for_delivery { background: #FF9800; color: #000; }
+.status-delivered  { background: #43A047; color: #fff; }
+.status-cancelled  { background: #f44336; color: #fff; }
+.status-refunded   { background: #795548; color: #fff; }
+.status-returned   { background: #795548; color: #fff; }
+
+.order-card-body {
+  padding: 16px 20px;
+}
+
+.order-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.meta-item label {
+  display: block;
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.meta-item span {
+  font-size: 14px;
+  color: #e0e0e0;
+}
+
+.meta-item span.highlight {
+  color: #ff6f61;
+  font-weight: 600;
+}
+
+/* Tracking bar */
+.tracking-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-left: 3px solid #4caf50;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.tracking-bar .t-label {
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+}
+
+.tracking-bar .t-number {
+  font-family: monospace;
+  color: #4caf50;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.tracking-bar .t-carrier {
+  background: #252525;
+  color: #ff6f61;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+/* Order actions */
+.order-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-track {
+  padding: 9px 18px;
+  background: transparent;
+  border: 1px solid #ff6f61;
+  color: #ff6f61;
+  border-radius: 8px;
+  font-size: 13px;
+  text-decoration: none;
+  transition: 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-track:hover {
+  background: #ff6f61;
+  color: #fff;
+}
+
+.btn-details {
+  padding: 9px 18px;
+  background: #ff6f61;
+  border: none;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 13px;
+  text-decoration: none;
+  transition: 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-details:hover {
+  background: #ff4a3b;
+}
+
+/* ---- Track Order Tab ---- */
+.track-panel {
+  background: #1e1e1e;
+  border-radius: 12px;
+  padding: 30px;
+}
+
+.track-panel h2 {
+  color: #fff;
+  margin-bottom: 8px;
+  font-size: 20px;
+}
+
+.track-panel p {
+  color: #888;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+
+.track-form {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.track-form input {
+  flex: 1;
+  min-width: 200px;
+  padding: 14px 16px;
+  background: #252525;
+  border: 1px solid #333;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 15px;
+}
+
+.track-form input:focus {
+  outline: none;
+  border-color: #ff6f61;
+}
+
+.track-form input::placeholder {
+  color: #555;
+}
+
+.track-form button {
+  padding: 14px 28px;
+  background: #ff6f61;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+  white-space: nowrap;
+}
+
+.track-form button:hover {
+  background: #ff4a3b;
+}
+
+/* Progress bar */
+.progress-section {
+  margin-top: 20px;
+}
+
+.progress-bar-wrap {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  padding-top: 8px;
+}
+
+.progress-bar-wrap::before {
+  content: '';
+  position: absolute;
+  top: 22px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #333;
+  z-index: 1;
+}
+
+.progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+  flex: 1;
+}
+
+.step-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.step-icon.done { background: #4caf50; }
+.step-icon.current { background: #ff6f61; box-shadow: 0 0 0 5px rgba(255,111,97,0.3); }
+
+.step-label {
+  font-size: 10px;
+  color: #555;
+  text-align: center;
+  max-width: 65px;
+  line-height: 1.3;
+}
+
+.step-label.active { color: #fff; }
+
+/* Track result */
+.track-result {
+  background: #252525;
+  border-radius: 10px;
+  padding: 20px;
+  margin-top: 20px;
+  display: none;
+}
+
+.track-result.show { display: block; }
+
+.track-result-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.track-result-item label {
+  display: block;
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.track-result-item span {
+  font-size: 14px;
+  color: #e0e0e0;
+}
+
+/* States */
+.loading-state, .empty-state, .auth-state {
+  text-align: center;
+  padding: 50px 20px;
+}
+
+.loading-state .spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #333;
+  border-top-color: #ff6f61;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.empty-state i { font-size: 48px; color: #333; margin-bottom: 16px; }
+.empty-state h3 { color: #888; margin-bottom: 8px; }
+.empty-state p { color: #555; margin-bottom: 20px; }
+
+.auth-state i { font-size: 48px; color: #ff6f61; margin-bottom: 16px; }
+.auth-state h3 { color: #fff; margin-bottom: 8px; }
+.auth-state p { color: #888; margin-bottom: 20px; }
+
+.btn-primary-link {
+  display: inline-block;
+  padding: 12px 28px;
+  background: #ff6f61;
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.btn-primary-link:hover { background: #ff4a3b; }
+
+.hidden { display: none !important; }
+
+@media (max-width: 600px) {
+  .page-header { flex-direction: column; }
+  .tabs { flex-direction: column; }
+  .track-result-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<div id="navbar-placeholder"></div>
+<script>
+fetch('components/navbar.html')
+  .then(res => res.text())
+  .then(data => {
+    document.getElementById('navbar-placeholder').innerHTML = data;
+    if (typeof updateAuthUI === 'function') updateAuthUI();
+  });
+</script>
+
+<!-- Page Container -->
+<div class="page-container">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1><i class="fas fa-box"></i> My Account</h1>
+    <div class="user-info" id="user-info-bar" style="display:none;">
+      <div class="user-avatar" id="user-avatar-letter">U</div>
+      <span class="user-email" id="user-email-display">Loading...</span>
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('orders', this)">
+      <i class="fas fa-box"></i> My Orders
+    </button>
+    <button class="tab-btn" onclick="switchTab('track', this)">
+      <i class="fas fa-truck"></i> Track Order
+    </button>
+  </div>
+
+  <!-- ===== MY ORDERS TAB ===== -->
+  <div id="tab-orders" class="tab-panel active">
+
+    <!-- Loading -->
+    <div id="orders-loading" class="loading-state">
+      <div class="spinner"></div>
+      <p style="color:#888;">Loading your orders...</p>
+    </div>
+
+    <!-- Not logged in -->
+    <div id="orders-auth" class="auth-state hidden">
+      <i class="fas fa-lock"></i>
+      <h3>Please Log In</h3>
+      <p>You need to be logged in to view your orders.</p>
+      <a href="login.html" class="btn-primary-link">Login</a>
+    </div>
+
+    <!-- Empty -->
+    <div id="orders-empty" class="empty-state hidden">
+      <i class="fas fa-shopping-bag"></i>
+      <h3>No Orders Yet</h3>
+      <p>You haven't placed any orders yet.</p>
+      <a href="shop.html" class="btn-primary-link">Start Shopping</a>
+    </div>
+
+    <!-- Orders list -->
+    <div id="orders-list" class="orders-list hidden"></div>
+
+  </div>
+
+  <!-- ===== TRACK ORDER TAB ===== -->
+  <div id="tab-track" class="tab-panel">
+    <div class="track-panel">
+      <h2><i class="fas fa-map-marker-alt" style="color:#ff6f61;"></i> Track Your Order</h2>
+      <p>Enter your Order ID to see the current status and tracking information.</p>
+
+      <div class="track-form">
+        <input type="text" id="track-order-input" placeholder="e.g. ORD-20260221-XXXXXX" />
+        <button onclick="trackOrder()"><i class="fas fa-search"></i> Track</button>
+      </div>
+
+      <!-- Track result -->
+      <div id="track-result" class="track-result">
+        <div class="track-result-grid">
+          <div class="track-result-item">
+            <label>Order ID</label>
+            <span id="tr-order-id" style="color:#ff6f61;font-weight:600;"></span>
+          </div>
+          <div class="track-result-item">
+            <label>Status</label>
+            <span id="tr-status-badge"></span>
+          </div>
+          <div class="track-result-item">
+            <label>Carrier</label>
+            <span id="tr-carrier" style="text-transform:uppercase;color:#ff6f61;"></span>
+          </div>
+          <div class="track-result-item">
+            <label>Tracking Number</label>
+            <span id="tr-tracking" style="font-family:monospace;color:#4caf50;"></span>
+          </div>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="progress-section">
+          <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">Shipment Progress</div>
+          <div class="progress-bar-wrap" id="tr-progress-bar"></div>
+        </div>
+
+        <div style="margin-top:20px;">
+          <a id="tr-full-link" href="#" target="_blank" class="btn-track">
+            <i class="fas fa-external-link-alt"></i> Full Tracking Page
+          </a>
+        </div>
+      </div>
+
+      <!-- Track error -->
+      <div id="track-error" style="display:none;background:rgba(244,67,54,0.1);border:1px solid #f44336;border-radius:8px;padding:14px 18px;color:#ff8a80;margin-top:16px;">
+        <i class="fas fa-exclamation-circle"></i> <span id="track-error-msg">Order not found.</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<div id="footer-placeholder"></div>
+<script>
+fetch('components/footer.html')
+  .then(res => res.text())
+  .then(data => document.getElementById('footer-placeholder').innerHTML = data);
+</script>
+
+<!-- Toast -->
+<div id="toast-container" style="position:fixed;top:20px;right:20px;z-index:9999;"></div>
+<script src="assets/js/toast.js"></script>
+
+<script>
+const API_URL = '/api';
+
+const ORDER_STAGES = [
+  { key: 'created',          label: 'Order\nPlaced',      icon: '📋' },
+  { key: 'paid',             label: 'Payment\nConfirmed', icon: '💳' },
+  { key: 'packed',           label: 'Packed',             icon: '📦' },
+  { key: 'shipped',          label: 'Shipped',            icon: '🚚' },
+  { key: 'in_transit',       label: 'In Transit',         icon: '✈️'  },
+  { key: 'out_for_delivery', label: 'Out for\nDelivery',  icon: '🏠' },
+  { key: 'delivered',        label: 'Delivered',          icon: '✅' }
+];
+
+const STATUS_COLORS = {
+  created: '#555', paid: '#2196F3', packed: '#9C27B0',
+  processing: '#FF9800', shipped: '#3F51B5', in_transit: '#00BCD4',
+  out_for_delivery: '#FF9800', delivered: '#4caf50',
+  cancelled: '#f44336', refunded: '#795548', returned: '#795548'
+};
+
+// ---- Auth helpers ----
+function isLoggedIn() { return !!localStorage.getItem('access_token'); }
+function getUser() { return JSON.parse(localStorage.getItem('user') || 'null'); }
+function getAuthHeaders() {
+  const token = localStorage.getItem('access_token');
+  return { 'Content-Type': 'application/json', 'Authorization': token ? 'Bearer ' + token : '' };
+}
+
+function logout() {
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('refresh_token');
+  localStorage.removeItem('user');
+  window.location.href = 'login.html';
+}
+
+// ---- Tab switching ----
+function switchTab(tabId, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tabId).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ---- Get email from any user object format ----
+function getUserEmail() {
+  const raw = localStorage.getItem('user');
+  if (!raw) return null;
+  try {
+    const obj = JSON.parse(raw);
+    // Handle: { email } or { user: { email } } or { data: { user: { email } } }
+    return obj.email
+      || (obj.user && obj.user.email)
+      || (obj.data && obj.data.user && obj.data.user.email)
+      || null;
+  } catch (_) { return null; }
+}
+
+// ---- Load orders ----
+async function loadOrders() {
+  const loading = document.getElementById('orders-loading');
+  const authDiv = document.getElementById('orders-auth');
+  const emptyDiv = document.getElementById('orders-empty');
+  const listDiv = document.getElementById('orders-list');
+
+  const userEmail = getUserEmail();
+  const token = localStorage.getItem('access_token');
+
+  if (!userEmail && !token) {
+    loading.classList.add('hidden');
+    authDiv.classList.remove('hidden');
+    return;
+  }
+
+  if (!userEmail) {
+    // Token exists but no email — show email lookup form
+    loading.classList.add('hidden');
+    authDiv.innerHTML = `
+      <i class="fas fa-envelope" style="font-size:40px;color:#ff6f61;margin-bottom:16px;"></i>
+      <h3>Enter Your Email</h3>
+      <p>Enter the email you used when placing your order.</p>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px;">
+        <input type="email" id="email-lookup-input" placeholder="your@email.com"
+          style="padding:12px 16px;background:#252525;border:1px solid #333;border-radius:8px;color:#fff;font-size:14px;min-width:240px;">
+        <button onclick="loadOrdersByEmail(document.getElementById('email-lookup-input').value)"
+          style="padding:12px 20px;background:#ff6f61;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer;">
+          <i class="fas fa-search"></i> Find Orders
+        </button>
+      </div>`;
+    authDiv.classList.remove('hidden');
+    return;
+  }
+
+  document.getElementById('user-info-bar').style.display = 'flex';
+  document.getElementById('user-email-display').textContent = userEmail;
+  document.getElementById('user-avatar-letter').textContent = userEmail[0].toUpperCase();
+
+  await fetchAndRenderOrders(userEmail, loading, emptyDiv, listDiv);
+}
+
+async function loadOrdersByEmail(email) {
+  if (!email || !email.includes('@')) {
+    alert('Please enter a valid email address.');
+    return;
+  }
+  const loading = document.getElementById('orders-loading');
+  const authDiv = document.getElementById('orders-auth');
+  const emptyDiv = document.getElementById('orders-empty');
+  const listDiv = document.getElementById('orders-list');
+  authDiv.classList.add('hidden');
+  loading.classList.remove('hidden');
+  await fetchAndRenderOrders(email, loading, emptyDiv, listDiv);
+}
+
+async function fetchAndRenderOrders(email, loading, emptyDiv, listDiv) {
+  try {
+    const resp = await fetch(API_URL + '/orders?email=' + encodeURIComponent(email), {
+      headers: getAuthHeaders()
+    });
+    const data = await resp.json();
+    const orders = data.data || [];
+
+    loading.classList.add('hidden');
+
+    if (orders.length === 0) {
+      emptyDiv.classList.remove('hidden');
+      return;
+    }
+
+    listDiv.classList.remove('hidden');
+    listDiv.innerHTML = orders.map(renderOrderCard).join('');
+
+  } catch (err) {
+    loading.classList.add('hidden');
+    listDiv.classList.remove('hidden');
+    listDiv.innerHTML = '<p style="text-align:center;color:#f44336;padding:30px;">Error loading orders. Please try again.</p>';
+  }
+}
+
+function renderOrderCard(order) {
+  const date = new Date(order.created_at).toLocaleDateString('en-US', {
+    year: 'numeric', month: 'long', day: 'numeric'
+  });
+  const statusKey = order.status || 'created';
+  const statusText = statusKey.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  const statusColor = STATUS_COLORS[statusKey] || '#555';
+
+  let trackingHtml = '';
+  if (order.tracking_number) {
+    const carrierHtml = order.carrier
+      ? '<span class="t-carrier">' + order.carrier + '</span>'
+      : '';
+    trackingHtml = `
+      <div class="tracking-bar">
+        <span class="t-label">Tracking:</span>
+        <span class="t-number">${order.tracking_number}</span>
+        ${carrierHtml}
+      </div>`;
+  }
+
+  return `
+    <div class="order-card">
+      <div class="order-card-header">
+        <span class="order-id"><i class="fas fa-receipt" style="color:#ff6f61;margin-right:6px;"></i>Order #${order.id}</span>
+        <span class="status-badge" style="background:${statusColor};color:#fff;">${statusText}</span>
+      </div>
+      <div class="order-card-body">
+        <div class="order-meta">
+          <div class="meta-item">
+            <label>Date</label>
+            <span>${date}</span>
+          </div>
+          <div class="meta-item">
+            <label>Total</label>
+            <span class="highlight">$${Number(order.total).toFixed(2)}</span>
+          </div>
+          <div class="meta-item">
+            <label>Items</label>
+            <span>${order.item_count || '—'} item${(order.item_count || 0) !== 1 ? 's' : ''}</span>
+          </div>
+        </div>
+        ${trackingHtml}
+        <div class="order-actions">
+          <a href="tracking.html?order=${order.id}" class="btn-track">
+            <i class="fas fa-truck"></i> Track Order
+          </a>
+          <a href="order-success.html?order_id=${order.id}" class="btn-details">
+            <i class="fas fa-eye"></i> View Details
+          </a>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ---- Track order ----
+async function trackOrder() {
+  const input = document.getElementById('track-order-input').value.trim();
+  const resultDiv = document.getElementById('track-result');
+  const errorDiv = document.getElementById('track-error');
+
+  resultDiv.classList.remove('show');
+  errorDiv.style.display = 'none';
+
+  if (!input) {
+    errorDiv.querySelector('#track-error-msg').textContent = 'Please enter an Order ID.';
+    errorDiv.style.display = 'block';
+    return;
+  }
+
+  try {
+    const resp = await fetch(API_URL + '/orders/' + encodeURIComponent(input));
+    if (!resp.ok) throw new Error('not found');
+    const data = await resp.json();
+    const order = data.data || data;
+
+    // Fill result
+    document.getElementById('tr-order-id').textContent = '#' + order.id;
+    document.getElementById('tr-carrier').textContent = order.carrier ? order.carrier.toUpperCase() : '—';
+    document.getElementById('tr-tracking').textContent = order.tracking_number || '—';
+    document.getElementById('tr-full-link').href = 'tracking.html?order=' + order.id;
+
+    const statusKey = order.status || 'created';
+    const statusText = statusKey.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    const statusBadge = document.getElementById('tr-status-badge');
+    statusBadge.textContent = statusText;
+    statusBadge.style.cssText = 'padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;background:' + (STATUS_COLORS[statusKey] || '#555') + ';color:#fff;';
+
+    // Progress bar
+    const stageIndex = ORDER_STAGES.findIndex(s => s.key === statusKey);
+    let progressHtml = '';
+    for (let i = 0; i < ORDER_STAGES.length; i++) {
+      const stage = ORDER_STAGES[i];
+      const iconClass = i < stageIndex ? 'done' : (i === stageIndex ? 'current' : '');
+      const labelClass = i <= stageIndex ? 'active' : '';
+      progressHtml += `
+        <div class="progress-step">
+          <div class="step-icon ${iconClass}">${stage.icon}</div>
+          <div class="step-label ${labelClass}">${stage.label.replace('\n', '<br>')}</div>
+        </div>`;
+    }
+    document.getElementById('tr-progress-bar').innerHTML = progressHtml;
+
+    resultDiv.classList.add('show');
+
+  } catch (err) {
+    document.getElementById('track-error-msg').textContent = 'Order not found. Please check the Order ID and try again.';
+    errorDiv.style.display = 'block';
+  }
+}
+
+// Allow pressing Enter in track input
+document.addEventListener('DOMContentLoaded', function() {
+  loadOrders();
+
+  const trackInput = document.getElementById('track-order-input');
+  if (trackInput) {
+    trackInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') trackOrder();
+    });
+  }
+
+  // If URL has ?tab=track, switch to track tab
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('tab') === 'track') {
+    const trackBtn = document.querySelector('.tab-btn:nth-child(2)');
+    if (trackBtn) switchTab('track', trackBtn);
+  }
+  // If URL has ?order=XXX, pre-fill and auto-track
+  const orderId = params.get('order');
+  if (orderId) {
+    const trackBtn = document.querySelector('.tab-btn:nth-child(2)');
+    if (trackBtn) switchTab('track', trackBtn);
+    document.getElementById('track-order-input').value = orderId;
+    trackOrder();
+  }
+});
+</script>
+
+</body>
+</html>

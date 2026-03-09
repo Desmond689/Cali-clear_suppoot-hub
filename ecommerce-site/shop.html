@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<title>Shop - Cali Clear</title>
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- Components CSS -->
+<link rel="stylesheet" href="components/assets/css/components.css">
+
+<style>
+/* ================= GLOBAL ================= */
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: #121212;
+  color: #e0e0e0;
+}
+
+a { text-decoration: none; }
+
+/* ================= SHOP ================= */
+.shop-container {
+  max-width: 1200px;
+  margin: 60px auto;
+  padding: 0 20px;
+}
+
+/* Filter */
+.shop-filter {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.shop-filter input,
+.shop-filter select {
+  flex: 1;
+  min-width: 200px;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  background: #1e1e1e;
+  color: #fff;
+  outline: none;
+}
+
+/* Grid */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 25px;
+}
+
+/* Card */
+.product-card {
+  background: #1e1e1e;
+  border-radius: 14px;
+  padding: 15px;
+  transition: 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 30px rgba(255,111,97,0.3);
+}
+
+.product-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.product-card h3 {
+  margin: 12px 0 5px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.price {
+  color: #ff6f61;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.product-card button {
+  width: 100%;
+  padding: 10px;
+  background: #ff6f61;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: 10px;
+}
+
+.product-card button:hover {
+  background: #ff4a3b;
+}
+
+.product-card .view-btn {
+  background: #333;
+  margin-bottom: 8px;
+}
+
+.product-card .view-btn:hover {
+  background: #555;
+}
+
+/* ================= TOAST ================= */
+#toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+.toast {
+  background: #1e1e1e;
+  padding: 12px 20px;
+  margin-bottom: 10px;
+  border-left: 4px solid #ff6f61;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+/* ================= FOOTER ================= */
+.site-footer {
+  background: #0f0f0f;
+  color: #e0e0e0;
+  padding: 60px 20px 20px;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px;
+}
+
+.footer-logo {
+  color: #ff6f61;
+  font-size: 26px;
+  margin-bottom: 10px;
+}
+
+.footer-text {
+  font-size: 14px;
+  color: #bdbdbd;
+}
+
+.footer-col h4 {
+  margin-bottom: 15px;
+  color: #fff;
+}
+
+.footer-col ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-col ul li {
+  margin-bottom: 10px;
+}
+
+.footer-col ul li a {
+  color: #bdbdbd;
+  transition: 0.3s;
+}
+
+.footer-col ul li a:hover {
+  color: #ff6f61;
+  padding-left: 5px;
+}
+
+.payment-icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.payment-icons span {
+  background: #1e1e1e;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  border: 1px solid #2a2a2a;
+}
+
+.newsletter-form {
+  display: flex;
+  gap: 10px;
+}
+
+.newsletter-form input {
+  flex: 1;
+  padding: 10px;
+  background: #1e1e1e;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+}
+
+.newsletter-form button {
+  background: #ff6f61;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 15px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.footer-bottom {
+  text-align: center;
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid #222;
+  font-size: 13px;
+  color: #777;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 900px) {
+  .products-grid { grid-template-columns: repeat(2, 1fr); }
+  .footer-container { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 500px) {
+  .products-grid { grid-template-columns: 1fr; }
+  .footer-container { grid-template-columns: 1fr; text-align: center; }
+  .newsletter-form { flex-direction: column; }
+}
+
+/* ================= TESTIMONIALS ================= */
+.testimonials-section {
+  background: #1a1a1a;
+  padding: 50px 20px;
+  margin: 40px 0;
+}
+
+.testimonials-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.testimonials-section h2 {
+  color: #ff6f61;
+  font-size: 32px;
+  margin-bottom: 40px;
+}
+
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.testimonial-card {
+  background: #252525;
+  padding: 30px;
+  border-radius: 12px;
+  text-align: left;
+}
+
+.testimonial-stars {
+  color: #ffc107;
+  font-size: 20px;
+  margin-bottom: 15px;
+}
+
+.testimonial-text {
+  font-style: italic;
+  color: #ccc;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.testimonial-author {
+  font-weight: 600;
+  color: #fff;
+}
+
+.testimonial-location {
+  font-size: 13px;
+  color: #888;
+  margin-top: 5px;
+}
+
+.testimonial-badge {
+  display: inline-block;
+  background: #4caf50;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  margin-top: 10px;
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<div id="navbar-placeholder"></div>
+<script>
+fetch('components/navbar.html')
+  .then(r => r.text())
+  .then(d => {
+    document.getElementById('navbar-placeholder').innerHTML = d;
+    if (typeof updateAuthUI === 'function') updateAuthUI();
+  });
+</script>
+
+<!-- SHOP -->
+<div class="shop-container">
+
+  <div class="shop-filter">
+    <input type="text" id="search" placeholder="Search products...">
+    <select id="category">
+      <option value="">All Categories</option>
+    </select>
+  </div>
+
+  <div class="products-grid" id="products-grid">
+    <p style="text-align:center;color:#888;grid-column:1/-1;">Loading products...</p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+
+<!-- Testimonials Section (shown before footer) -->
+<section class="testimonials-section">
+  <div class="testimonials-container">
+    <h2>What Our Customers Say</h2>
+    <div class="testimonials-grid">
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"Incredible quality and fast shipping! Cali Clear has become my go-to. The products are always fresh and exactly as described."</p>
+        <p class="testimonial-author">Michael R.</p>
+        <p class="testimonial-location">Los Angeles, CA</p>
+        <span class="testimonial-badge">Verified Buyer</span>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"Best online shopping experience I've had. Great customer service and the delivery was super fast. Highly recommend!"</p>
+        <p class="testimonial-author">Sarah K.</p>
+        <p class="testimonial-location">San Diego, CA</p>
+        <span class="testimonial-badge">Verified Buyer</span>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"Finally found a reliable source for quality products. The website is easy to use and checkout was a breeze. Will order again!"</p>
+        <p class="testimonial-author">David M.</p>
+        <p class="testimonial-location">San Francisco, CA</p>
+        <span class="testimonial-badge">Verified Buyer</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-container">
+
+    <div class="footer-col">
+      <h2 class="footer-logo">Cali Clear</h2>
+      <p class="footer-text">Cali Clear delivers premium-quality products with consistency, transparency, and care.</p>
+    </div>
+
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="shop.html">Shop</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="faq.html">FAQ</a></li>
+        <li><a href="terms.html">Terms</a></li>
+        <li><a href="privacy.html">Privacy Policy</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>We Accept</h4>
+      <div class="payment-icons">
+        <span>Visa</span>
+        <span>MasterCard</span>
+        <span>PayPal</span>
+        <span>Apple Pay</span>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4>Newsletter</h4>
+      <p class="footer-text">Subscribe to receive product updates, exclusive offers, and important announcements from Cali Clear.</p>
+      <form class="newsletter-form">
+        <input type="email" placeholder="Enter your email">
+        <button type="submit">Subscribe</button>
+      </form>
+    </div>
+
+  </div>
+
+    <div class="footer-bottom">
+      © 2026 Cali Clear. All rights reserved.
+    </div>
+</footer>
+
+<!-- TOAST -->
+<div id="toast-container"></div>
+
+<script>
+const API_URL = '/api';
+let allProducts = [];
+
+/* Toast notification */
+function showToast(msg, showCartBtn = false) {
+  const t = document.createElement("div");
+  t.className = "toast";
+  t.innerHTML = msg + (showCartBtn ? '<br><a href="cart.html" style="color:#ff6f61;text-decoration:underline;cursor:pointer;" onclick="this.parentElement.remove()">View Cart</a>' : '');
+  document.getElementById("toast-container").appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+}
+
+/* Cart functions */
+function updateCartCount() {
+  const cartCount = document.getElementById('cart-count');
+  if (cartCount) {
+    // First try API, then fallback to localStorage
+    fetch('/api/cart', { credentials: 'include' })
+      .then(r => r.json())
+      .then(data => {
+        const count = data.data?.reduce((sum, item) => sum + (item.quantity || 1), 0) || 0;
+        cartCount.textContent = count;
+      })
+      .catch(() => {
+        let cart = JSON.parse(localStorage.getItem("cart") || '[]');
+        cartCount.textContent = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
+      });
+  }
+}
+
+async function addToCart(product) {
+  try {
+    const response = await fetch(`${API_URL}/cart/add`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ product_id: product.id, quantity: 1 }),
+      credentials: 'include'
+    });
+    
+    if (response.ok) {
+      // Sync to localStorage for fallback
+      let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const existing = cart.find(item => item.id === product.id);
+      if (existing) {
+        existing.qty = (existing.qty || 1) + 1;
+      } else {
+        cart.push({ id: product.id, name: product.name, price: product.price, image: product.image_url, qty: 1 });
+      }
+      localStorage.setItem('cart', JSON.stringify(cart));
+      showToast(`Added ${product.name} to cart 🛒`, true);
+    } else {
+      const data = await response.json();
+      showToast(data.message || 'Error adding to cart');
+    }
+  } catch (error) {
+    console.log('API not available, using localStorage');
+    // Fallback to localStorage
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const existing = cart.find(item => item.id === product.id);
+    if (existing) {
+      existing.qty = (existing.qty || 1) + 1;
+    } else {
+      cart.push({ id: product.id, name: product.name, price: product.price, image: product.image_url, qty: 1 });
+    }
+    localStorage.setItem('cart', JSON.stringify(cart));
+    showToast(`Added ${product.name} to cart 🛒`, true);
+  }
+  
+  updateCartCount();
+}
+
+/* Fetch products from API */
+async function fetchProducts() {
+  try {
+    const response = await fetch(`${API_URL}/products`);
+    if (!response.ok) throw new Error('API not available');
+    const data = await response.json();
+    return data.data?.products || [];
+  } catch (error) {
+    console.warn('API not available, using fallback');
+    try {
+      const res = await fetch('data/products.json');
+      const data = await res.json();
+      return data || [];
+    } catch (e) {
+      console.error('Failed to load products');
+      return [];
+    }
+  }
+}
+
+/* Render products */
+function render(products) {
+  const grid = document.getElementById("products-grid");
+  if (!products.length) {
+    grid.innerHTML = '<p style="text-align:center;color:#888;grid-column:1/-1;">No products found</p>';
+    return;
+  }
+  
+  grid.innerHTML = products.map(p => `
+    <div class="product-card" data-product-id="${p.id}">
+      <img src="${p.image_url || p.image}" alt="${p.name}">
+      <h3>${p.name}</h3>
+      <div class="price">${Number(p.price).toFixed(2)}</div>
+      <button class="view-btn" onclick="location.href='product.html?id=${p.id}'">View</button>
+      <button class="add-to-cart-btn" data-id="${p.id}" data-name="${p.name.replace(/"/g, '\\"')}">Add to Cart</button>
+    </div>
+  `).join("");
+
+  // Add event delegation for add to cart buttons
+  grid.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const productId = parseInt(this.dataset.id);
+      const product = allProducts.find(p => p.id === productId);
+      if (product) {
+        addToCart(product);
+      }
+    });
+  });
+}
+
+/* Load categories */
+async function loadCategories() {
+  try {
+    const response = await fetch(`${API_URL}/categories`);
+    if (!response.ok) throw new Error('API not available');
+    const data = await response.json();
+    const categories = data.data || [];
+    const categorySelect = document.getElementById('category');
+    categories.forEach(cat => {
+      const option = document.createElement('option');
+      option.value = cat.id;
+      option.textContent = cat.name;
+      categorySelect.appendChild(option);
+    });
+  } catch (error) {
+    // Fallback - extract from products
+    const categorySet = new Set(allProducts.map(p => p.category || 'General'));
+    const categorySelect = document.getElementById('category');
+    categorySet.forEach(cat => {
+      const option = document.createElement('option');
+      option.value = cat;
+      option.textContent = cat;
+      categorySelect.appendChild(option);
+    });
+  }
+}
+
+/* Filter */
+function filter() {
+  const s = document.getElementById('search').value.toLowerCase();
+  const c = document.getElementById('category').value;
+  
+  const filtered = allProducts.filter(p => {
+    const matchSearch = p.name.toLowerCase().includes(s) || 
+                       (p.description && p.description.toLowerCase().includes(s));
+    const matchCategory = !c || String(p.category_id) === c || p.category === c;
+    return matchSearch && matchCategory;
+  });
+  
+  render(filtered);
+}
+
+/* Initialize */
+document.addEventListener('DOMContentLoaded', async function() {
+  allProducts = await fetchProducts();
+  
+  // Populate categories
+  const categorySet = new Set(allProducts.map(p => p.category || 'General'));
+  const categorySelect = document.getElementById('category');
+  categorySet.forEach(cat => {
+    const option = document.createElement('option');
+    option.value = cat;
+    option.textContent = cat;
+    categorySelect.appendChild(option);
+  });
+  
+  // Render initial products
+  render(allProducts.slice(0, 12));
+  
+  // Setup filters
+  document.getElementById('search').oninput = filter;
+  document.getElementById('category').onchange = filter;
+  
+  // Update cart count
+  updateCartCount();
+  
+  // Load footer with chat
+  fetch('components/footer.html')
+    .then(res => res.text())
+    .then(html => {
+      const footer = document.createElement('footer');
+      footer.innerHTML = html;
+      document.body.appendChild(footer);
+      // Reinit chat after footer loads
+      setTimeout(() => {
+        const bubble = document.getElementById('chat-bubble');
+        if (bubble) {
+          const panel = document.getElementById('chat-panel');
+          const input = document.getElementById('chat-input');
+          const messages = document.getElementById('chat-messages');
+          if (panel && input && messages) {
+            bubble.addEventListener('click', () => {
+              panel.classList.toggle('hidden');
+              if (!panel.classList.contains('hidden')) {
+                input.focus();
+              }
+            });
+            input.addEventListener('keydown', e => {
+              if (e.key !== 'Enter') return;
+              const text = e.target.value.trim();
+              if (!text) return;
+              messages.innerHTML += `<div class="user-msg">${text}</div>`;
+              e.target.value = '';
+              let reply = "Sorry, I didn't understand that. Type \"agent\" to contact us.";
+              const lc = text.toLowerCase();
+              if (lc.includes('return')) reply = 'You can return items within 30 days. Check our FAQ for details.';
+              else if (lc.includes('shipping')) reply = 'Standard shipping takes 5–7 business days.';
+              else if (lc.includes('order')) reply = 'Your order is being processed. Use the tracking page with your order number.';
+              else if (lc.includes('agent') || lc.includes('human')) {
+                reply = 'Click here to email support: <a href="mailto:support@caliclear.shop">support@caliclear.shop</a>';
+              }
+              messages.innerHTML += `<div class="bot-msg">${reply}</div>`;
+              messages.scrollTop = messages.scrollHeight;
+            });
+          }
+        }
+      }, 100);
+    })
+    .catch(err => console.error('Error loading footer:', err));
+});
+</script>
+
+</body>
+</html>

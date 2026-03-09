@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<title>Order Success - Cali Clear</title>
+
+<!-- CSS -->
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="assets/css/animations.css">
+<link rel="stylesheet" href="assets/css/responsive.css">
+<link rel="stylesheet" href="components/assets/css/components.css">
+
+<style>
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #121212;
+  color: #e0e0e0;
+  margin: 0;
+  padding: 0;
+}
+
+/* Order Success Section */
+.order-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 80px 20px;
+  min-height: 60vh;
+}
+
+.order-success img {
+  width: 100px;
+  margin-bottom: 30px;
+  animation: bounceIn 0.6s ease-out;
+}
+
+.order-success h1 {
+  font-size: 36px;
+  color: #ff6f61;
+  margin-bottom: 15px;
+}
+
+.order-success p {
+  font-size: 18px;
+  margin-bottom: 30px;
+  color: #ddd;
+}
+
+.order-details {
+  background: #1e1e1e;
+  padding: 25px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 30px;
+  text-align: left;
+}
+
+.order-details h3 {
+  margin-bottom: 15px;
+  color: #ff6f61;
+  text-align: center;
+}
+
+.order-details .detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #333;
+}
+
+.order-details .detail-row:last-child {
+  border-bottom: none;
+}
+
+.order-details .detail-row.total {
+  font-weight: bold;
+  color: #fff;
+  font-size: 18px;
+  padding-top: 15px;
+}
+
+.order-details .detail-row.total span {
+  color: #ff6f61;
+}
+
+.order-actions {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.primary-btn {
+  background: #ff6f61;
+  color: #fff;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: 0.3s;
+}
+
+.primary-btn:hover {
+  background: #ff4a3b;
+  transform: translateY(-2px);
+}
+
+.secondary-btn {
+  background: transparent;
+  color: #ff6f61;
+  padding: 15px 30px;
+  border: 2px solid #ff6f61;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: 0.3s;
+}
+
+.secondary-btn:hover {
+  background: #ff6f61;
+  color: #fff;
+}
+
+/* Tracking status */
+.tracking-status {
+  background: #1e1e1e;
+  padding: 20px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 30px;
+}
+
+.tracking-status h3 {
+  color: #ff6f61;
+  margin-bottom: 15px;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.status-badge.created { background: #2196F3; color: #fff; }
+.status-badge.processing { background: #FF9800; color: #fff; }
+.status-badge.shipped { background: #9C27B0; color: #fff; }
+.status-badge.delivered { background: #43A047; color: #fff; }
+
+/* Social Sharing */
+.social-share {
+  margin-top: 20px;
+  display: flex;
+  gap: 15px;
+}
+
+.social-share a img {
+  width: 35px;
+  transition: 0.3s;
+}
+
+.social-share a img:hover {
+  transform: scale(1.1);
+}
+
+/* Loading spinner */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #333;
+  border-top-color: #ff6f61;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes bounceIn {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@media (max-width: 500px) {
+  .order-success h1 { font-size: 28px; }
+  .order-actions { flex-direction: column; }
+  .primary-btn, .secondary-btn { width: 100%; box-sizing: border-box; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<div id="navbar-placeholder"></div>
+<script>
+fetch('components/navbar.html')
+  .then(res => res.text())
+  .then(data => {
+    document.getElementById('navbar-placeholder').innerHTML = data;
+    // Update auth UI if function exists
+    if (typeof updateAuthUI === 'function') {
+      updateAuthUI();
+    }
+  })
+  .catch(err => console.error('Error loading navbar:', err));
+</script>
+
+<!-- Order Success Section -->
+<section class="order-success">
+  <img src="assets/images/icons/success.svg" alt="Success">
+  <h1>Thank You! Your Order is Confirmed</h1>
+  <p>Your order has been successfully placed. We'll send you a confirmation email shortly.</p>
+
+  <!-- Order Details (loaded dynamically) -->
+  <div id="order-details-container">
+    <div class="loading">
+      <div class="spinner"></div>
+    </div>
+  </div>
+
+  <!-- Tracking Info (if available) -->
+  <div id="tracking-container"></div>
+
+  <!-- Action Buttons -->
+  <div class="order-actions">
+    <a href="shop.html" class="primary-btn">Continue Shopping</a>
+    <a href="tracking.html" class="secondary-btn">Track Your Order</a>
+  </div>
+
+  <!-- Optional Social Sharing -->
+  <div class="social-share">
+    <a href="#"><img src="assets/images/icons/facebook.svg" alt="Facebook"></a>
+    <a href="#"><img src="assets/images/icons/twitter.svg" alt="Twitter"></a>
+    <a href="#"><img src="assets/images/icons/instagram.svg" alt="Instagram"></a>
+  </div>
+</section>
+
+<!-- Footer -->
+<div id="footer-placeholder"></div>
+<script>
+fetch('components/footer.html')
+  .then(res => res.text())
+  .then(data => document.getElementById('footer-placeholder').innerHTML = data)
+  .catch(err => console.error('Error loading footer:', err));
+</script>
+
+<!-- Toast container -->
+<div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+<script src="assets/js/toast.js"></script>
+
+<script>
+const API_URL = '/api';
+
+// Get order ID from URL
+const urlParams = new URLSearchParams(window.location.search);
+const orderId = urlParams.get('order_id') || localStorage.getItem('lastOrderId');
+
+// Store order ID for tracking
+if (orderId) {
+  localStorage.setItem('lastOrderId', orderId);
+}
+
+// Get auth headers
+function getAuthHeaders() {
+  const token = localStorage.getItem('access_token');
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': token ? `Bearer ${token}` : ''
+  };
+}
+
+// Fetch and display order details
+async function loadOrderDetails() {
+  const container = document.getElementById('order-details-container');
+  
+  if (!orderId) {
+    container.innerHTML = `
+      <div class="order-details">
+        <h3>Order Summary</h3>
+        <p style="text-align:center;color:#888;">Order details not available</p>
+      </div>
+    `;
+    return;
+  }
+  
+  try {
+    const response = await fetch(`${API_URL}/orders/${orderId}`, {
+      headers: getAuthHeaders()
+    });
+    
+    if (!response.ok) {
+      throw new Error('Order not found');
+    }
+    
+    const data = await response.json();
+    const order = data.data;
+    
+    // Format date
+    const date = new Date(order.created_at).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    
+    // Get status badge
+    const statusClass = order.status || 'created';
+    const statusText = order.status ? order.status.charAt(0).toUpperCase() + order.status.slice(1) : 'Created';
+    
+    container.innerHTML = `
+      <div class="order-details">
+        <h3>Order #${order.id}</h3>
+        <div class="detail-row">
+          <span>Date:</span>
+          <span>${date}</span>
+        </div>
+        <div class="detail-row">
+          <span>Status:</span>
+          <span class="status-badge ${statusClass}">${statusText}</span>
+        </div>
+        <div class="detail-row">
+          <span>Email:</span>
+          <span>${order.email}</span>
+        </div>
+        <div class="detail-row">
+          <span>Shipping Address:</span>
+          <span>${order.shipping_address || 'Not provided'}</span>
+        </div>
+        <div class="detail-row total">
+          <span>Total Paid:</span>
+          <span>$${Number(order.total).toFixed(2)}</span>
+        </div>
+      </div>
+    `;
+    
+    // Load tracking info if available
+    loadTrackingInfo(order);
+    
+  } catch (error) {
+    console.error('Error loading order:', error);
+    container.innerHTML = `
+      <div class="order-details">
+        <h3>Order #${orderId}</h3>
+        <p style="text-align:center;color:#888;">Unable to load order details</p>
+      </div>
+    `;
+  }
+}
+
+// Load tracking information
+async function loadTrackingInfo(order) {
+  const trackingContainer = document.getElementById('tracking-container');
+  
+  if (order.tracking_number) {
+    trackingContainer.innerHTML = `
+      <div class="tracking-status">
+        <h3>Tracking Information</h3>
+        <div class="detail-row">
+          <span>Carrier:</span>
+          <span>${order.carrier || 'N/A'}</span>
+        </div>
+        <div class="detail-row">
+          <span>Tracking Number:</span>
+          <span style="font-family:monospace;">${order.tracking_number}</span>
+        </div>
+        <a href="tracking.html?order_id=${order.id}" class="secondary-btn" style="margin-top:15px;padding:10px 20px;font-size:14px;">
+          Track Package
+        </a>
+      </div>
+    `;
+  }
+}
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', loadOrderDetails);
+</script>
+
+</body>
+</html>

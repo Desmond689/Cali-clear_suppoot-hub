@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<title>Cali Clear - Home</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!-- CSS -->
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="assets/css/animations.css">
+<link rel="stylesheet" href="assets/css/responsive.css">
+<link rel="stylesheet" href="components/assets/css/components.css">
+
+<style>
+/* ===== Body ===== */
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #121212;
+  color: #e0e0e0;
+  margin: 0;
+  padding: 0;
+}
+
+/* ===== Hero Section ===== */
+.hero-home {
+  background: url('assets/images/hero/hero1.jpg') center/cover no-repeat;
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+}
+
+.hero-home::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+}
+
+.hero-home h1 {
+  position: relative;
+  font-size: 48px;
+  color: #ff6f61;
+  font-weight: bold;
+}
+
+.hero-home p {
+  position: relative;
+  font-size: 18px;
+  margin-top: 12px;
+  color: #ddd;
+  line-height: 1.5;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ===== Sections ===== */
+.section {
+  max-width: 1200px;
+  margin: 50px auto;
+  padding: 0 20px;
+}
+
+.section h2 {
+  color: #ff6f61;
+  margin-bottom: 25px;
+}
+
+/* ===== Products Grid ===== */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+  gap: 20px;
+}
+
+.product-card {
+  background: #1e1e1e;
+  border-radius: 12px;
+  padding: 15px;
+  text-align: center;
+  transition: 0.3s;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 20px rgba(255, 111, 97, 0.3);
+}
+
+.product-card img {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.product-card h3 {
+  font-size: 16px;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.product-card p {
+  color: #ff6f61;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.product-card button {
+  background: #ff6f61;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* ===== Categories ===== */
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.category-card {
+  flex: 1;
+  min-width: 200px;
+  height: 150px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.category-card h3 {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  color: #fff;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.7);
+}
+
+/* ===== Newsletter ===== */
+.newsletter {
+  background: #1e1e1e;
+  text-align: center;
+  padding: 50px 20px;
+  border-radius: 10px;
+  margin-top: 50px;
+}
+
+.newsletter h2 {
+  margin-bottom: 20px;
+  color: #ff6f61;
+}
+
+.newsletter input {
+  padding: 12px;
+  width: 250px;
+  border: none;
+  border-radius: 6px;
+  margin-right: 10px;
+}
+
+.newsletter button {
+  padding: 12px 20px;
+  background: #ff6f61;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* ===== Toast Container ===== */
+#toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+</style>
+</head>
+<body>
+<!-- Auth check: redirect to intro if not logged in -->
+<script>
+  (function() {
+    const token = localStorage.getItem('access_token');
+    const user = localStorage.getItem('user');
+    // Only redirect if not in debug mode and no auth data
+    if (!token || !user) {
+      const isAutoLoginEnabled = localStorage.getItem('skip_intro'); // Allow bypass for testing
+      if (!isAutoLoginEnabled) {
+        window.location.href = 'intro.html';
+      }
+    }
+  })();
+</script>
+
+<!-- Navbar -->
+<div id="navbar-placeholder"></div>
+<script>
+  fetch('components/navbar.html?t=' + Date.now())
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById('navbar-placeholder').innerHTML = data;
+    })
+    .catch(err => console.error('Error loading navbar:', err));
+</script>
+
+<!-- Hero Section -->
+<section class="hero-home">
+  <div>
+     <h1>Cali Clear</h1>
+     <p>Premium products crafted for a clean, smooth experience.</p>
+     <p>At Cali Clear, we believe quality should speak for itself. Every product is chosen with care, tested for consistency, and delivered with reliability you can trust.</p>
+  </div>
+</section>
+
+<!-- Featured Products -->
+<div class="section">
+  <h2>Featured Products</h2>
+  <div class="products-grid" id="products-grid">
+    <!-- Products will be loaded dynamically via JS -->
+  </div>
+</div>
+
+<!-- About Section -->
+<div class="section">
+  <h2>Purity in Every Drop, Potency in Every Puff</h2>
+  <p>
+    Cali Clear offers high-performance THC disposable vape carts, featuring premium liquid diamonds and live resin. Enjoy potent hits, rich flavors, and smooth puffs. Browse Cali Clear’s all-in-one vaporizer pods to elevate your cannabis experience. We’re built on an unwavering commitment to purity, top-tier quality, and third-party lab testing for your absolute safety. Your ultimate experience is just a click away.
+  </p>
+  <div class="about-links">
+    <a href="#our-story">Our story</a> | <a href="#our-products">Our products</a> | <a href="#reviews">Cali Clears Carts Reviews</a>
+  </div>
+  <p>Join our community of happy vapers. Read our customer reviews and share your experience with Cali Clear.</p>
+  <button>Leave a review</button>
+</div>
+
+<!-- Newsletter -->
+<div class="section newsletter">
+  <h2>Subscribe for Updates</h2>
+  <form id="newsletter-form-main">
+    <input type="email" placeholder="Enter your email" required>
+    <button type="submit">Subscribe</button>
+  </form>
+  <div id="newsletter-main-msg"></div>
+</div>
+
+<!-- Footer -->
+<div id="footer-placeholder"></div>
+<script>
+  fetch('components/footer.html')
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById('footer-placeholder').innerHTML = data;
+      // Initialize chat after footer loads
+      setTimeout(() => {
+        const bubble = document.getElementById('chat-bubble');
+        const panel = document.getElementById('chat-panel');
+        const input = document.getElementById('chat-input');
+        const messages = document.getElementById('chat-messages');
+        
+        if (bubble && panel && input && messages) {
+          bubble.addEventListener('click', () => {
+            panel.classList.toggle('hidden');
+            if (!panel.classList.contains('hidden')) {
+              input.focus();
+            }
+          });
+          
+          input.addEventListener('keydown', e => {
+            if (e.key !== 'Enter') return;
+            const text = e.target.value.trim();
+            if (!text) return;
+            messages.innerHTML += `<div class="user-msg">${text}</div>`;
+            e.target.value = '';
+            let reply = "Sorry, I didn't understand that. Type \"agent\" to contact us.";
+            const lc = text.toLowerCase();
+            if (lc.includes('return')) reply = 'You can return items within 30 days. Check our FAQ for details.';
+            else if (lc.includes('shipping')) reply = 'Standard shipping takes 5–7 business days.';
+            else if (lc.includes('order')) reply = 'Your order is being processed. Use the tracking page with your order number.';
+            else if (lc.includes('agent') || lc.includes('human')) {
+              reply = 'Click here to email support: <a href="mailto:support@caliclear.shop">support@caliclear.shop</a>';
+            }
+            messages.innerHTML += `<div class="bot-msg">${reply}</div>`;
+            messages.scrollTop = messages.scrollHeight;
+          });
+        }
+      }, 100);
+    })
+    .catch(err => console.error('Error loading footer:', err));
+</script>
+
+<!-- Toast -->
+<div id="toast-container"></div>
+<script src="assets/js/main.js"></script>
+<script src="assets/js/toast.js"></script>
+<script src="assets/js/auth.js"></script>
+<!-- Products JS (Dynamic Loading) -->
+<script src="assets/js/products.js"></script>
+
+</body>
+</html>
