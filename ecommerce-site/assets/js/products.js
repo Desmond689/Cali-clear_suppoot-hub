@@ -1,5 +1,6 @@
 // Products JS - Full Integration with Backend API
-const API_URL = '/api';
+// Use existing API_URL or define it (check to avoid redeclaration)
+var API_URL = typeof API_URL !== 'undefined' ? API_URL : '/api';
 
 document.addEventListener("DOMContentLoaded", async () => {
   const productId = new URLSearchParams(window.location.search).get("id");
@@ -8,24 +9,41 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let allProducts = [];
 
-  // ===== FETCH PRODUCTS FROM BACKEND API =====
+  // ===== FETCH PRODUCTS FROM BACKEND API OR FALLBACK =====
   try {
     const response = await fetch(`${API_URL}/products`);
     if (response.ok) {
       const data = await response.json();
       allProducts = data.data?.products || [];
+      console.log('Loaded products from API:', allProducts.length);
     } else {
-      // Fallback to products.json if API fails
       throw new Error('API not available');
     }
   } catch (err) {
-    console.log('Using fallback products.json');
+    console.log('API not available, using fallback products.json');
     try {
-      const res = await fetch("../data/products.json");
-      const data = await res.json();
-      allProducts = data || [];
+      // Try multiple possible paths for products.json
+      let res = await fetch("data/products.json");
+      if (!res.ok) {
+        res = await fetch("../data/products.json");
+      }
+      if (!res.ok) {
+        res = await fetch("assets/data/products.json");
+      }
+      if (res.ok) {
+        const data = await res.json();
+        allProducts = data || [];
+        console.log('Loaded products from JSON:', allProducts.length);
+      } else {
+        throw new Error('Could not load products.json');
+      }
     } catch (e) {
-      console.error('Failed to load products');
+      console.error('Failed to load products:', e);
+      // Show message to user
+      const grid = document.getElementById("products-grid");
+      if (grid) {
+        grid.innerHTML = '<p style="text-align:center;padding:2rem;">Unable to load products. Please try again later.</p>';
+      }
       return;
     }
   }
@@ -50,6 +68,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // ===== HOMEPAGE =====
   if (isHomePage) {
+    console.log('Homepage detected, rendering products');
     renderProductGrid(allProducts.slice(0, 4));
   }
 
@@ -131,17 +150,32 @@ document.addEventListener("DOMContentLoaded", async () => {
   // ===============================
   function renderProductGrid(products) {
     const grid = document.getElementById("products-grid");
-    if (!grid) return;
+    if (!grid) {
+      console.log('products-grid element not found');
+      return;
+    }
+    
+    if (!products || products.length === 0) {
+      grid.innerHTML = '<p style="text-align:center;padding:2rem;">No products available.</p>';
+      return;
+    }
 
-    grid.innerHTML = products.map(p => `
-      <div class="product-card">
-        <img src="${p.image_url || p.image}" alt="${p.name}">
-        <h4>${p.name}</h4>
-        <div class="product-rating">${"★".repeat(p.rating || 4)}${"☆".repeat(5 - (p.rating || 4))}</div>
-        <p>$${Number(p.price).toFixed(2)}</p>
-        <button onclick="location.href='product.html?id=${p.id}'">View</button>
-      </div>
-    `).join("");
+    console.log('Rendering', products.length, 'products');
+    grid.innerHTML = products.map(p => {
+      // Handle both image and image_url fields
+      const imgSrc = p.image_url || p.image || 'assets/images/logo.png';
+      const rating = p.rating || 4;
+      const name = p.cleanName || p.name || 'Product';
+      return `
+        <div class="product-card">
+          <img src="${imgSrc}" alt="${name}" onerror="this.src='assets/images/logo.png'">
+          <h4>${name}</h4>
+          <div class="product-rating">${"★".repeat(rating)}${"☆".repeat(5 - rating)}</div>
+          <p>${Number(p.price || 0).toFixed(2)}</p>
+          <button onclick="location.href='product.html?id=${p.id}'">View</button>
+        </div>
+      `;
+    }).join("");
   }
 
   // ===============================

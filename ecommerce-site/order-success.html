@@ -13,6 +13,10 @@
 <link rel="stylesheet" href="assets/css/responsive.css">
 <link rel="stylesheet" href="components/assets/css/components.css">
 
+<!-- JS for navbar toggle -->
+<script src="assets/js/main.js"></script>
+<script src="assets/js/toast.js"></script>
+
 <style>
 body {
   font-family: 'Poppins', sans-serif;
@@ -224,6 +228,10 @@ fetch('components/navbar.html')
     // Update auth UI if function exists
     if (typeof updateAuthUI === 'function') {
       updateAuthUI();
+    }
+    // Initialize navbar toggle after navbar is loaded
+    if (typeof setupNavbarToggle === 'function') {
+      setupNavbarToggle();
     }
   })
   .catch(err => console.error('Error loading navbar:', err));

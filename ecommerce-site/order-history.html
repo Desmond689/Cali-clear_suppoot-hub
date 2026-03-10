@@ -14,6 +14,10 @@
 <link rel="stylesheet" href="components/assets/css/components.css">
 <!-- Font Awesome removed (no external CDN tracking) -->
 
+<!-- JS for navbar toggle -->
+<script src="assets/js/main.js"></script>
+<script src="assets/js/toast.js"></script>
+
 <style>
   /* Replace Font Awesome icons with Unicode symbols - no external dependencies */
   .fas { font-style: normal; font-weight: normal; margin-right: 4px; font-family: Arial, sans-serif; }
@@ -550,6 +554,10 @@ fetch('components/navbar.html')
   .then(data => {
     document.getElementById('navbar-placeholder').innerHTML = data;
     if (typeof updateAuthUI === 'function') updateAuthUI();
+    // Initialize navbar toggle after navbar is loaded
+    if (typeof setupNavbarToggle === 'function') {
+      setupNavbarToggle();
+    }
   });
 </script>
 

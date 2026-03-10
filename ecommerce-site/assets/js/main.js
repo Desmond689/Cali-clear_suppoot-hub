@@ -4,11 +4,9 @@
 function toggleNavbar() {
 	const links = document.getElementById('navbar-links');
 	const toggle = document.getElementById('navbar-toggle');
-	if (!links || !toggle) return;
-
-	// Ensure accessibility attributes
-	if (!toggle.hasAttribute('aria-controls')) {
-		toggle.setAttribute('aria-controls', 'navbar-links');
+	if (!links || !toggle) {
+		console.log('Navbar elements not found');
+		return;
 	}
 
 	const isOpen = toggle.getAttribute('aria-expanded') === 'true';
@@ -23,7 +21,7 @@ function toggleNavbar() {
 		toggle.setAttribute('aria-expanded', 'true');
 		document.body.classList.add('no-scroll');
 		// Focus first focusable item for better keyboard navigation
-		const firstLink = links.querySelector('a, button');
+		const firstLink = links.querySelector('a');
 		if (firstLink) firstLink.focus({ preventScroll: true });
 	}
 }
@@ -32,88 +30,118 @@ function toggleNavbar() {
 function setupNavbarToggle() {
 	const toggle = document.getElementById('navbar-toggle');
 	const links = document.getElementById('navbar-links');
-	if (toggle && links) {
-		// Check if already setup
-		if (toggle.dataset.setup === 'true') return true;
-		toggle.dataset.setup = 'true';
+	
+	// If elements don't exist yet, return false
+	if (!toggle || !links) {
+		return false;
+	}
+	
+	// Check if already setup
+	if (toggle.dataset.setup === 'true') {
+		return true;
+	}
+	
+	toggle.dataset.setup = 'true';
 
-		// Ensure ARIA attribute exists
-		if (!toggle.hasAttribute('aria-expanded')) toggle.setAttribute('aria-expanded', 'false');
+	// Ensure ARIA attributes exist
+	if (!toggle.hasAttribute('aria-expanded')) {
+		toggle.setAttribute('aria-expanded', 'false');
+	}
+	if (!toggle.hasAttribute('aria-controls')) {
+		toggle.setAttribute('aria-controls', 'navbar-links');
+	}
 
-		toggle.addEventListener('click', function(e) {
-			e.preventDefault();
-			toggleNavbar();
+	// Remove inline onclick to avoid double-firing
+	toggle.removeAttribute('onclick');
+	
+	// Add click event listener
+	toggle.addEventListener('click', function(e) {
+		e.preventDefault();
+		toggleNavbar();
+	});
+
+	// Close when clicking a nav link (mobile)
+	links.querySelectorAll('a').forEach(function(a) {
+		a.addEventListener('click', function() {
+			if (toggle.getAttribute('aria-expanded') === 'true') {
+				links.classList.remove('active');
+				toggle.classList.remove('active');
+				toggle.setAttribute('aria-expanded', 'false');
+				document.body.classList.remove('no-scroll');
+			}
 		});
+	});
 
-		// Close when clicking a nav link (mobile)
-		links.querySelectorAll('a').forEach(function(a) {
-			a.addEventListener('click', function() {
-				if (toggle.getAttribute('aria-expanded') === 'true') {
-					links.classList.remove('active');
-					toggle.classList.remove('active');
-					toggle.setAttribute('aria-expanded', 'false');
-				}
-			});
+	// Close on outside click
+	if (!document.body.dataset.navOutsideListener) {
+		document.addEventListener('click', function(e) {
+			const toggleEl = document.getElementById('navbar-toggle');
+			const linksEl = document.getElementById('navbar-links');
+			if (!toggleEl || !linksEl) return;
+			if (toggleEl.contains(e.target) || linksEl.contains(e.target)) return;
+			if (toggleEl.getAttribute('aria-expanded') === 'true') {
+				linksEl.classList.remove('active');
+				toggleEl.classList.remove('active');
+				toggleEl.setAttribute('aria-expanded', 'false');
+				document.body.classList.remove('no-scroll');
+			}
 		});
+		document.body.dataset.navOutsideListener = 'true';
+	}
 
-		// Close on outside click (only add once)
-		if (!document.body.dataset.navOutsideListener) {
-			document.addEventListener('click', function(e) {
+	// Close on Escape key
+	if (!document.body.dataset.navEscapeListener) {
+		document.addEventListener('keydown', function(e) {
+			if (e.key === 'Escape') {
 				const toggleEl = document.getElementById('navbar-toggle');
 				const linksEl = document.getElementById('navbar-links');
 				if (!toggleEl || !linksEl) return;
-				if (toggleEl.contains(e.target) || linksEl.contains(e.target)) return;
 				if (toggleEl.getAttribute('aria-expanded') === 'true') {
 					linksEl.classList.remove('active');
 					toggleEl.classList.remove('active');
 					toggleEl.setAttribute('aria-expanded', 'false');
+					document.body.classList.remove('no-scroll');
 				}
-			});
-			document.body.dataset.navOutsideListener = 'true';
-		}
-
-		// Close on Escape key
-		if (!document.body.dataset.navEscapeListener) {
-			document.addEventListener('keydown', function(e) {
-				if (e.key === 'Escape') {
-					const toggleEl = document.getElementById('navbar-toggle');
-					const linksEl = document.getElementById('navbar-links');
-					if (!toggleEl || !linksEl) return;
-					if (toggleEl.getAttribute('aria-expanded') === 'true') {
-						linksEl.classList.remove('active');
-						toggleEl.classList.remove('active');
-						toggleEl.setAttribute('aria-expanded', 'false');
-					}
-				}
-			});
-			document.body.dataset.navEscapeListener = 'true';
-		}
-
-		return true;
+			}
+		});
+		document.body.dataset.navEscapeListener = 'true';
 	}
-	return false;
+
+	return true;
 }
 
 // Setup navbar when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-	// Try immediately and with delays
+	// Try immediately and with delays to catch dynamically loaded navbar
 	setupNavbarToggle();
 	setTimeout(setupNavbarToggle, 100);
+	setTimeout(setupNavbarToggle, 300);
 	setTimeout(setupNavbarToggle, 500);
 	setTimeout(setupNavbarToggle, 1000);
 
-	// Watch for navbar being loaded dynamically
+	// Watch for navbar being loaded dynamically via fetch
 	const navbarPlaceholder = document.getElementById('navbar-placeholder');
 	if (navbarPlaceholder) {
 		const observer = new MutationObserver(function(mutations) {
 			mutations.forEach(function(mutation) {
 				if (mutation.addedNodes.length > 0) {
+					// Give time for the HTML to be parsed
 					setTimeout(setupNavbarToggle, 50);
+					setTimeout(setupNavbarToggle, 200);
 				}
 			});
 		});
 		observer.observe(navbarPlaceholder, { childList: true });
 	}
+
+	// Also check periodically in case navbar loads after page load
+	let attempts = 0;
+	const checkInterval = setInterval(function() {
+		attempts++;
+		if (setupNavbarToggle() || attempts >= 10) {
+			clearInterval(checkInterval);
+		}
+	}, 200);
 
 	// Smooth scroll for anchor links
 	document.querySelectorAll('a[href^="#"]').forEach(function(link) {

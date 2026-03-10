@@ -9,6 +9,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="components/assets/css/components.css">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/responsive.css">
+
+<!-- JS for navbar toggle -->
+<script src="assets/js/main.js"></script>
+<script src="assets/js/toast.js"></script>
 
 <style>
 * {
@@ -214,7 +220,13 @@ input {
 <script>
 fetch('components/navbar.html')
   .then(r => r.text())
-  .then(d => document.getElementById('navbar-placeholder').innerHTML = d);
+  .then(d => {
+    document.getElementById('navbar-placeholder').innerHTML = d;
+    // Initialize navbar toggle after navbar is loaded
+    if (typeof setupNavbarToggle === 'function') {
+      setupNavbarToggle();
+    }
+  });
 </script>
 
 

@@ -1,5 +1,6 @@
 // Login & registration UI logic with backend API
-const API_URL = '/api';
+// Use existing API_URL or define it (check to avoid redeclaration)
+var API_URL = typeof API_URL !== 'undefined' ? API_URL : '/api';
 
 document.addEventListener('DOMContentLoaded', function() {
 	// Show/hide password

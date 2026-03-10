@@ -121,46 +121,8 @@
   border-radius: 2px;
 }
 
-/* Responsive Navbar */
-@media (max-width: 900px) {
-  .navbar-main {
-    flex-direction: column;
-    gap: 1rem;
-  }
-}
-
-@media (max-width: 600px) {
-  .navbar-links {
-    display: none;
-    position: absolute;
-    top: 60px;
-    left: 0;
-    right: 0;
-    background: #fff;
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1rem 0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  }
-
-  .navbar-links.active {
-    display: flex;
-  }
-
-  .navbar-toggle {
-    display: flex;
-  }
-
-  .announcement-bar {
-    flex-direction: column;
-    gap: 0.5rem;
-    text-align: center;
-  }
-
-  .announcement {
-    margin-left: 0;
-  }
-}
+/* Responsive Navbar - Styles moved to responsive.css */
+/* The main responsive.css handles all mobile navbar styles */
 
 /* ================= FOOTER BASE ================= */
 .footer {
