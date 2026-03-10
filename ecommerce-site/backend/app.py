@@ -44,38 +44,10 @@ def handle_500(e):
     traceback.print_exc()
     return jsonify({'error': str(e), 'traceback': traceback.format_exc()}), 500
 
-# Ensure `is_active` column exists in user table (migrations may not have run).
-# This block runs every startup and is safe for SQLite (ALTER TABLE adds column only if missing).
+# Create tables FIRST before any migration/initialization code
 with app.app_context():
-    try:
-        conn = db.engine.connect()
-        conn.execute(db.text("SELECT is_active FROM user LIMIT 1"))
-    except Exception:
-        # column missing; add it
-        try:
-            conn.execute(db.text("ALTER TABLE user ADD COLUMN is_active BOOLEAN DEFAULT 1"))
-            print("[MIGRATION] Added 'is_active' column to user table")
-        except Exception as exc:
-            print("[MIGRATION] Failed to add 'is_active' column:", exc)
-    finally:
-        try:
-            conn.close()
-        except Exception:
-            pass
-
-    # make sure there's at least one admin user; useful in fresh/dev environments
-    from database.models import User
-    admin_email = Config.DEFAULT_ADMIN_EMAIL
-    admin_password = Config.DEFAULT_ADMIN_PASSWORD
-    existing = User.query.filter_by(is_admin=True).first()
-    if not existing:
-        print(f"[INIT] No admin user found, creating default admin ({admin_email})")
-        user = User(email=admin_email, is_admin=True)
-        user.set_password(admin_password)
-        db.session.add(user)
-        db.session.commit()
-    else:
-        print(f"[INIT] Admin user exists: {existing.email}")
+    db.create_all()
+    print("[INIT] Database tables created")
 
 
 # Register blueprints
@@ -133,9 +105,27 @@ def serve_component(filename):
 def serve_favicon():
     return send_from_directory(BASE_DIR, 'favicon.ico')
 
-# Create tables and seed data
+# Run migrations and seed data after tables are created
 with app.app_context():
-    db.create_all()
+    # Ensure `is_active` column exists in user table (for older databases)
+    try:
+        conn = db.engine.connect()
+        conn.execute(db.text("SELECT is_active FROM user LIMIT 1"))
+        conn.close()
+    except Exception:
+        # Column or table missing; add it
+        try:
+            conn = db.engine.connect()
+            conn.execute(db.text("ALTER TABLE user ADD COLUMN is_active BOOLEAN DEFAULT 1"))
+            conn.commit()
+            conn.close()
+            print("[MIGRATION] Added 'is_active' column to user table")
+        except Exception as exc:
+            print("[MIGRATION] Failed to add 'is_active' column:", exc)
+            try:
+                conn.close()
+            except Exception:
+                pass
     
     # Add missing columns to existing tables
     try:
