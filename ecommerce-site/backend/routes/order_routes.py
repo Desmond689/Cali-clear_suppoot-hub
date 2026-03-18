@@ -164,7 +164,7 @@ def create_order():
         shipping_address=shipping_address,
         customer_name=customer_name,
         city=city,
-        zip_code=zip_code
+        zip_code=zip_codey
     )
     db.session.add(order)
 
@@ -183,6 +183,10 @@ def create_order():
             product.stock -= item['quantity']
 
     db.session.commit()
+    
+    # Auto-setup MiniPay details (default payment method)
+    from services.minipay_service import set_order_minipay_details
+    set_order_minipay_details(order_number)
 
     # Prepare order details for email
     order_details = {
@@ -199,10 +203,10 @@ def create_order():
             order_details=order_details,
             items=order_items,
             shipping_address=shipping_address,
-            payment_method=payment_method
+            payment_method='MiniPay'
         )
     except Exception as e:
         print(f'Warning: Could not send order confirmation email: {e}')
 
-    return success_response({'order_id': order_number, 'message': 'Order created'}), 201
+    return success_response({'order_id': order_number, 'message': 'Order created - Pay with MiniPay'}), 201
 

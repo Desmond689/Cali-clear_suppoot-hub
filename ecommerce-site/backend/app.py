@@ -68,6 +68,7 @@ app.register_blueprint(payment_bp, url_prefix='/api/payment')
 app.register_blueprint(admin_bp, url_prefix='/api/admin')
 app.register_blueprint(auth_bp, url_prefix='/api')
 app.register_blueprint(message_bp)
+app.register_blueprint(minipay_bp, url_prefix='/api/minipay')
 
 # Serve HTML pages
 HTML_PAGES = [

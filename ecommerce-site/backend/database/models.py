@@ -1,6 +1,7 @@
 from database.db import db
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
+import os
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -58,9 +59,21 @@ class Order(db.Model):
     zip_code = db.Column(db.String(20))  # ZIP code for destination
     tracking_number = db.Column(db.String(100))
     carrier = db.Column(db.String(50))
+    
+    # MiniPay fields
+    minipay_phone = db.Column(db.String(20), default=lambda: os.getenv('MINIPAY_PHONE', 'MINIPAY_WALLET'))
+    minipay_qr_data = db.Column(db.Text)  # Base64 QR image
+    payment_deadline = db.Column(db.DateTime)
+    transaction_ref = db.Column(db.String(100))
+    screenshot_path = db.Column(db.String(200))
+    payment_status = db.Column(db.String(20), default='none')  # none/pending/verified/rejected
+    
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     # Relationship to order items for admin endpoints and detail views
     items = db.relationship('OrderItem', backref='order', lazy=True)
+    
+    # MiniPay relationship
+    confirmations = db.relationship('PaymentConfirmation', backref='order', lazy=True, cascade='all, delete-orphan')
 
 class OrderItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -71,17 +84,25 @@ class OrderItem(db.Model):
     # Relationship to product for name/price lookup
     product = db.relationship('Product', lazy=True)
 
+class PaymentConfirmation(db.Model):
+    \"\"\"Customer payment confirmation submissions\"\"\"
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.String(20), db.ForeignKey('order.id'), nullable=False)
+    amount_sent = db.Column(db.Float)
+    transaction_ref = db.Column(db.String(100))
+    submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
+    screenshot_data = db.Column(db.LargeBinary)  # Binary screenshot
+    status = db.Column(db.String(20), default='pending')  # pending/verified/rejected
 
 class AdminVerificationToken(db.Model):
-    """Stores one-time verification tokens for admin login."""
+    \"\"\"Stores one-time verification tokens for admin login.\"\"\"
     id = db.Column(db.Integer, primary_key=True)
     token = db.Column(db.String(36), unique=True, nullable=False)
     admin_email = db.Column(db.String(120), nullable=False)
     admin_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
-
 class Message(db.Model):
-    """Customer support messages from chat widget"""
+    \"\"\"Customer support messages from chat widget\"\"\"
     id = db.Column(db.Integer, primary_key=True)
     customer_email = db.Column(db.String(120), nullable=False)
     customer_name = db.Column(db.String(100))
@@ -91,9 +112,8 @@ class Message(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     replied_at = db.Column(db.DateTime)
 
-
 class PasswordResetToken(db.Model):
-    """One-time password reset tokens"""
+    \"\"\"One-time password reset tokens\"\"\"
     id = db.Column(db.Integer, primary_key=True)
     token = db.Column(db.String(36), unique=True, nullable=False)
     user_email = db.Column(db.String(120), nullable=False)
@@ -103,5 +123,6 @@ class PasswordResetToken(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def is_valid(self):
-        """Check if token is valid (not expired and not used)."""
+        \"\"\"Check if token is valid (not expired and not used).\"\"\"
         return not self.used and datetime.utcnow() < self.expires_at
+
