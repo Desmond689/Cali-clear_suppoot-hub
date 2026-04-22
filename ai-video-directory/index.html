@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Video Generator Directory | Best AI Video Tools 2026</title>
+    <meta name="description" content="Discover the best AI video generation models and tools. Compare features, pricing, and capabilities of top AI video generators.">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="container">
+                <a href="index.html" class="logo">
+                    <span class="logo-icon"><i class="fas fa-robot"></i></span>
+                    <span class="logo-text">AI Video<span class="accent">Directory</span></span>
+                </a>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="#home" class="active">Home</a></li>
+                    <li><a href="#models">Models</a></li>
+                    <li><a href="#compare">Compare</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-bg">
+            <div class="gradient-orb orb-1"></div>
+            <div class="gradient-orb orb-2"></div>
+            <div class="grid-overlay"></div>
+        </div>
+        <div class="container">
+            <div class="hero-content">
+                <span class="badge">🚀 #1 Resource for AI Video Tools</span>
+                <h1>Discover the Best <span class="gradient-text">AI Video Generation</span> Models</h1>
+                <p>Explore and compare the top AI video generation models powering the future of content creation. Find the perfect tool for your creative needs.</p>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number" id="modelCount">15</span>
+                        <span class="stat-label">AI Models</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">50K+</span>
+                        <span class="stat-label">Users</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">1M+</span>
+                        <span class="stat-label">Videos Created</span>
+                    </div>
+                </div>
+                <div class="hero-buttons">
+                    <a href="#models" class="btn btn-primary">
+                        <i class="fas fa-play"></i> Explore Models
+                    </a>
+                    <a href="#compare" class="btn btn-secondary">
+                        <i class="fas fa-balance-scale"></i> Compare
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filter Section -->
+    <section class="filters">
+        <div class="container">
+            <div class="filter-bar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search AI video models...">
+                </div>
+                <div class="filter-group">
+                    <select id="categoryFilter" class="filter-select">
+                        <option value="all">All Categories</option>
+                        <option value="text-to-video">Text to Video</option>
+                        <option value="image-to-video">Image to Video</option>
+                        <option value="video-to-video">Video to Video</option>
+                        <option value="animation">Animation</option>
+                    </select>
+                    <select id="pricingFilter" class="filter-select">
+                        <option value="all">All Pricing</option>
+                        <option value="free">Free</option>
+                        <option value="freemium">Freemium</option>
+                        <option value="paid">Paid</option>
+                    </select>
+                    <select id="sortFilter" class="filter-select">
+                        <option value="popular">Most Popular</option>
+                        <option value="newest">Newest</option>
+                        <option value="name">Name A-Z</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Models Grid -->
+    <section class="models-section" id="models">
+        <div class="container">
+            <div class="section-header">
+                <h2>Top AI Video Generation Models</h2>
+                <p>Browse our curated list of the most powerful AI video generation tools</p>
+            </div>
+            <div class="models-grid" id="modelsGrid">
+                <!-- Models will be dynamically inserted here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Compare Section -->
+    <section class="compare-section" id="compare">
+        <div class="container">
+            <div class="section-header">
+                <h2>Compare Models</h2>
+                <p>Select up to 3 models to compare their features side by side</p>
+            </div>
+            <div class="compare-container">
+                <div class="compare-selectors">
+                    <select id="compare1" class="compare-select">
+                        <option value="">Select Model 1</option>
+                    </select>
+                    <select id="compare2" class="compare-select">
+                        <option value="">Select Model 2</option>
+                    </select>
+                    <select id="compare3" class="compare-select">
+                        <option value="">Select Model 3</option>
+                    </select>
+                    <button class="btn btn-primary" id="compareBtn">
+                        <i class="fas fa-balance-scale"></i> Compare
+                    </button>
+                </div>
+                <div class="compare-table" id="compareTable">
+                    <!-- Compare results will be shown here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Why Use Our Directory?</h2>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h3>Curated Selection</h3>
+                    <p>Hand-picked collection of the most powerful and reliable AI video generation models</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <h3>Regular Updates</h3>
+                    <p>Continuously updated with the latest AI video generation tools and features</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Detailed Reviews</h3>
+                    <p>In-depth analysis of each tool's capabilities, pricing, and performance</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Community Driven</h3>
+                    <p>Reviews and ratings from real users to help you make informed decisions</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="newsletter-section">
+        <div class="container">
+            <div class="newsletter-content">
+                <h2>Stay Updated</h2>
+                <p>Get the latest updates on new AI video generation tools and features</p>
+                <form class="newsletter-form" id="newsletterForm">
+                    <input type="email" placeholder="Enter your email" required>
+                    <button type="submit" class="btn btn-primary">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="index.html" class="logo">
+                        <span class="logo-icon"><i class="fas fa-robot"></i></span>
+                        <span class="logo-text">AI Video<span class="accent">Directory</span></span>
+                    </a>
+                    <p>Your ultimate resource for discovering the best AI video generation models and tools.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-github"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-discord"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#models">Models</a></li>
+                        <li><a href="#compare">Compare</a></li>
+                        <li><a href="#about">About</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Tutorials</a></li>
+                        <li><a href="#">API Docs</a></li>
+                        <li><a href="#">Support</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 AI Video Directory. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+</body>
+</html>

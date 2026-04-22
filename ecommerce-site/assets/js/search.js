@@ -1,4 +1,5 @@
 // Shop page: product rendering, filters, sort, search, pagination, quick view modal
+const API_URL = '/api';
 document.addEventListener('DOMContentLoaded', function() {
 	const grid = document.getElementById('shop-products-grid');
 	const pagination = document.getElementById('pagination');
@@ -13,12 +14,20 @@ document.addEventListener('DOMContentLoaded', function() {
 	const quickViewModal = document.getElementById('quick-view-modal');
 	let allProducts = [], filtered = [], page = 1, perPage = 8;
 
-	// Fetch products
-	fetch('data/products.json')
-		.then(r => r.json())
-		.then(products => {
-			allProducts = products;
+	// Fetch products - try API first, fallback to JSON
+	fetch(`${API_URL}/products`)
+		.then(r => r.ok ? r.json() : Promise.reject('API not available'))
+		.then(data => {
+			allProducts = data.data?.products || [];
 			filterAndRender();
+		})
+		.catch(() => {
+			fetch('data/products.json')
+				.then(r => r.json())
+				.then(products => {
+					allProducts = products;
+					filterAndRender();
+				});
 		});
 
 	// Filtering, sorting, searching

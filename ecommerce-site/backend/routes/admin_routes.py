@@ -511,6 +511,8 @@ def get_orders():
                 'shipping_address': order.shipping_address,
                 'city': order.city,
                 'zip_code': order.zip_code,
+                'payment_status': order.payment_status,
+                'payment_method_name': order.payment_method_name,
                 'created_at': order.created_at.isoformat() if order.created_at else None,
                 'items': items_by_order.get(order.id, [])
             })
@@ -947,3 +949,194 @@ def test_notification():
     print("[NOTIFICATIONS] Test notification triggered")
     
     return success_response({'message': 'Test notification sent'}), 200
+
+
+# ============ PAYMENT METHODS ============
+
+@admin_bp.route('/payment-methods', methods=['GET'])
+@admin_required
+def get_payment_methods():
+    """List all payment methods for admin"""
+    from database.models import PaymentMethod
+    methods = PaymentMethod.query.order_by(PaymentMethod.sort_order).all()
+    result = []
+    for m in methods:
+        details = {}
+        try:
+            details = json.loads(m.account_details) if m.account_details else {}
+        except (json.JSONDecodeError, TypeError):
+            details = {}
+        result.append({
+            'id': m.id,
+            'name': m.name,
+            'slug': m.slug,
+            'icon': m.icon,
+            'account_details': details,
+            'instructions': m.instructions,
+            'active': m.active,
+            'sort_order': m.sort_order,
+            'created_at': m.created_at.isoformat() if m.created_at else None,
+            'updated_at': m.updated_at.isoformat() if m.updated_at else None
+        })
+    return success_response(result), 200
+
+
+@admin_bp.route('/payment-methods', methods=['POST'])
+@admin_required
+def create_payment_method():
+    """Create a new payment method"""
+    from database.models import PaymentMethod
+    data = request.get_json()
+    if not data:
+        return error_response('Invalid request body'), 400
+
+    name = data.get('name', '').strip()
+    slug = data.get('slug', '').strip().lower()
+    if not name or not slug:
+        return error_response('Name and slug are required'), 400
+
+    if PaymentMethod.query.filter_by(slug=slug).first():
+        return error_response('A payment method with this slug already exists'), 409
+
+    pm = PaymentMethod(
+        name=name,
+        slug=slug,
+        icon=data.get('icon', ''),
+        account_details=json.dumps(data.get('account_details', {})),
+        instructions=data.get('instructions', ''),
+        active=data.get('active', True),
+        sort_order=data.get('sort_order', 0)
+    )
+    db.session.add(pm)
+    db.session.commit()
+    return success_response({'id': pm.id, 'message': 'Payment method created'}), 201
+
+
+@admin_bp.route('/payment-methods/<int:pm_id>', methods=['PUT'])
+@admin_required
+def update_payment_method(pm_id):
+    """Update a payment method"""
+    from database.models import PaymentMethod
+    pm = PaymentMethod.query.get(pm_id)
+    if not pm:
+        return error_response('Payment method not found'), 404
+
+    data = request.get_json()
+    if not data:
+        return error_response('Invalid request body'), 400
+
+    if 'name' in data:
+        pm.name = data['name']
+    if 'slug' in data:
+        new_slug = data['slug'].strip().lower()
+        existing = PaymentMethod.query.filter(PaymentMethod.slug == new_slug, PaymentMethod.id != pm_id).first()
+        if existing:
+            return error_response('Slug already in use'), 409
+        pm.slug = new_slug
+    if 'icon' in data:
+        pm.icon = data['icon']
+    if 'account_details' in data:
+        pm.account_details = json.dumps(data['account_details'])
+    if 'instructions' in data:
+        pm.instructions = data['instructions']
+    if 'active' in data:
+        pm.active = bool(data['active'])
+    if 'sort_order' in data:
+        pm.sort_order = int(data['sort_order'])
+
+    db.session.commit()
+    return success_response({'message': 'Payment method updated'}), 200
+
+
+@admin_bp.route('/payment-methods/<int:pm_id>', methods=['DELETE'])
+@admin_required
+def delete_payment_method(pm_id):
+    """Delete a payment method"""
+    from database.models import PaymentMethod
+    pm = PaymentMethod.query.get(pm_id)
+    if not pm:
+        return error_response('Payment method not found'), 404
+
+    db.session.delete(pm)
+    db.session.commit()
+    return success_response({'message': 'Payment method deleted'}), 200
+
+
+@admin_bp.route('/payment-methods/<int:pm_id>/toggle', methods=['PATCH'])
+@admin_required
+def toggle_payment_method(pm_id):
+    """Toggle active status"""
+    from database.models import PaymentMethod
+    pm = PaymentMethod.query.get(pm_id)
+    if not pm:
+        return error_response('Payment method not found'), 404
+
+    pm.active = not pm.active
+    db.session.commit()
+    return success_response({'message': f'Payment method {"activated" if pm.active else "deactivated"}'}), 200
+
+
+# ============ PAYMENT VERIFICATION ============
+
+@admin_bp.route('/payments/pending', methods=['GET'])
+@admin_required
+def get_pending_payments():
+    """Get orders with pending payment status"""
+    orders = Order.query.filter_by(payment_status='pending').order_by(Order.created_at.desc()).all()
+    result = []
+    for o in orders:
+        result.append({
+            'id': o.id,
+            'email': o.email,
+            'customer_name': o.customer_name,
+            'total': o.total,
+            'payment_method_name': o.payment_method_name,
+            'payment_status': o.payment_status,
+            'transaction_ref': o.transaction_ref,
+            'created_at': o.created_at.isoformat() if o.created_at else None
+        })
+    return success_response(result), 200
+
+
+@admin_bp.route('/payments/verify/<order_id>', methods=['POST'])
+@admin_required
+def verify_payment(order_id):
+    """Verify payment for an order"""
+    from database.models import Message
+    order = Order.query.get(order_id)
+    if not order:
+        return error_response('Order not found'), 404
+
+    data = request.get_json() or {}
+    action = data.get('action', 'verify')  # 'verify' or 'reject'
+    note = data.get('note', '')
+
+    if action == 'verify':
+        order.payment_status = 'verified'
+        order.status = 'paid'
+        status_msg = f"✅ Payment verified for Order #{order_id}!\n\nYour order is now being processed."
+    elif action == 'reject':
+        order.payment_status = 'rejected'
+        status_msg = f"❌ Payment could not be verified for Order #{order_id}."
+        if note:
+            status_msg += f"\n\nReason: {note}"
+        status_msg += "\n\nPlease re-upload your payment proof or contact support."
+    else:
+        return error_response('Invalid action'), 400
+
+    db.session.commit()
+
+    # Send chat notification to customer
+    msg = Message(
+        customer_email=order.email,
+        customer_name='Bot',
+        message=status_msg,
+        message_type='status_update',
+        order_id=order_id,
+        status='replied',
+        replied_at=datetime.utcnow()
+    )
+    db.session.add(msg)
+    db.session.commit()
+
+    return success_response({'message': f'Payment {action}d'}), 200

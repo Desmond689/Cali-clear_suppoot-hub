@@ -5,30 +5,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	const API_URL = '/api';
 
-	// Show toast notification with View Cart link
-	function showToast(msg, showCartBtn = false) {
-		const container = document.getElementById('toast-container');
-		if (!container) {
-			const toastContainer = document.createElement('div');
-			toastContainer.id = 'toast-container';
-			toastContainer.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;';
-			document.body.appendChild(toastContainer);
-			return showToast(msg, showCartBtn);
-		}
-
-		const toast = document.createElement('div');
-		toast.innerHTML = msg + (showCartBtn ? '<br><a href="cart.html" style="color:#ff6f61;text-decoration:underline;cursor:pointer;margin-top:5px;display:inline-block;">View Cart</a>' : '');
-		toast.style.cssText = 'background:#333;color:#fff;padding:12px 18px;margin-top:10px;border-radius:8px;opacity:0;transition:0.3s;';
-		container.appendChild(toast);
-
-		requestAnimationFrame(() => toast.style.opacity = '1');
-
-		setTimeout(() => {
-			toast.style.opacity = '0';
-			setTimeout(() => toast.remove(), 300);
-		}, 4000);
-	}
-
 	// Fetch products from API
 	async function fetchProducts() {
 		try {
@@ -150,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					<div class="product-rating">${'★'.repeat(4)}${'☆'.repeat(1)}</div>
 					<div class="product-price">$${Number(product.price).toFixed(2)}</div>
 					<p class="product-desc">${product.description || ''}</p>
-					<button class="btn add-to-cart" data-id="${product.id}">Add to Cart</button>
+					<button class="btn add-to-cart" data-id="${product.id}" data-name="${product.name}" data-price="${Number(product.price).toFixed(2)}">Add to Cart</button>
 				</div>
 			</div>
 		`).join('');

@@ -220,60 +220,29 @@ body {
 
 <!-- NAVBAR -->
 <div id="navbar-placeholder"></div>
-<script>
-fetch('components/navbar.html')
-  .then(res => res.text())
-  .then(data => {
-    document.getElementById('navbar-placeholder').innerHTML = data;
-    // Update auth UI if function exists
-    if (typeof updateAuthUI === 'function') {
-      updateAuthUI();
-    }
-    // Initialize navbar toggle after navbar is loaded
-    if (typeof setupNavbarToggle === 'function') {
-      setupNavbarToggle();
-    }
-  })
-  .catch(err => console.error('Error loading navbar:', err));
-</script>
-
-<!-- Order Success Section -->
-<section class="order-success">
-  <img src="assets/images/icons/success.svg" alt="Success">
-  <h1>Thank You! Your Order is Confirmed</h1>
-  <p>Your order has been successfully placed. We'll send you a confirmation email shortly.</p>
-
-  <!-- Order Details (loaded dynamically) -->
-  <div id="order-details-container">
-    <div class="loading">
-      <div class="spinner"></div>
-    </div>
-  </div>
-
-  <!-- Tracking Info (if available) -->
-  <div id="tracking-container"></div>
-
-  <!-- Action Buttons -->
-  <div class="order-actions">
-    <a href="shop.html" class="primary-btn">Continue Shopping</a>
-    <a href="tracking.html" class="secondary-btn">Track Your Order</a>
-  </div>
-
-  <!-- Optional Social Sharing -->
-  <div class="social-share">
-    <a href="#"><img src="assets/images/icons/facebook.svg" alt="Facebook"></a>
-    <a href="#"><img src="assets/images/icons/twitter.svg" alt="Twitter"></a>
-    <a href="#"><img src="assets/images/icons/instagram.svg" alt="Instagram"></a>
-  </div>
-</section>
-
-<!-- Footer -->
 <div id="footer-placeholder"></div>
 <script>
-fetch('components/footer.html')
-  .then(res => res.text())
-  .then(data => document.getElementById('footer-placeholder').innerHTML = data)
-  .catch(err => console.error('Error loading footer:', err));
+  function loadFooterWithChat() {
+    fetch('components/footer.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('footer-placeholder').innerHTML = data;
+
+        // Ensure chat bootstrap script is loaded and initialized (works for injected footer)
+        if (!document.getElementById('chatbot-script')) {
+          const s = document.createElement('script');
+          s.id = 'chatbot-script';
+          s.src = 'assets/js/chatbot.js';
+          s.onload = () => { if (typeof initChat === 'function') initChat(); };
+          document.body.appendChild(s);
+        } else if (typeof initChat === 'function') {
+          initChat();
+        }
+      })
+      .catch(err => console.error('Error loading footer:', err));
+  }
+
+  document.addEventListener('DOMContentLoaded', loadFooterWithChat);
 </script>
 
 <!-- Toast container -->
@@ -326,6 +295,49 @@ async function loadOrderDetails() {
     
     const data = await response.json();
     const order = data.data;
+    
+    // Check if payment is pending and show payment prompt
+    if (order.payment_status === 'pending' || order.payment_status === 'none') {
+        container.innerHTML = `
+            <div class="order-details">
+                <h3>Order #${order.id}</h3>
+                <div class="detail-row">
+                    <span>Status:</span>
+                    <span class="status-badge" style="background:#FF9800;color:#fff;">Payment Pending</span>
+                </div>
+                <div class="detail-row">
+                    <span>Total:</span>
+                    <span>${Number(order.total).toFixed(2)}</span>
+                </div>
+                <p style="text-align:center;color:#FF9800;margin-top:20px;">
+                    Please complete your MiniPay payment to process this order.
+                </p>
+                <a href="minipay.html?order_id=${order.id}" class="primary-btn" style="display:block;margin-top:15px;text-align:center;">
+                    Complete Payment
+                </a>
+            </div>
+        `;
+        return;
+    }
+    
+    // Check if payment is verified/paid
+    if (order.payment_status === 'verified') {
+        container.innerHTML = `
+            <div class="order-details">
+                <h3>Order #${order.id}</h3>
+                <div class="detail-row">
+                    <span>Status:</span>
+                    <span class="status-badge" style="background:#43A047;color:#fff;">Paid</span>
+                </div>
+                <div class="detail-row">
+                    <span>Total Paid:</span>
+                    <span>${Number(order.total).toFixed(2)}</span>
+                </div>
+            </div>
+        `;
+        loadTrackingInfo(order);
+        return;
+    }
     
     // Format date
     const date = new Date(order.created_at).toLocaleDateString('en-US', {
@@ -408,3 +420,4 @@ document.addEventListener('DOMContentLoaded', loadOrderDetails);
 
 </body>
 </html>
+

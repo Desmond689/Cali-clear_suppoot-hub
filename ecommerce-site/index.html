@@ -193,119 +193,57 @@ body {
 </style>
 </head>
 <body>
-<!-- Auth check: redirect to intro if not logged in -->
-<script>
-  (function() {
-    const token = localStorage.getItem('access_token');
-    const user = localStorage.getItem('user');
-    // Only redirect if not in debug mode and no auth data
-    if (!token || !user) {
-      const isAutoLoginEnabled = localStorage.getItem('skip_intro'); // Allow bypass for testing
-      if (!isAutoLoginEnabled) {
-        window.location.href = 'intro.html';
-      }
-    }
-  })();
-</script>
-
-<!-- Navbar -->
 <div id="navbar-placeholder"></div>
-<script>
-  fetch('components/navbar.html?t=' + Date.now())
-    .then(res => res.text())
-    .then(data => {
-      document.getElementById('navbar-placeholder').innerHTML = data;
-      // Initialize navbar toggle after navbar is loaded
-      if (typeof setupNavbarToggle === 'function') {
-        setupNavbarToggle();
-      }
-    })
-    .catch(err => console.error('Error loading navbar:', err));
-</script>
 
-<!-- Hero Section -->
 <section class="hero-home">
-  <div>
-     <h1>Cali Clear</h1>
-     <p>Premium products crafted for a clean, smooth experience.</p>
-     <p>At Cali Clear, we believe quality should speak for itself. Every product is chosen with care, tested for consistency, and delivered with reliability you can trust.</p>
+  <div class="hero-content">
+    <h1>Cali Clear – Premium Products</h1>
+    <p>Discover top-quality products with fast shipping and trusted service.</p>
+    <a href="shop.html" class="btn btn-lg" style="background:#ff6f61;color:#fff;">Shop Now</a>
   </div>
 </section>
 
-<!-- Featured Products -->
-<div class="section">
+<section class="section">
   <h2>Featured Products</h2>
-  <div class="products-grid" id="products-grid">
-    <!-- Products will be loaded dynamically via JS -->
-  </div>
-</div>
+  <div id="products-grid" class="products-grid"></div>
+</section>
 
-<!-- About Section -->
-<div class="section">
-  <h2>Purity in Every Drop, Potency in Every Puff</h2>
-  <p>
-    Cali Clear offers high-performance THC disposable vape carts, featuring premium liquid diamonds and live resin. Enjoy potent hits, rich flavors, and smooth puffs. Browse Cali Clear’s all-in-one vaporizer pods to elevate your cannabis experience. We’re built on an unwavering commitment to purity, top-tier quality, and third-party lab testing for your absolute safety. Your ultimate experience is just a click away.
-  </p>
-  <div class="about-links">
-    <a href="#our-story">Our story</a> | <a href="#our-products">Our products</a> | <a href="#reviews">Cali Clears Carts Reviews</a>
-  </div>
-  <p>Join our community of happy vapers. Read our customer reviews and share your experience with Cali Clear.</p>
-  <button>Leave a review</button>
-</div>
-
-<!-- Newsletter -->
-<div class="section newsletter">
-  <h2>Subscribe for Updates</h2>
-  <form id="newsletter-form-main">
-    <input type="email" placeholder="Enter your email" required>
-    <button type="submit">Subscribe</button>
-  </form>
-  <div id="newsletter-main-msg"></div>
-</div>
-
-<!-- Footer -->
 <div id="footer-placeholder"></div>
+
 <script>
-  fetch('components/footer.html')
-    .then(res => res.text())
-    .then(data => {
-      document.getElementById('footer-placeholder').innerHTML = data;
-      // Initialize chat after footer loads
-      setTimeout(() => {
-        const bubble = document.getElementById('chat-bubble');
-        const panel = document.getElementById('chat-panel');
-        const input = document.getElementById('chat-input');
-        const messages = document.getElementById('chat-messages');
-        
-        if (bubble && panel && input && messages) {
-          bubble.addEventListener('click', () => {
-            panel.classList.toggle('hidden');
-            if (!panel.classList.contains('hidden')) {
-              input.focus();
-            }
-          });
-          
-          input.addEventListener('keydown', e => {
-            if (e.key !== 'Enter') return;
-            const text = e.target.value.trim();
-            if (!text) return;
-            messages.innerHTML += `<div class="user-msg">${text}</div>`;
-            e.target.value = '';
-            let reply = "Sorry, I didn't understand that. Type \"agent\" to contact us.";
-            const lc = text.toLowerCase();
-            if (lc.includes('return')) reply = 'You can return items within 30 days. Check our FAQ for details.';
-            else if (lc.includes('shipping')) reply = 'Standard shipping takes 5–7 business days.';
-            else if (lc.includes('order')) reply = 'Your order is being processed. Use the tracking page with your order number.';
-            else if (lc.includes('agent') || lc.includes('human')) {
-              reply = 'Click here to email support: <a href="mailto:support@caliclear.shop">support@caliclear.shop</a>';
-            }
-            messages.innerHTML += `<div class="bot-msg">${reply}</div>`;
-            messages.scrollTop = messages.scrollHeight;
-          });
+  function loadNavbar() {
+    fetch('components/navbar.html')
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('navbar-placeholder').innerHTML = html;
+      })
+      .catch(err => console.error('Error loading navbar:', err));
+  }
+
+  function loadFooterWithChat() {
+    fetch('components/footer.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('footer-placeholder').innerHTML = data;
+
+        // Ensure chat bootstrap script is loaded and initialized (works for injected footer)
+        if (!document.getElementById('chatbot-script')) {
+          const s = document.createElement('script');
+          s.id = 'chatbot-script';
+          s.src = 'assets/js/chatbot.js';
+          s.onload = () => { if (typeof initChat === 'function') initChat(); };
+          document.body.appendChild(s);
+        } else if (typeof initChat === 'function') {
+          initChat();
         }
-      }, 100);
-    })
-    .catch(err => console.error('Error loading footer:', err));
+      })
+      .catch(err => console.error('Error loading footer:', err));
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    loadNavbar();
+    loadFooterWithChat();
+  });
 </script>
 
 <!-- Toast -->
@@ -316,3 +254,4 @@ body {
 
 </body>
 </html>
+

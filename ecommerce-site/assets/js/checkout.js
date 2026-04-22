@@ -224,6 +224,30 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 
 	/**
+	 * Setup MiniPay for order
+	 */
+	async function setupMiniPay(orderId) {
+		try {
+			const response = await fetch(`/api/minipay/setup/${orderId}`, {
+				method: 'POST',
+				headers: getAuthHeaders()
+			});
+			
+			const data = await response.json();
+			
+			if (!response.ok) {
+				console.error('MiniPay setup error:', data);
+				return null;
+			}
+			
+			return data.data;
+		} catch (error) {
+			console.error('MiniPay setup error:', error);
+			return null;
+		}
+	}
+
+	/**
 	 * Place order - main order creation function
 	 */
 	async function placeOrder(formData) {
@@ -239,11 +263,18 @@ document.addEventListener('DOMContentLoaded', function() {
 				payment_method: paymentMethod
 			});
 			
+			// For MiniPay, setup the payment details
+			if (paymentMethod === 'minipay') {
+				const minipaySetup = await setupMiniPay(orderData.order_id);
+				console.log('[CHECKOUT] MiniPay setup result:', minipaySetup);
+			}
+			
 			return {
 				success: true,
 				order_id: orderData.order_id,
 				email: email,
-				message: orderData.message
+				message: orderData.message,
+				payment_method: paymentMethod
 			};
 		} catch (error) {
 			return {
@@ -257,11 +288,29 @@ document.addEventListener('DOMContentLoaded', function() {
 	 * Get cart items from API
 	 */
 	async function getCartItems() {
+		// First try to get from localStorage cart
+		const localCart = localStorage.getItem('cart');
+		if (localCart) {
+			try {
+				const cart = JSON.parse(localCart);
+				console.log('[CHECKOUT] Local cart:', cart);
+				return cart.map(item => ({
+					product_id: item.product_id || item.id,
+					id: item.product_id || item.id,
+					quantity: item.quantity || item.qty || 1,
+					price: item.price
+				}));
+			} catch (e) {
+				console.error('[CHECKOUT] Error parsing local cart:', e);
+			}
+		}
+		
+		// Fallback to API
 		cartItems = await fetchCartFromAPI();
 		return cartItems.map(item => ({
 			product_id: item.product_id,
 			id: item.product_id,
-			quantity: item.quantity || item.qty,
+			quantity: item.quantity || item.qty || 1,
 			price: item.price
 		}));
 	}
@@ -280,13 +329,27 @@ document.addEventListener('DOMContentLoaded', function() {
 	 * Get email from form
 	 */
 	function getEmail() {
-		return document.getElementById('email')?.value || document.getElementById('fullName')?.value || '';
+		return document.getElementById('email')?.value || '';
 	}
 
 	/**
-	 * Get order total
+	 * Get customer name from form
+	 */
+	function getName() {
+		const name = document.getElementById('fullName')?.value || document.getElementById('name')?.value || '';
+		return name.trim();
+	}
+
+	/**
+	 * Get order total - from renderOrderSummary in checkout.html
 	 */
 	function getOrderTotal() {
+		const totalEl = document.getElementById('total');
+		if (totalEl) {
+			const text = totalEl.textContent.replace(/[^0-9.]/g, '');
+			const value = parseFloat(text);
+			if (!isNaN(value)) return value;
+		}
 		return window.orderTotal || 0;
 	}
 
@@ -294,8 +357,13 @@ document.addEventListener('DOMContentLoaded', function() {
 	 * Get selected payment method from form
 	 */
 	function getSelectedPaymentMethod() {
-		const selected = document.querySelector('input[name="pay"]:checked');
-		return selected ? selected.value : 'card';
+		// Check for radio button selection
+		const selected = document.querySelector('input[name="payment_method"]:checked');
+		if (selected) return selected.value;
+		// Check for global selectedPM (used by inline checkout)
+		if (window.selectedPM && window.selectedPM.slug) return window.selectedPM.slug;
+		// Fallback
+		return 'pending';
 	}
 
 	// Place order - main form submission handler
@@ -349,23 +417,35 @@ document.addEventListener('DOMContentLoaded', function() {
 				const cartCount = document.getElementById('cart-count');
 				if (cartCount) cartCount.textContent = '0';
 				
-				// Show success message
-				if (typeof showToast === 'function') {
-					showToast('Order created successfully!');
-				} else {
-					alert('Order created successfully!');
-				}
-				
 				// Store order ID and customer email for order tracking
 				localStorage.setItem('lastOrderId', result.order_id);
 				if (result.email) {
 					localStorage.setItem('user', JSON.stringify({ email: result.email }));
 				}
 				
-				// Redirect to success page after a delay
+				// Check if this is a MiniPay order
+				if (result.payment_method === 'minipay') {
+					// Show success message
+					if (typeof showToast === 'function') {
+						showToast('Order created! Redirecting to payment...');
+					} else {
+						alert('Order created! Redirecting to payment...');
+					}
+				} else {
+					// Show success message and redirect to order success
+					if (typeof showToast === 'function') {
+						showToast('Order created successfully!');
+					} else {
+						alert('Order created successfully!');
+					}
+				}
+
+				const customerName = getName() || 'Guest';
 				setTimeout(() => {
-					window.location.href = `order-success.html?order_id=${result.order_id}`;
-				}, 1500);
+					if (typeof openChatForOrder === 'function') {
+						openChatForOrder(result.order_id, result.email || email, customerName, getSelectedPaymentMethod(), items.map(item => item.name || item.product_id).join(', '), total);
+					}
+				}, 500);
 			} else {
 				throw new Error(result.message);
 			}
@@ -393,4 +473,6 @@ document.addEventListener('DOMContentLoaded', function() {
 		getOrderTotal,
 		getSelectedPaymentMethod
 	};
+});
+
 });

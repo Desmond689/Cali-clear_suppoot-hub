@@ -843,6 +843,7 @@
   </style>
 </head>
 <body>
+  <script src="assets/js/admin-payments.js"></script>
   <!-- Login Section -->
   <div id="login-section" class="login-container">
     <div class="login-box">
@@ -884,6 +885,8 @@
         <li><a href="#" data-section="products"><i class="fas fa-box"></i> Products</a></li>
         <li><a href="#" data-section="categories"><i class="fas fa-tags"></i> Categories</a></li>
         <li><a href="#" data-section="orders"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+        <li><a href="#" data-section="payments"><i class="fas fa-dollar-sign"></i> Payments</a></li>
+        <li><a href="#" data-section="pay-methods"><i class="fas fa-credit-card"></i> Pay Methods</a></li>
         <li><a href="#" data-section="messages"><i class="fas fa-comments"></i> Messages <span id="msg-badge" class="badge" style="display:none;"></span></a></li>
         <li><a href="#" data-section="users"><i class="fas fa-users"></i> Users</a></li>
         <li><a href="#" data-section="reports"><i class="fas fa-chart-bar"></i> Reports</a></li>
@@ -1049,6 +1052,8 @@
                 <th>Customer</th>
                 <th>Items</th>
                 <th>Total</th>
+                <th>Payment</th>
+                <th>Pay Status</th>
                 <th>Status</th>
                 <th>Tracking</th>
                 <th>Date</th>
@@ -1056,33 +1061,247 @@
               </tr>
             </thead>
             <tbody id="orders-table-body">
-              <tr><td colspan="8" class="loading"><i class="fas fa-spinner"></i> Loading orders...</td></tr>
+              <tr><td colspan="10" class="loading"><i class="fas fa-spinner"></i> Loading orders...</td></tr>
             </tbody>
           </table>
           <div class="pagination" id="orders-pagination"></div>
         </div>
       </section>
 
+      <!-- Payments Section -->
+      <section id="payments" class="admin-section">
+        <div class="table-container">
+          <div class="table-header">
+            <h2><i class="fas fa-dollar-sign"></i> MiniPay Payments</h2>
+            <div class="actions">
+              <div class="search-box">
+                <input type="text" id="payment-search" placeholder="Search by order ID or email..." oninput="loadPayments()">
+                <select id="payment-status-filter" onchange="loadPayments()">
+                  <option value="">All Status</option>
+                  <option value="pending">Pending Verification</option>
+                  <option value="verified">Verified</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="expired">Expired</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <!-- MiniPay Stats -->
+          <div class="stats-grid" style="margin-bottom: 20px; grid-template-columns: repeat(4, 1fr);">
+            <div class="stat-card">
+              <div class="icon" style="background: #ffc107;"><i class="fas fa-clock"></i></div>
+              <div class="info">
+                <h3>Pending</h3>
+                <div class="number" id="stat-pending-payments">0</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="icon" style="background: #28a745;"><i class="fas fa-check"></i></div>
+              <div class="info">
+                <h3>Verified</h3>
+                <div class="number" id="stat-verified-payments">0</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="icon" style="background: #dc3545;"><i class="fas fa-times"></i></div>
+              <div class="info">
+                <h3>Rejected</h3>
+                <div class="number" id="stat-rejected-payments">0</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="icon" style="background: #667eea;"><i class="fas fa-dollar-sign"></i></div>
+              <div class="info">
+                <h3>Revenue</h3>
+                <div class="number" id="stat-payment-revenue">$0</div>
+              </div>
+            </div>
+          </div>
+          
+          <table>
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Order Total</th>
+                <th>Amount Sent</th>
+                <th>Transaction Ref</th>
+                <th>Submitted</th>
+                <th>Deadline</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="payments-table-body">
+              <tr><td colspan="9" class="loading"><i class="fas fa-spinner"></i> Loading payments...</td></tr>
+            </tbody>
+          </table>
+          <div class="pagination" id="payments-pagination"></div>
+        </div>
+        
+        <!-- Payment Details Modal -->
+        <div id="payment-modal" class="modal" style="display: none;">
+          <div class="modal-content" style="max-width: 600px;">
+            <h2 style="color: #667eea;">Payment Details</h2>
+            <div id="payment-details-content" style="text-align: left;"></div>
+            <div style="margin-top: 20px; display: flex; gap: 10px;">
+              <button class="btn btn-success" onclick="verifyPayment()" style="flex: 1;"><i class="fas fa-check"></i> Verify Payment</button>
+              <button class="btn btn-danger" onclick="rejectPayment()" style="flex: 1;"><i class="fas fa-times"></i> Reject</button>
+              <button class="btn" onclick="closePaymentModal()" style="flex: 1; background: #666;">Close</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Payment Methods Section -->
+      <section id="pay-methods" class="admin-section">
+        <div class="table-container">
+          <div class="table-header">
+            <h2><i class="fas fa-credit-card"></i> Payment Methods</h2>
+            <div class="actions">
+              <button class="btn btn-primary" onclick="openPmModal()">
+                <i class="fas fa-plus"></i> Add Method
+              </button>
+            </div>
+          </div>
+          <p style="color:#888;font-size:13px;margin-bottom:16px;">
+            Configure payment methods shown to customers at checkout. Changes apply instantly to new orders.
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Icon</th>
+                <th>Name</th>
+                <th>Slug</th>
+                <th>Account Details</th>
+                <th>Status</th>
+                <th>Order</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="pm-table-body">
+              <tr><td colspan="7" class="loading"><i class="fas fa-spinner"></i> Loading payment methods...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Add/Edit Payment Method Modal -->
+        <div id="pm-modal" class="modal" style="display:none;">
+          <div class="modal-content" style="max-width:600px;">
+            <h2 id="pm-modal-title" style="color:#ff6f61;">Add Payment Method</h2>
+            <input type="hidden" id="pm-edit-id">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div>
+                <label style="font-size:13px;color:#ccc;">Name</label>
+                <input type="text" id="pm-name" placeholder="e.g. Venmo" style="width:100%;padding:10px;background:#2a2a2a;border:1px solid #444;border-radius:6px;color:#fff;margin:4px 0 10px;box-sizing:border-box;">
+              </div>
+              <div>
+                <label style="font-size:13px;color:#ccc;">Slug</label>
+                <input type="text" id="pm-slug" placeholder="e.g. venmo" style="width:100%;padding:10px;background:#2a2a2a;border:1px solid #444;border-radius:6px;color:#fff;margin:4px 0 10px;box-sizing:border-box;">
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div>
+                <label style="font-size:13px;color:#ccc;">Icon (emoji)</label>
+                <input type="text" id="pm-icon" placeholder="e.g. 💳" style="width:100%;padding:10px;background:#2a2a2a;border:1px solid #444;border-radius:6px;color:#fff;margin:4px 0 10px;box-sizing:border-box;">
+              </div>
+              <div>
+                <label style="font-size:13px;color:#ccc;">Sort Order</label>
+                <input type="number" id="pm-sort" value="0" style="width:100%;padding:10px;background:#2a2a2a;border:1px solid #444;border-radius:6px;color:#fff;margin:4px 0 10px;box-sizing:border-box;">
+              </div>
+            </div>
+            <label style="font-size:13px;color:#ccc;">Account Details (JSON)</label>
+            <textarea id="pm-details" rows="4" placeholder='{"username":"@your-venmo"}' style="width:100%;padding:10px;background:#2a2a2a;border:1px solid #444;border-radius:6px;color:#fff;margin:4px 0 10px;box-sizing:border-box;font-family:monospace;font-size:12px;resize:vertical;"></textarea>
+            <label style="font-size:13px;color:#ccc;">Instructions (shown to customer)</label>
+            <textarea id="pm-instructions" rows="3" placeholder="Send payment to: @username..." style="width:100%;padding:10px;background:#2a2a2a;border:1px solid #444;border-radius:6px;color:#fff;margin:4px 0 10px;box-sizing:border-box;font-family:Poppins;font-size:12px;resize:vertical;"></textarea>
+            <div style="margin:10px 0;">
+              <label style="font-size:13px;color:#ccc;display:flex;align-items:center;gap:8px;">
+                <input type="checkbox" id="pm-active" checked style="accent-color:#ff6f61;"> Active
+              </label>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:16px;">
+              <button class="btn btn-primary" onclick="savePm()" style="flex:1;"><i class="fas fa-save"></i> Save</button>
+              <button class="btn" onclick="closePmModal()" style="flex:1;background:#666;">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- Messages Section -->
       <section id="messages" class="admin-section">
-        <div style="display:grid;grid-template-columns:300px 1fr;gap:20px;height:600px;">
+        <div style="display:grid;grid-template-columns:280px 1fr 300px;gap:20px;height:620px;">
           <!-- Conversation List -->
           <div style="background:#252525;border-radius:12px;overflow-y:auto;border:1px solid #333;">
-            <div style="padding:15px;border-bottom:1px solid #333;font-weight:600;">Conversations</div>
-            <div id="conversations-list" style="overflow-y:auto;max-height:540px;">
+            <div style="padding:15px;border-bottom:1px solid #333;display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-weight:600;">Conversations</span>
+              <button onclick="markAllNotificationsRead()" style="background:none;border:none;color:#ff6f61;cursor:pointer;font-size:12px;" title="Mark all read">Mark Read</button>
+            </div>
+            <div id="conversations-list" style="overflow-y:auto;max-height:560px;">
               <div style="padding:20px;text-align:center;color:#888;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
             </div>
           </div>
           
           <!-- Chat View -->
           <div style="background:#252525;border-radius:12px;display:flex;flex-direction:column;border:1px solid #333;">
-            <div style="padding:15px;border-bottom:1px solid #333;font-weight:600;" id="chat-view-header">Select a conversation</div>
+            <div style="padding:15px;border-bottom:1px solid #333;font-weight:600;display:flex;justify-content:space-between;align-items:center;" id="chat-view-header">
+              <span>Select a conversation</span>
+              <span id="chat-order-badge" style="display:none;background:#ff6f61;color:#fff;padding:3px 10px;border-radius:12px;font-size:11px;cursor:pointer;" onclick="toggleOrderPanel()"></span>
+            </div>
             <div id="chat-view-messages" style="flex:1;overflow-y:auto;padding:15px;display:flex;align-items:center;justify-content:center;color:#888;">
               No conversation selected
             </div>
+            <!-- Quick Actions Bar -->
+            <div id="chat-quick-actions" style="padding:6px 10px;border-top:1px solid #333;display:none;gap:6px;flex-wrap:wrap;">
+              <button onclick="sendQuickPaymentInstructions()" style="background:#2196f3;color:#fff;border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:11px;">?? Send Payment Details</button>
+              <button onclick="verifyPaymentFromChat()" style="background:#4caf50;color:#fff;border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:11px;">? Verify Payment</button>
+              <button onclick="rejectPaymentFromChat()" style="background:#f44336;color:#fff;border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:11px;">? Reject Payment</button>
+              <button onclick="sendReminderFromChat()" style="background:#ff9800;color:#fff;border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:11px;">? Send Reminder</button>
+            </div>
             <div style="padding:10px;border-top:1px solid #333;display:flex;gap:10px;">
-              <input id="admin-reply-input" type="text" placeholder="Type your reply..." style="flex:1;padding:10px;background:#1e1e1e;border:1px solid #333;border-radius:8px;color:#fff;">
+              <input id="admin-reply-input" type="text" placeholder="Type your reply..." style="flex:1;padding:10px;background:#1e1e1e;border:1px solid #333;border-radius:8px;color:#fff;" onkeydown="if(event.key==='Enter')sendAdminReply()">
               <button onclick="sendAdminReply()" class="btn btn-success" style="width:100px;"><i class="fas fa-send"></i> Send</button>
+            </div>
+          </div>
+          
+          <!-- Order Detail Panel -->
+          <div id="order-detail-panel" style="background:#252525;border-radius:12px;border:1px solid #333;overflow-y:auto;display:none;">
+            <div style="padding:15px;border-bottom:1px solid #333;display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-weight:600;">Order Details</span>
+              <button onclick="hideOrderPanel()" style="background:none;border:none;color:#888;cursor:pointer;font-size:18px;">&times;</button>
+            </div>
+            <div id="order-panel-content" style="padding:15px;"></div>
+          </div>
+        </div>
+
+        <!-- Payment Instructions Modal -->
+        <div id="payment-instructions-modal" class="modal" style="display:none;">
+          <div class="modal-content" style="max-width:500px;">
+            <div class="modal-header">
+              <h3>?? Send Payment Instructions</h3>
+              <button class="modal-close" onclick="closePaymentInstructionsModal()">&times;</button>
+            </div>
+            <div style="padding:20px;">
+              <div class="form-group">
+                <label>Select Payment Method</label>
+                <select id="pi-method-select" onchange="loadMiddlemenForMethod()" style="width:100%;padding:10px;background:#1e1e1e;border:1px solid #333;border-radius:8px;color:#fff;">
+                  <option value="">-- Select --</option>
+                </select>
+              </div>
+              <div class="form-group" id="pi-middleman-group" style="display:none;">
+                <label>Select Middleman</label>
+                <select id="pi-middleman-select" onchange="fillMiddlemanDetails()" style="width:100%;padding:10px;background:#1e1e1e;border:1px solid #333;border-radius:8px;color:#fff;">
+                  <option value="">-- Select --</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Message to Customer</label>
+                <textarea id="pi-message" rows="6" style="width:100%;padding:10px;background:#1e1e1e;border:1px solid #333;border-radius:8px;color:#fff;font-family:monospace;resize:vertical;" placeholder="?? Payment Details:&#10;Send to: $cashtag123&#10;Name: John Doe&#10;Send proof after payment ?"></textarea>
+              </div>
+              <div style="display:flex;gap:10px;">
+                <button onclick="sendPaymentInstructionsFromModal()" class="btn btn-primary" style="flex:1;">Send to Customer</button>
+                <button onclick="closePaymentInstructionsModal()" class="btn" style="flex:1;background:#666;">Cancel</button>
+              </div>
             </div>
           </div>
         </div>
@@ -1792,6 +2011,7 @@
       }
       
       loadDashboardStats();
+      startNotificationPolling();
     }
 
     function showSection(sectionId) {
@@ -1801,6 +2021,8 @@
         'products': 'Products Management',
         'categories': 'Categories Management',
         'orders': 'Orders Management',
+        'payments': 'Payment Verification',
+        'pay-methods': 'Payment Methods',
         'messages': 'Customer Messages',
         'users': 'Users Management',
         'reports': 'Reports & Analytics',
@@ -1825,6 +2047,11 @@
         loadCategories();
       } else if (sectionId === 'orders') {
         loadOrders();
+      } else if (sectionId === 'payments') {
+        loadPayments();
+        loadPaymentStats();
+      } else if (sectionId === 'pay-methods') {
+        loadPaymentMethods();
       } else if (sectionId === 'messages') {
         loadMessages();
       } else if (sectionId === 'users') {
@@ -1832,6 +2059,136 @@
       } else if (sectionId === 'settings') {
         loadSettings();
         loadCarriers();
+      }
+    }
+
+    // ================= PAYMENT METHODS =================
+    async function loadPaymentMethods() {
+      try {
+        var res = await apiRequest('/admin/payment-methods');
+        var data = res.data || [];
+        var tbody = document.getElementById('pm-table-body');
+        if (!data.length) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#888;padding:30px;">No payment methods configured. Click "Add Method" to create one.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = data.map(function(pm) {
+          var details = pm.account_details || {};
+          var detailsStr = Object.entries(details).map(function(e) { return e[0] + ': ' + e[1]; }).join('<br>');
+          var statusBadge = pm.active
+            ? '<span style="background:#2e7d32;color:#fff;padding:3px 10px;border-radius:12px;font-size:12px;">Active</span>'
+            : '<span style="background:#c62828;color:#fff;padding:3px 10px;border-radius:12px;font-size:12px;">Inactive</span>';
+          return '<tr>' +
+            '<td style="font-size:24px;text-align:center;">' + (pm.icon || '💳') + '</td>' +
+            '<td><strong>' + pm.name + '</strong></td>' +
+            '<td><code style="color:#ff6f61;">' + pm.slug + '</code></td>' +
+            '<td style="font-size:12px;line-height:1.6;">' + detailsStr + '</td>' +
+            '<td>' + statusBadge + '</td>' +
+            '<td>' + pm.sort_order + '</td>' +
+            '<td>' +
+              '<button class="btn-sm" onclick="editPm(' + pm.id + ')" style="background:#2196f3;color:#fff;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;margin-right:4px;font-size:12px;">Edit</button>' +
+              '<button class="btn-sm" onclick="togglePm(' + pm.id + ')" style="background:' + (pm.active ? '#f44336' : '#4caf50') + ';color:#fff;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;margin-right:4px;font-size:12px;">' + (pm.active ? 'Disable' : 'Enable') + '</button>' +
+              '<button class="btn-sm" onclick="deletePm(' + pm.id + ')" style="background:#666;color:#fff;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;font-size:12px;">Delete</button>' +
+            '</td>' +
+          '</tr>';
+        }).join('');
+      } catch (e) {
+        console.error('Error loading payment methods:', e);
+      }
+    }
+
+    function openPmModal(pm) {
+      document.getElementById('pm-edit-id').value = pm ? pm.id : '';
+      document.getElementById('pm-modal-title').textContent = pm ? 'Edit Payment Method' : 'Add Payment Method';
+      document.getElementById('pm-name').value = pm ? pm.name : '';
+      document.getElementById('pm-slug').value = pm ? pm.slug : '';
+      document.getElementById('pm-icon').value = pm ? (pm.icon || '') : '';
+      document.getElementById('pm-sort').value = pm ? pm.sort_order : 0;
+      document.getElementById('pm-details').value = pm ? JSON.stringify(pm.account_details || {}, null, 2) : '';
+      document.getElementById('pm-instructions').value = pm ? (pm.instructions || '') : '';
+      document.getElementById('pm-active').checked = pm ? pm.active : true;
+      document.getElementById('pm-modal').style.display = 'flex';
+    }
+
+    function closePmModal() {
+      document.getElementById('pm-modal').style.display = 'none';
+    }
+
+    async function editPm(id) {
+      try {
+        var res = await apiRequest('/admin/payment-methods');
+        var methods = res.data || [];
+        var pm = methods.find(function(m) { return m.id === id; });
+        if (pm) openPmModal(pm);
+      } catch (e) {
+        console.error('Error loading payment method:', e);
+      }
+    }
+
+    async function savePm() {
+      var editId = document.getElementById('pm-edit-id').value;
+      var name = document.getElementById('pm-name').value.trim();
+      var slug = document.getElementById('pm-slug').value.trim();
+      var icon = document.getElementById('pm-icon').value.trim();
+      var sort = parseInt(document.getElementById('pm-sort').value) || 0;
+      var detailsStr = document.getElementById('pm-details').value.trim();
+      var instructions = document.getElementById('pm-instructions').value.trim();
+      var active = document.getElementById('pm-active').checked;
+
+      if (!name || !slug) {
+        alert('Name and slug are required');
+        return;
+      }
+
+      var details = {};
+      if (detailsStr) {
+        try {
+          details = JSON.parse(detailsStr);
+        } catch (e) {
+          alert('Invalid JSON in account details');
+          return;
+        }
+      }
+
+      var payload = {
+        name: name,
+        slug: slug,
+        icon: icon,
+        sort_order: sort,
+        account_details: details,
+        instructions: instructions,
+        active: active
+      };
+
+      try {
+        if (editId) {
+          await apiRequest('/admin/payment-methods/' + editId, { method: 'PUT', body: payload });
+        } else {
+          await apiRequest('/admin/payment-methods', { method: 'POST', body: payload });
+        }
+        closePmModal();
+        loadPaymentMethods();
+      } catch (e) {
+        alert('Error saving: ' + e.message);
+      }
+    }
+
+    async function togglePm(id) {
+      try {
+        await apiRequest('/admin/payment-methods/' + id + '/toggle', { method: 'PATCH' });
+        loadPaymentMethods();
+      } catch (e) {
+        alert('Error toggling: ' + e.message);
+      }
+    }
+
+    async function deletePm(id) {
+      if (!confirm('Delete this payment method?')) return;
+      try {
+        await apiRequest('/admin/payment-methods/' + id, { method: 'DELETE' });
+        loadPaymentMethods();
+      } catch (e) {
+        alert('Error deleting: ' + e.message);
       }
     }
 
@@ -2271,34 +2628,155 @@
       }
     }
 
-    // ================= ORDERS =================
-    async function loadOrders() {
-      var tbody = document.getElementById('orders-table-body');
-      tbody.innerHTML = '<tr><td colspan="8" class="loading"><i class="fas fa-spinner"></i> Loading orders...</td></tr>';
+    // ================= PAYMENTS =================
+    var currentSelectedPayment = null;
+    var currentPaymentPage = 1;
+
+    async function loadPaymentStats() {
+      try {
+        var data = await apiRequest('/minipay/admin/analytics?days=30');
+        document.getElementById('stat-pending-payments').textContent = data.pending_count || 0;
+        document.getElementById('stat-verified-payments').textContent = data.total_payments || 0;
+        document.getElementById('stat-rejected-payments').textContent = data.rejected_count || 0;
+        document.getElementById('stat-payment-revenue').textContent = '$' + (data.total_revenue || 0).toFixed(2);
+      } catch (error) {
+        console.error('Error loading payment stats:', error);
+      }
+    }
+    
+    async function loadPayments() {
+      var tbody = document.getElementById('payments-table-body');
+      if (!tbody) return;
+      
+      tbody.innerHTML = '<tr><td colspan="9" class="loading"><i class="fas fa-spinner"></i> Loading payments...</td></tr>';
       
       try {
-        var search = document.getElementById('order-search').value;
-        var status = document.getElementById('order-status-filter').value;
-        var page = currentPages.orders;
+        var search = document.getElementById('payment-search')?.value || '';
+        var status = document.getElementById('payment-status-filter')?.value || '';
+        var page = currentPaymentPage;
         
-        var endpoint = '/admin/orders?page=' + page + '&per_page=10';
+        var endpoint = '/minipay/admin/pending?page=' + page + '&per_page=20';
         if (search) endpoint += '&search=' + encodeURIComponent(search);
         if (status) endpoint += '&status=' + status;
         
         var data = await apiRequest(endpoint);
-        var orders = data.orders || [];
+        var payments = data.payments || [];
         
-        if (orders.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="8" class="loading">No orders found</td></tr>';
+        if (payments.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="9" class="loading">No pending payments found</td></tr>';
           return;
         }
         
         var html = '';
+        for (var i = 0; i < payments.length; i++) {
+          var payment = payments[i];
+          var statusClass = 'status-' + (payment.status || 'pending');
+          var deadline = payment.payment_deadline ? new Date(payment.payment_deadline).toLocaleString() : 'N/A';
+          var submitted = payment.submitted_at ? new Date(payment.submitted_at).toLocaleString() : 'N/A';
+          
+          html += '<tr>';
+          html += '<td>#' + payment.order_id + '</td>';
+          html += '<td>' + (payment.customer_name || payment.email || 'N/A') + '</td>';
+          html += '<td>$' + parseFloat(payment.order_total || 0).toFixed(2) + '</td>';
+          html += '<td>$' + parseFloat(payment.amount_sent || 0).toFixed(2) + '</td>';
+          html += '<td>' + (payment.transaction_ref || 'N/A') + '</td>';
+          html += '<td>' + submitted + '</td>';
+          html += '<td>' + deadline + '</td>';
+          html += '<td><span class="status ' + statusClass + '">' + (payment.status || 'pending') + '</span></td>';
+          html += '<td>';
+          html += '<button class="btn btn-primary btn-sm" title="View Proof" onclick="viewPaymentScreenshot(\'' + payment.order_id + '\')"><i class="fas fa-image"></i></button> ';
+          html += '<button class="btn btn-success btn-sm" title="Verify" onclick="verifyPayment(\'' + payment.order_id + '\', \'verify\')"><i class="fas fa-check"></i></button> ';
+          html += '<button class="btn btn-danger btn-sm" title="Reject" onclick="verifyPayment(\'' + payment.order_id + '\', \'reject\')"><i class="fas fa-times"></i></button>';
+          html += '</td>';
+          html += '</tr>';
+        }
+        tbody.innerHTML = html;
+
+        var totalPages = data.pages || 1;
+        var currentPage = data.current_page || 1;
+        renderPagination('payments', totalPages, currentPage);
+
+      } catch (error) {
+        console.error('Error loading payments:', error);
+        tbody.innerHTML = '<tr><td colspan="9" class="loading">Error loading payments</td></tr>';
+      }
+    }
+
+    async function viewPaymentScreenshot(orderId) {
+      try {
+        var data = await apiRequest('/minipay/admin/screenshot/' + orderId);
+        if (data) {
+          // If it returns binary data, open in new window
+          window.open('/api/minipay/admin/screenshot/' + orderId, '_blank');
+        } else {
+          showNotification('No screenshot found', 'warning');
+        }
+      } catch (error) {
+        console.error('Error viewing screenshot:', error);
+        showNotification('Error loading screenshot', 'error');
+      }
+    }
+
+    async function verifyPayment(orderId, action) {
+      var message = action === 'verify' ? 'Verify this payment?' : 'Reject this payment?';
+      if (!confirm(message)) return;
+      
+      try {
+        var reason = '';
+        if (action === 'reject') {
+          reason = prompt('Rejection reason (optional):');
+          if (reason === null) return;
+        }
+        
+        var payload = { action: action };
+        if (reason) payload.reason = reason;
+        
+        await apiRequest('/minipay/admin/verify/' + orderId, {
+          method: 'POST',
+          body: payload
+        });
+        
+        showNotification(action === 'verify' ? 'Payment verified!' : 'Payment rejected', 'success');
+        loadPayments();
+        loadPaymentStats();
+      } catch (error) {
+        console.error('Error processing payment:', error);
+        showNotification('Error: ' + error.message, 'error');
+      }
+    }
+
+    // ================= ORDERS =================
+    var currentOrderPage = 1;
+
+    async function loadOrders() {
+      var tbody = document.getElementById('orders-table-body');
+      if (!tbody) return;
+
+      tbody.innerHTML = '<tr><td colspan="8" class="loading"><i class="fas fa-spinner"></i> Loading orders...</td></tr>';
+
+      try {
+        var search = document.getElementById('order-search')?.value || '';
+        var status = document.getElementById('order-status-filter')?.value || '';
+        var page = currentOrderPage;
+
+        var endpoint = '/admin/orders?page=' + page + '&per_page=10';
+        if (search) endpoint += '&search=' + encodeURIComponent(search);
+        if (status) endpoint += '&status=' + status;
+
+        var data = await apiRequest(endpoint);
+        var orders = data.orders || [];
+
+        if (orders.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="8" class="loading">No orders found</td></tr>';
+          return;
+        }
+
+        var html = '';
         for (var i = 0; i < orders.length; i++) {
           var order = orders[i];
           var statusClass = 'status-' + (order.status || 'pending');
-          var itemCount = order.items ? order.items.length : 0;
-          
+          var itemCount = order.item_count || (order.items ? order.items.length : 0);
+
           var safeTracking = escapeForHtmlAttr(order.tracking_number || '');
           var safeCarrier = escapeForHtmlAttr(order.carrier || '');
           var trackingDisplay = order.tracking_number
@@ -2322,11 +2800,11 @@
           html += '</tr>';
         }
         tbody.innerHTML = html;
-        
+
         var totalPages = data.pages || 1;
         var currentPage = data.current_page || 1;
         renderPagination('orders', totalPages, currentPage);
-        
+
       } catch (error) {
         console.error('Error loading orders:', error);
         tbody.innerHTML = '<tr><td colspan="8" class="loading">Error loading orders</td></tr>';
@@ -2968,8 +3446,122 @@
       }, 3000);
     }
 
+    // ================= REAL-TIME NOTIFICATION POLLING =================
+    var pollTimer = null;
+    var lastPollTime = new Date().toISOString();
+    var previousCounts = { unread_notifications: 0, new_messages: 0, pending_payments: 0 };
+
+    function startNotificationPolling() {
+      if (pollTimer) clearInterval(pollTimer);
+      pollNow();
+      pollTimer = setInterval(pollNow, 10000); // Poll every 10 seconds
+    }
+
+    function stopNotificationPolling() {
+      if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+    }
+
+    async function pollNow() {
+      try {
+        var data = await apiRequest('/admin/notifications/poll?since=' + encodeURIComponent(lastPollTime));
+        lastPollTime = data.server_time;
+
+        // Update badge counts
+        var counts = data.counts || {};
+        updateBadges(counts);
+
+        // Show alerts for new items
+        if (data.notifications && data.notifications.length > 0) {
+          data.notifications.forEach(function(n) {
+            showNotification(n.title, n.type === 'payment_rejected' ? 'error' : 'info');
+            playAlertSound(n.type);
+          });
+        }
+
+        if (data.messages && data.messages.length > 0) {
+          var customerMsgs = data.messages.filter(function(m) { return m.customer_name !== 'Bot'; });
+          if (customerMsgs.length > 0) {
+            showNotification(customerMsgs.length + ' new message(s)', 'info');
+            playAlertSound('message');
+          }
+          // Refresh conversation list if on messages tab
+          if (currentConversationEmail !== null || document.getElementById('messages').classList.contains('active')) {
+            loadMessages();
+          }
+        }
+
+        previousCounts = counts;
+      } catch (e) {
+        // Silently fail polling - will retry next interval
+      }
+    }
+
+    function updateBadges(counts) {
+      var msgBadge = document.getElementById('msg-badge');
+      if (msgBadge) {
+        var total = (counts.new_messages || 0) + (counts.pending_payments || 0);
+        if (total > 0) {
+          msgBadge.textContent = total;
+          msgBadge.style.display = 'inline-block';
+        } else {
+          msgBadge.style.display = 'none';
+        }
+      }
+
+      // Update dashboard notification card if visible
+      var notifBadge = document.getElementById('notif-badge');
+      if (notifBadge) {
+        var nTotal = (counts.unread_notifications || 0);
+        if (nTotal > 0) {
+          notifBadge.textContent = nTotal;
+          notifBadge.style.display = 'inline-block';
+        } else {
+          notifBadge.style.display = 'none';
+        }
+      }
+    }
+
+    function playAlertSound(type) {
+      try {
+        var ctx = new (window.AudioContext || window.webkitAudioContext)();
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        gain.gain.value = 0.15;
+
+        if (type === 'new_order') {
+          osc.frequency.value = 880;
+          osc.type = 'sine';
+        } else if (type === 'proof_upload') {
+          osc.frequency.value = 660;
+          osc.type = 'triangle';
+        } else if (type === 'message') {
+          osc.frequency.value = 520;
+          osc.type = 'sine';
+        } else {
+          osc.frequency.value = 440;
+          osc.type = 'sine';
+        }
+
+        osc.start();
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+        osc.stop(ctx.currentTime + 0.4);
+      } catch (e) { /* Audio not available */ }
+    }
+
+    function markAllNotificationsRead() {
+      apiRequest('/admin/notifications/mark-read', { method: 'POST', body: { all: true } })
+        .then(function() {
+          showNotification('All notifications marked as read', 'success');
+          updateBadges({ unread_notifications: 0, new_messages: 0, pending_payments: 0 });
+        })
+        .catch(function(e) { showNotification('Error marking as read', 'error'); });
+    }
+
     // ================= MESSAGES (Chat Interface) =================
     var currentConversationEmail = null;
+    var currentConversationOrderId = null;
     var allMessages = [];
 
     async function loadMessages() {
@@ -2986,11 +3578,23 @@
               name: m.customer_name,
               lastMessage: m.message,
               lastDate: m.created_at,
-              unread: 0
+              orderId: m.order_id,
+              unread: 0,
+              hasProof: false
             };
           }
-          if (m.status === 'new' || m.status === 'replied' && !m.admin_reply) {
+          if (m.created_at > conversations[m.customer_email].lastDate) {
+            conversations[m.customer_email].lastMessage = m.message;
+            conversations[m.customer_email].lastDate = m.created_at;
+          }
+          if (m.order_id && !conversations[m.customer_email].orderId) {
+            conversations[m.customer_email].orderId = m.order_id;
+          }
+          if (m.status === 'new') {
             conversations[m.customer_email].unread++;
+          }
+          if (m.message_type === 'proof') {
+            conversations[m.customer_email].hasProof = true;
           }
         });
         
@@ -3005,28 +3609,61 @@
           return;
         }
         
-        conversationsList.innerHTML = sorted.map(conv => `
-          <div onclick="selectConversation('${conv.email}')" 
-               style="padding:12px;border-bottom:1px solid #333;cursor:pointer;transition:0.2s;background:${currentConversationEmail === conv.email ? '#333' : 'transparent'};"
+        conversationsList.innerHTML = sorted.map(conv => {
+          var isActive = currentConversationEmail === conv.email;
+          var typeIcon = conv.hasProof ? '??' : conv.orderId ? '??' : '??';
+          return `<div onclick="selectConversation('${conv.email}')" 
+               style="padding:12px;border-bottom:1px solid #333;cursor:pointer;transition:0.2s;background:${isActive ? '#333' : 'transparent'};"
                onmouseover="this.style.background='#2a2a2a'" 
-               onmouseout="this.style.background='${currentConversationEmail === conv.email ? '#333' : 'transparent'}'">
-            <div style="font-weight:600;color:#fff;">${conv.name}</div>
-            <div style="font-size:12px;color:#999;margin-top:4px;">${conv.email}</div>
-            <div style="font-size:12px;color:#ccc;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${conv.lastMessage.substring(0, 30)}...</div>
-            ${conv.unread > 0 ? `<div style="display:inline-block;background:#ff6f61;color:#fff;border-radius:50%;width:20px;height:20px;text-align:center;line-height:20px;font-size:12px;margin-top:4px;">${conv.unread}</div>` : ''}
-          </div>
-        `).join('');
+               onmouseout="this.style.background='${isActive ? '#333' : 'transparent'}'">
+            <div style="font-weight:600;color:#fff;display:flex;justify-content:space-between;align-items:center;">
+              <span>${typeIcon} ${escapeHtml(conv.name || conv.email)}</span>
+              ${conv.unread > 0 ? `<span style="background:#ff6f61;color:#fff;border-radius:50%;min-width:20px;height:20px;text-align:center;line-height:20px;font-size:11px;">${conv.unread}</span>` : ''}
+            </div>
+            <div style="font-size:11px;color:#999;margin-top:2px;">${conv.email}</div>
+            <div style="font-size:12px;color:#ccc;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(conv.lastMessage.substring(0, 40))}</div>
+            ${conv.orderId ? `<div style="font-size:10px;color:#ff6f61;margin-top:2px;">Order #${conv.orderId}</div>` : ''}
+          </div>`;
+        }).join('');
       } catch (error) {
         console.error('Error loading messages:', error);
         showNotification('Error loading messages', 'error');
       }
     }
 
-    function selectConversation(email) {
+    async function selectConversation(email) {
       currentConversationEmail = email;
-      document.getElementById('chat-view-header').textContent = `Chat with ${email}`;
+      
+      // Find the order ID for this conversation
+      var convMsgs = allMessages.filter(m => m.customer_email === email);
+      var orderMsg = convMsgs.find(m => m.order_id);
+      currentConversationOrderId = orderMsg ? orderMsg.order_id : null;
+      
+      // Update header
+      var headerEl = document.getElementById('chat-view-header');
+      headerEl.querySelector('span').textContent = `Chat with ${email}`;
+      
+      // Show order badge if there's an order
+      var orderBadge = document.getElementById('chat-order-badge');
+      if (currentConversationOrderId) {
+        orderBadge.textContent = `Order #${currentConversationOrderId}`;
+        orderBadge.style.display = 'inline-block';
+      } else {
+        orderBadge.style.display = 'none';
+      }
+      
+      // Show quick actions
+      document.getElementById('chat-quick-actions').style.display = currentConversationOrderId ? 'flex' : 'none';
+      
       renderConversation(email);
       loadMessages(); // Refresh to update unread counts
+      
+      // Load order details panel
+      if (currentConversationOrderId) {
+        loadOrderPanel(currentConversationOrderId);
+      } else {
+        hideOrderPanel();
+      }
     }
 
     function renderConversation(email) {
@@ -3038,29 +3675,269 @@
         return;
       }
       
+      // Sort messages chronologically (oldest first)
+      messages.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+      
       let html = '<div style="width:100%;display:flex;flex-direction:column;gap:8px;">';
       
       messages.forEach(msg => {
-        // User message
-        html += `
-          <div style="text-align:right;margin:8px 0;">
-            <div style="background:#ff6f61;color:#fff;padding:8px 12px;border-radius:12px;display:inline-block;max-width:70%;word-wrap:break-word;">${escapeHtml(msg.message)}</div>
-            <div style="font-size:11px;color:#999;margin-top:4px;text-align:right;">${formatTime(msg.created_at)}</div>
-          </div>`;
+        var isBot = msg.customer_name === 'Bot';
+        var isProof = msg.message_type === 'proof';
+        var isPaymentDetails = msg.message_type === 'payment_details';
+        var isOrder = msg.message_type === 'order';
+        var isQuickAction = msg.message_type === 'quick_action';
         
-        // Admin reply (if exists)
-        if (msg.admin_reply) {
-          html += `
-            <div style="text-align:left;margin:8px 0;">
-              <div style="background:#e0e0e0;color:#333;padding:8px 12px;border-radius:12px;display:inline-block;max-width:70%;word-wrap:break-word;">${escapeHtml(msg.admin_reply)}</div>
-              <div style="font-size:11px;color:#999;margin-top:4px;text-align:left;">${formatTime(msg.replied_at)}</div>
-            </div>`;
+        // Style based on message type
+        var bubbleBg = '#ff6f61';
+        var textColor = '#fff';
+        if (isBot) { bubbleBg = '#e0e0e0'; textColor = '#333'; }
+        if (isPaymentDetails) { bubbleBg = '#1565c0'; textColor = '#fff'; }
+        if (isProof) { bubbleBg = '#2e7d32'; textColor = '#fff'; }
+        if (isOrder) { bubbleBg = '#e65100'; textColor = '#fff'; }
+        
+        var align = isBot ? 'left' : 'right';
+        var typeLabel = '';
+        if (isProof) typeLabel = '<div style="font-size:10px;opacity:0.8;margin-bottom:4px;">?? Payment Proof</div>';
+        if (isPaymentDetails) typeLabel = '<div style="font-size:10px;opacity:0.8;margin-bottom:4px;">?? Payment Details</div>';
+        if (isOrder) typeLabel = '<div style="font-size:10px;opacity:0.8;margin-bottom:4px;">?? Order</div>';
+        if (isQuickAction) typeLabel = '<div style="font-size:10px;opacity:0.8;margin-bottom:4px;">? Action</div>';
+        
+        html += `<div style="text-align:${align};margin:8px 0;">
+          <div style="background:${bubbleBg};color:${textColor};padding:8px 12px;border-radius:12px;display:inline-block;max-width:75%;word-wrap:break-word;">
+            ${typeLabel}${escapeHtml(msg.message).replace(/\n/g, '<br>')}
+          </div>
+          <div style="font-size:11px;color:#999;margin-top:4px;text-align:${align};">${formatTime(msg.created_at)}</div>
+        </div>`;
+        
+        // Show proof screenshot if available
+        if (isProof && msg.has_screenshot) {
+          html += `<div style="text-align:${align};margin:4px 0;">
+            <button onclick="viewProofScreenshot(${msg.id})" style="background:#2e7d32;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:11px;">?? View Screenshot</button>
+          </div>`;
         }
       });
       
       html += '</div>';
       chatView.innerHTML = html;
       chatView.scrollTop = chatView.scrollHeight;
+    }
+
+    async function loadOrderPanel(orderId) {
+      try {
+        var data = await apiRequest('/admin/orders/' + orderId);
+        var panel = document.getElementById('order-detail-panel');
+        var content = document.getElementById('order-panel-content');
+        
+        var statusColors = {
+          'created': '#888', 'payment_requested': '#ff9800', 'payment_instructions_sent': '#2196f3',
+          'paid': '#4caf50', 'packed': '#9c27b0', 'processing': '#2196f3',
+          'shipped': '#ff5722', 'delivered': '#4caf50', 'cancelled': '#f44336'
+        };
+        var statusColor = statusColors[data.status] || '#888';
+        
+        var items = (data.items || []).map(item => 
+          `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #333;">
+            <span>${escapeHtml(item.name || 'Product #' + item.product_id)} x${item.quantity}</span>
+            <span>$${(item.price * item.quantity).toFixed(2)}</span>
+          </div>`
+        ).join('');
+        
+        content.innerHTML = `
+          <div style="background:#1e1e1e;padding:12px;border-radius:8px;margin-bottom:12px;">
+            <div style="font-size:16px;font-weight:600;color:#fff;">#${data.id}</div>
+            <div style="margin-top:6px;">
+              <span style="background:${statusColor};color:#fff;padding:3px 10px;border-radius:12px;font-size:11px;text-transform:uppercase;">${(data.status || '').replace(/_/g, ' ')}</span>
+            </div>
+          </div>
+          <div style="margin-bottom:12px;">
+            <div style="font-size:11px;color:#888;text-transform:uppercase;margin-bottom:4px;">Customer</div>
+            <div style="color:#fff;font-size:13px;">${escapeHtml(data.customer_name || 'N/A')}</div>
+            <div style="color:#999;font-size:12px;">${escapeHtml(data.email)}</div>
+          </div>
+          <div style="margin-bottom:12px;">
+            <div style="font-size:11px;color:#888;text-transform:uppercase;margin-bottom:4px;">Total</div>
+            <div style="color:#ff6f61;font-size:18px;font-weight:700;">$${(data.total || 0).toFixed(2)}</div>
+          </div>
+          <div style="margin-bottom:12px;">
+            <div style="font-size:11px;color:#888;text-transform:uppercase;margin-bottom:4px;">Payment</div>
+            <div style="color:#fff;font-size:13px;">${escapeHtml(data.payment_method_name || 'N/A')}</div>
+            <div style="color:#999;font-size:12px;">Status: ${escapeHtml(data.payment_status || 'none')}</div>
+          </div>
+          <div style="margin-bottom:12px;">
+            <div style="font-size:11px;color:#888;text-transform:uppercase;margin-bottom:8px;">Items</div>
+            ${items || '<div style="color:#888;">No items</div>'}
+          </div>
+          <div style="margin-bottom:12px;">
+            <div style="font-size:11px;color:#888;text-transform:uppercase;margin-bottom:4px;">Shipping</div>
+            <div style="color:#fff;font-size:12px;">${escapeHtml(data.shipping_address || 'N/A')}</div>
+            ${data.city ? `<div style="color:#999;font-size:12px;">${escapeHtml(data.city)}, ${escapeHtml(data.zip_code || '')}</div>` : ''}
+          </div>
+          <div style="font-size:11px;color:#888;">${data.created_at ? new Date(data.created_at).toLocaleString() : ''}</div>
+        `;
+        
+        panel.style.display = 'block';
+      } catch (e) {
+        console.error('Error loading order panel:', e);
+      }
+    }
+
+    function hideOrderPanel() {
+      document.getElementById('order-detail-panel').style.display = 'none';
+    }
+
+    function toggleOrderPanel() {
+      var panel = document.getElementById('order-detail-panel');
+      if (panel.style.display === 'none' && currentConversationOrderId) {
+        loadOrderPanel(currentConversationOrderId);
+      } else {
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+      }
+    }
+
+    // ====== Chat Quick Actions ======
+    async function sendQuickPaymentInstructions() {
+      if (!currentConversationOrderId) {
+        showNotification('No order associated with this conversation', 'error');
+        return;
+      }
+      // Load payment methods for the modal
+      try {
+        var methods = await apiRequest('/payment-methods');
+        var select = document.getElementById('pi-method-select');
+        select.innerHTML = '<option value="">-- Select Method --</option>';
+        (methods || []).forEach(function(m) {
+          select.innerHTML += `<option value="${m.slug}">${m.icon || '??'} ${m.name}</option>`;
+        });
+        document.getElementById('pi-message').value = '';
+        document.getElementById('pi-middleman-group').style.display = 'none';
+        document.getElementById('payment-instructions-modal').style.display = 'flex';
+      } catch (e) {
+        showNotification('Error loading payment methods', 'error');
+      }
+    }
+
+    async function loadMiddlemenForMethod() {
+      var slug = document.getElementById('pi-method-select').value;
+      if (!slug) {
+        document.getElementById('pi-middleman-group').style.display = 'none';
+        return;
+      }
+      try {
+        var data = await apiRequest('/admin/middlemen/for-method/' + slug);
+        var middlemen = data.middlemen || [];
+        var select = document.getElementById('pi-middleman-select');
+        select.innerHTML = '<option value="">-- Use Default --</option>';
+        middlemen.forEach(function(mm) {
+          select.innerHTML += `<option value='${JSON.stringify(mm.account_info)}'>${mm.name}</option>`;
+        });
+        document.getElementById('pi-middleman-group').style.display = middlemen.length > 0 ? 'block' : 'none';
+        
+        // Auto-fill default instructions
+        var methods = await apiRequest('/payment-methods');
+        var method = (methods || []).find(function(m) { return m.slug === slug; });
+        if (method) {
+          var details = method.account_details || {};
+          var detailsStr = Object.entries(details).map(function(e) { return e[0] + ': ' + e[1]; }).join('\n');
+          document.getElementById('pi-message').value = 
+            '?? Payment Details:\n' + detailsStr + '\n\nSend proof after payment ?';
+        }
+      } catch (e) {
+        console.error('Error loading middlemen:', e);
+      }
+    }
+
+    function fillMiddlemanDetails() {
+      var val = document.getElementById('pi-middleman-select').value;
+      if (!val) return;
+      try {
+        var info = JSON.parse(val);
+        var detailsStr = Object.entries(info).map(function(e) { return e[0] + ': ' + e[1]; }).join('\n');
+        document.getElementById('pi-message').value = 
+          '?? Payment Details:\n' + detailsStr + '\n\nSend proof after payment ?';
+      } catch (e) {}
+    }
+
+    async function sendPaymentInstructionsFromModal() {
+      if (!currentConversationOrderId) { showNotification('No order selected', 'error'); return; }
+      var msg = document.getElementById('pi-message').value.trim();
+      if (!msg) { showNotification('Please enter a message', 'error'); return; }
+      
+      try {
+        await apiRequest('/messages/admin/send-payment-instructions', {
+          method: 'POST',
+          body: { order_id: currentConversationOrderId, message: msg }
+        });
+        showNotification('Payment instructions sent!', 'success');
+        closePaymentInstructionsModal();
+        loadMessages();
+        selectConversation(currentConversationEmail);
+      } catch (e) {
+        showNotification('Error sending instructions: ' + e.message, 'error');
+      }
+    }
+
+    function closePaymentInstructionsModal() {
+      document.getElementById('payment-instructions-modal').style.display = 'none';
+    }
+
+    async function verifyPaymentFromChat() {
+      if (!currentConversationOrderId) { showNotification('No order selected', 'error'); return; }
+      if (!confirm('Verify payment for Order #' + currentConversationOrderId + '?')) return;
+      try {
+        await apiRequest('/messages/admin/verify-payment/' + currentConversationOrderId, {
+          method: 'POST', body: { action: 'verify' }
+        });
+        showNotification('Payment verified!', 'success');
+        loadMessages();
+        selectConversation(currentConversationEmail);
+        if (currentConversationOrderId) loadOrderPanel(currentConversationOrderId);
+      } catch (e) {
+        showNotification('Error: ' + e.message, 'error');
+      }
+    }
+
+    async function rejectPaymentFromChat() {
+      if (!currentConversationOrderId) { showNotification('No order selected', 'error'); return; }
+      var reason = prompt('Rejection reason (optional):');
+      if (reason === null) return;
+      try {
+        await apiRequest('/messages/admin/verify-payment/' + currentConversationOrderId, {
+          method: 'POST', body: { action: 'reject', note: reason }
+        });
+        showNotification('Payment rejected', 'info');
+        loadMessages();
+        selectConversation(currentConversationEmail);
+        if (currentConversationOrderId) loadOrderPanel(currentConversationOrderId);
+      } catch (e) {
+        showNotification('Error: ' + e.message, 'error');
+      }
+    }
+
+    async function sendReminderFromChat() {
+      if (!currentConversationOrderId) { showNotification('No order selected', 'error'); return; }
+      try {
+        await apiRequest('/admin/notifications/send-reminder/' + currentConversationOrderId, { method: 'POST' });
+        showNotification('Reminder sent!', 'success');
+        loadMessages();
+        selectConversation(currentConversationEmail);
+      } catch (e) {
+        showNotification('Error: ' + e.message, 'error');
+      }
+    }
+
+    async function viewProofScreenshot(msgId) {
+      try {
+        var data = await apiRequest('/messages/' + msgId + '/screenshot');
+        if (data && data.screenshot_data) {
+          // Open in new window
+          var w = window.open('', '_blank', 'width=800,height=600');
+          w.document.write('<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh;"><img src="' + data.screenshot_data + '" style="max-width:100%;max-height:100vh;" /></body></html>');
+        } else {
+          showNotification('No screenshot available', 'info');
+        }
+      } catch (e) {
+        showNotification('Error loading screenshot', 'error');
+      }
     }
 
     async function sendAdminReply() {
@@ -3087,7 +3964,7 @@
       const lastMsg = messages[messages.length - 1];
       
       try {
-        await apiRequest(`/messages/${lastMsg.id}`, {
+        await apiRequest('/messages/' + lastMsg.id, {
           method: 'PUT',
           body: { reply: reply }
         });

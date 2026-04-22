@@ -5,7 +5,8 @@ var API_URL = typeof API_URL !== 'undefined' ? API_URL : '/api';
 document.addEventListener("DOMContentLoaded", async () => {
   const productId = new URLSearchParams(window.location.search).get("id");
   const isProductPage = !!document.getElementById("main-product-img");
-  const isHomePage = !!document.getElementById("products-grid");
+  const isShopPage = window.location.pathname.endsWith("shop.html") || window.location.pathname.endsWith("/shop") || window.location.pathname.endsWith("shop");
+  const isHomePage = window.location.pathname.endsWith("index.html") || window.location.pathname === "/" || window.location.pathname === "";
 
   let allProducts = [];
 
@@ -66,9 +67,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderRelated(allProducts, product);
   }
 
+  // ===== SHOP PAGE =====
+  if (isShopPage) {
+    console.log('Shop page detected, rendering all products');
+    renderProductGrid(allProducts);
+  }
+
   // ===== HOMEPAGE =====
-  if (isHomePage) {
-    console.log('Homepage detected, rendering products');
+  if (!isShopPage && isHomePage) {
+    console.log('Homepage detected, rendering featured products');
     renderProductGrid(allProducts.slice(0, 4));
   }
 
@@ -112,7 +119,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const addBtn = document.getElementById("add-to-cart");
     if (addBtn) {
       addBtn.disabled = !inStock;
-      addBtn.onclick = () => addToCart(product);
+      addBtn.onclick = () => {
+        addToCart(product);
+      };
     }
 
     const wishBtn = document.getElementById("add-to-wishlist");
@@ -140,9 +149,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         <h4>${p.name}</h4>
         <div class="product-rating">${"★".repeat(p.rating || 4)}${"☆".repeat(5 - (p.rating || 4))}</div>
         <p>$${Number(p.price).toFixed(2)}</p>
-        <button onclick="location.href='product.html?id=${p.id}'">View</button>
+        <button class="btn add-to-cart" data-id="${p.id}" data-name="${p.name}" data-price="${Number(p.price).toFixed(2)}">Add to Cart</button>
       </div>
     `).join("");
+
+    // Add to cart event binding for related products
+    grid.querySelectorAll('.product-card .add-to-cart').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const productId = this.dataset.id;
+        const product = allProducts.find(prod => String(prod.id) === String(productId));
+        if (product) addToCart(product);
+      });
+    });
   }
 
   // ===============================
@@ -172,10 +190,19 @@ document.addEventListener("DOMContentLoaded", async () => {
           <h4>${name}</h4>
           <div class="product-rating">${"★".repeat(rating)}${"☆".repeat(5 - rating)}</div>
           <p>${Number(p.price || 0).toFixed(2)}</p>
-          <button onclick="location.href='product.html?id=${p.id}'">View</button>
+          <button class="btn add-to-cart" data-id="${p.id}" data-name="${name}" data-price="${Number(p.price || 0).toFixed(2)}">Add to Cart</button>
         </div>
       `;
     }).join("");
+
+    // Add to cart event binding for shop grid
+    grid.querySelectorAll('.product-card .add-to-cart').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const productId = this.dataset.id;
+        const product = products.find(prod => String(prod.id) === String(productId));
+        if (product) addToCart(product);
+      });
+    });
   }
 
   // ===============================

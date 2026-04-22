@@ -137,111 +137,50 @@
 
   <!-- Navbar -->
   <div id="navbar-placeholder"></div>
-  <script>
-    fetch('components/navbar.html')
-      .then(res => res.text())
-      .then(data => {
-        document.getElementById('navbar-placeholder').innerHTML = data;
-        if (typeof updateAuthUI === 'function') {
-          updateAuthUI();
-        }
-        if (typeof setupNavbarToggle === 'function') {
-          setupNavbarToggle();
-        }
-      });
-  </script>
-
-  <!-- Cart JS - loads first -->
-  <script src="assets/js/cart.js"></script>
-  
-  <!-- Initialize cart after navbar and cart.js are loaded -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Wait for cart.js to be ready
-      function initCart() {
-        if (typeof loadCart === 'function') {
-          console.log('[CART] Initializing cart...');
-          loadCart();
-        } else {
-          console.log('[CART] Waiting for cart.js to load...');
-          setTimeout(initCart, 50);
-        }
-      }
-      // Start initialization after a small delay to ensure all scripts are loaded
-      setTimeout(initCart, 100);
-    });
-  </script>
-
-  <!-- Cart Container -->
-  <div class="cart-container">
-    <h1 class="cart-title">Shopping Cart</h1>
-
-    <table class="cart-table" id="cart-table">
-      <thead>
-        <tr>
-          <th>Product</th>
-          <th>Price</th>
-          <th>Quantity</th>
-          <th>Total</th>
-          <th>Remove</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td colspan="5">Your cart is empty. Add products to see them here.</td></tr>
-      </tbody>
-    </table>
-
-    <div class="cart-summary" id="cart-summary">
-      <h3>Cart Summary</h3>
-      <p><span>Subtotal:</span> <span id="subtotal">$0.00</span></p>
-      <p><span>Tax (10%):</span> <span id="tax">$0.00</span></p>
-      <p><strong>Total:</strong> <strong id="total">$0.00</strong></p>
-      <button class="checkout-btn" onclick="window.location.href='checkout.html'">Proceed to Checkout</button>
-    </div>
-  </div>
-
-  <!-- Footer -->
   <div id="footer-placeholder"></div>
   <script>
+  function loadFooterWithChat() {
     fetch('components/footer.html')
-      .then(res => res.text())
+      .then(response => response.text())
       .then(data => {
         document.getElementById('footer-placeholder').innerHTML = data;
-        // Initialize chat after footer loads
-        setTimeout(() => {
-          const bubble = document.getElementById('chat-bubble');
-          const panel = document.getElementById('chat-panel');
-          const input = document.getElementById('chat-input');
-          const messages = document.getElementById('chat-messages');
-          
-          if (bubble && panel && input && messages) {
-            bubble.addEventListener('click', () => {
-              panel.classList.toggle('hidden');
-              if (!panel.classList.contains('hidden')) {
-                input.focus();
-              }
-            });
-            
-            input.addEventListener('keydown', e => {
-              if (e.key !== 'Enter') return;
-              const text = e.target.value.trim();
-              if (!text) return;
-              messages.innerHTML += `<div class="user-msg">${text}</div>`;
-              e.target.value = '';
-              let reply = "Sorry, I didn't understand that. Type \"agent\" to contact us.";
-              const lc = text.toLowerCase();
-              if (lc.includes('return')) reply = 'You can return items within 30 days. Check our FAQ for details.';
-              else if (lc.includes('shipping')) reply = 'Standard shipping takes 5–7 business days.';
-              else if (lc.includes('order')) reply = 'Your order is being processed. Use the tracking page with your order number.';
-              else if (lc.includes('agent') || lc.includes('human')) {
-                reply = 'Click here to email support: <a href="mailto:support@caliclear.shop">support@caliclear.shop</a>';
-              }
-              messages.innerHTML += `<div class="bot-msg">${reply}</div>`;
-              messages.scrollTop = messages.scrollHeight;
-            });
-          }
-        }, 100);
-      });
-  </script>
+
+        // Ensure chat bootstrap script is loaded and initialized (works for injected footer)
+        if (!document.getElementById('chatbot-script')) {
+          const s = document.createElement('script');
+          s.id = 'chatbot-script';
+          s.src = 'assets/js/chatbot.js';
+          s.onload = () => { if (typeof initChat === 'function') initChat(); };
+          document.body.appendChild(s);
+        } else if (typeof initChat === 'function') {
+          initChat();
+        }
+      })
+      .catch(err => console.error('Error loading footer:', err));
+  }
+
+  document.addEventListener('DOMContentLoaded', loadFooterWithChat);
+</script>
+
+<main class="cart-main">
+  <h1>Shopping Cart</h1>
+  <table class="cart-table" id="cart-table">
+    <thead>
+      <tr><th>Product</th><th>Price</th><th>Qty</th><th>Total</th><th>Action</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <div class="cart-summary">
+    <p>Subtotal: $<span id="subtotal">0.00</span></p>
+    <p>Tax: $<span id="tax">0.00</span></p>
+    <p>Total: $<span id="total">0.00</span></p>
+    <button class="checkout-btn" onclick="window.location='checkout.html'">Checkout</button>
+  </div>
+</main>
+
+<script src="assets/js/toast.js"></script>
+<script src="assets/js/cart.js"></script>
+
 </body>
 </html>
+

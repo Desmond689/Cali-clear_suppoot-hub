@@ -49,6 +49,20 @@ with app.app_context():
     db.create_all()
     print("[INIT] Database tables created")
 
+        # Run migrations to add missing columns
+    try:
+        from sqlalchemy import text
+        with db.engine.connect() as conn:
+            try:
+                conn.execute(text("ALTER TABLE message ADD COLUMN screenshot_data TEXT"))
+                conn.commit()
+                print("[MIGRATION] Added screenshot_data column")
+            except Exception as e:
+                if "duplicate" not in str(e).lower():
+                    print(f"[MIGRATION] {e}")
+    except Exception as e:
+        print(f"[MIGRATION] Error: {e}")
+
 
 # Register blueprints
 from routes.product_routes import product_bp
@@ -59,6 +73,10 @@ from routes.payment_routes import payment_bp
 from routes.admin_routes import admin_bp
 from routes.auth_routes import auth_bp
 from routes.message_routes import bp as message_bp
+from routes.minipay_routes import minipay_bp
+from routes.payment_method_routes import pm_bp
+from routes.notification_routes import notif_bp
+from routes.middleman_routes import mm_bp
 
 app.register_blueprint(product_bp, url_prefix='/api')
 app.register_blueprint(cart_bp, url_prefix='/api')
@@ -69,10 +87,13 @@ app.register_blueprint(admin_bp, url_prefix='/api/admin')
 app.register_blueprint(auth_bp, url_prefix='/api')
 app.register_blueprint(message_bp)
 app.register_blueprint(minipay_bp, url_prefix='/api/minipay')
+app.register_blueprint(pm_bp, url_prefix='/api')
+app.register_blueprint(notif_bp)
+app.register_blueprint(mm_bp)
 
 # Serve HTML pages
 HTML_PAGES = [
-    'index', 'shop', 'product', 'cart', 'checkout', 'order-success',
+    'index', 'shop', 'product', 'cart', 'checkout', 'minipay', 'order-success',
     'login', 'register', 'wishlist', 'about', 'contact', 'faq',
     'privacy', 'terms', 'admin', 'tracking', 'order-history', 'forgot', 'reset', 'intro'
 ]
@@ -165,6 +186,81 @@ with app.app_context():
             print("Database seeded with products from products.json")
         except Exception as e:
             print(f"Warning: Could not seed database: {e}")
+
+    # Seed default payment methods if table is empty
+    from database.models import PaymentMethod
+    if PaymentMethod.query.count() == 0:
+        import json as _json
+        defaults = [
+            {
+                'name': 'Venmo',
+                'slug': 'venmo',
+                'icon': '💳',
+                'account_details': _json.dumps({'username': '@YOUR-VENMO'}),
+                'instructions': 'Send payment to Venmo: @YOUR-VENMO\nInclude your Order ID in the note.',
+                'sort_order': 1
+            },
+            {
+                'name': 'Cash App',
+                'slug': 'cashapp',
+                'icon': '💵',
+                'account_details': _json.dumps({'cashtag': '$YOUR-CASHTAG'}),
+                'instructions': 'Send payment to Cash App: $YOUR-CASHTAG\nInclude your Order ID in the note.',
+                'sort_order': 2
+            },
+            {
+                'name': 'PayPal',
+                'slug': 'paypal',
+                'icon': '🅿️',
+                'account_details': _json.dumps({'email': 'your-paypal@email.com'}),
+                'instructions': 'Send payment to PayPal: your-paypal@email.com\nInclude your Order ID in the note.',
+                'sort_order': 3
+            },
+            {
+                'name': 'Bank Transfer',
+                'slug': 'bank',
+                'icon': '🏦',
+                'account_details': _json.dumps({
+                    'bank_name': 'YOUR BANK',
+                    'account_number': '0000000000',
+                    'routing_number': '000000000',
+                    'account_name': 'YOUR NAME'
+                }),
+                'instructions': 'Bank Transfer Details:\nBank: YOUR BANK\nAccount: 0000000000\nRouting: 000000000\nName: YOUR NAME\nPlease include your Order ID in the transfer memo.',
+                'sort_order': 4
+            }
+        ]
+        for d in defaults:
+            pm = PaymentMethod(**d)
+            db.session.add(pm)
+        db.session.commit()
+        print("[SEED] Default payment methods created")
+
+    # Add payment_method_id and payment_method_name columns to order table
+    try:
+        db.session.execute(db.text('ALTER TABLE "order" ADD COLUMN payment_method_id INTEGER'))
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+
+    try:
+        db.session.execute(db.text('ALTER TABLE "order" ADD COLUMN payment_method_name VARCHAR(50)'))
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+
+    # Add message_type and order_id columns to message table
+    try:
+        db.session.execute(db.text('ALTER TABLE "message" ADD COLUMN message_type VARCHAR(30) DEFAULT "text"'))
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+
+    try:
+        db.session.execute(db.text('ALTER TABLE "message" ADD COLUMN order_id VARCHAR(20)'))
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
 
     # Ensure at least one admin exists for local development/testing
     try:

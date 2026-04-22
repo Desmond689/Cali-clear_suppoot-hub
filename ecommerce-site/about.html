@@ -248,96 +248,54 @@
 
   <!-- Navbar -->
   <div id="navbar-placeholder"></div>
-  <script>
-    // Load navbar.html dynamically
-    fetch('components/navbar.html')
-      .then(response => response.text())
-      .then(data => {
-        document.getElementById('navbar-placeholder').innerHTML = data;
-        if (typeof setupNavbarToggle === 'function') setupNavbarToggle();
-      });
-  </script>
-
-  <!-- Hero Section -->
-  <section class="about-hero">
-    <h1>About Cali Clear</h1>
-  </section>
-
-  <!-- About Section -->
-  <section class="about-section">
-    <div class="about-text">
-      <h2>About Cali Clear</h2>
-      <p><strong>Cali Clear LLC</strong> is a registered business based in California, USA. We are dedicated to providing premium quality products with honesty, transparency, and exceptional customer service.</p>
-      <p>Founded in 2024, we have built a reputation for reliability and quality. Every product we offer goes through rigorous quality control to ensure it meets our high standards.</p>
-      <p><strong>Our Commitment to You:</strong></p>
-      <ul>
-        <li>Premium quality products</li>
-        <li>Secure payment processing</li>
-        <li>Fast & reliable shipping</li>
-        <li>100% customer satisfaction</li>
-        <li>Dedicated support team</li>
-      </ul>
-      
-      <!-- Business Info -->
-      <div class="business-info-box">
-        <h3>Business Information</h3>
-        <p><strong>Company:</strong> Cali Clear LLC</p>
-        <p><strong>Location:</strong> Los Angeles, California, USA</p>
-        <p><strong>Email:</strong> support@caliclear.shop</p>
-        <p><strong>Phone:</strong> (555) 123-4567</p>
-        <p><strong>Hours:</strong> Mon-Fri 9am-6pm PST</p>
-        <p><strong>Registration:</strong> Registered in California, USA</p>
-      </div>
-    </div>
-    <div class="about-image">
-      <img src="assets/images/hero/about-hero.jpg" alt="About Cali Clear">
-      <div style="text-align: center;">
-        <span class="trust-badge-large">Licensed & Registered Business</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- Values Section -->
-  <section class="values-section">
-    <h2>Why Choose Cali Clear?</h2>
-    <div class="values-grid">
-      <div class="value-card">
-        <div class="value-icon">🔒</div>
-        <h3>Secure Payments</h3>
-        <p>All transactions are encrypted and processed securely through Stripe</p>
-      </div>
-      <div class="value-card">
-        <div class="value-icon">✓</div>
-        <h3>Quality Guaranteed</h3>
-        <p>Every product is quality tested before shipping</p>
-      </div>
-      <div class="value-card">
-        <div class="value-icon">🚚</div>
-        <h3>Fast Shipping</h3>
-        <p>Quick and reliable delivery to your doorstep</p>
-      </div>
-      <div class="value-card">
-        <div class="value-icon">💬</div>
-        <h3>24/7 Support</h3>
-        <p>Our team is here to help anytime</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- CTA Section -->
-  <section class="about-cta">
-    <h2>Ready to Shop Our Products?</h2>
-    <a href="shop.html">Visit Shop</a>
-  </section>
-
-  <!-- Footer -->
   <div id="footer-placeholder"></div>
   <script>
-    // Load footer.html dynamically
+  function loadFooterWithChat() {
     fetch('components/footer.html')
       .then(response => response.text())
-      .then(data => document.getElementById('footer-placeholder').innerHTML = data);
-  </script>
+      .then(data => {
+        document.getElementById('footer-placeholder').innerHTML = data;
+
+        // Ensure chat bootstrap script is loaded and initialized (works for injected footer)
+        if (!document.getElementById('chatbot-script')) {
+          const s = document.createElement('script');
+          s.id = 'chatbot-script';
+          s.src = 'assets/js/chatbot.js';
+          s.onload = () => { if (typeof initChat === 'function') initChat(); };
+          document.body.appendChild(s);
+        } else if (typeof initChat === 'function') {
+          initChat();
+        }
+      })
+      .catch(err => console.error('Error loading footer:', err));
+  }
+
+  document.addEventListener('DOMContentLoaded', loadFooterWithChat);
+</script>
+
+<main class="about-main">
+  <section class="about-hero">
+    <div class="about-content" style="position:relative;z-index:2;">
+      <h1>About Cali Clear</h1>
+      <p>High-quality products. Fast shipping. Trusted service.</p>
+    </div>
+  </section>
+  <section class="about-section">
+    <div class="about-text">
+      <h2>Who We Are</h2>
+      <p>We are a customer-first e-commerce brand delivering reliable products for everyday use.</p>
+      <ul>
+        <li>Premium product lineup</li>
+        <li>Safe and secure checkout</li>
+        <li>Fast shipping and easy returns</li>
+      </ul>
+    </div>
+    <div class="about-image">
+      <img src="assets/images/hero/about-hero.jpg" alt="About Image">
+    </div>
+  </section>
+</main>
 
 </body>
 </html>
+

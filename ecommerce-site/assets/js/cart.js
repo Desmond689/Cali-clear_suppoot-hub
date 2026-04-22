@@ -218,27 +218,6 @@ function updateCartCount(count) {
     if (navbarCartCount) navbarCartCount.textContent = count;
 }
 
-// Toast notification
-function showToast(msg) {
-    const container = document.getElementById('toast-container');
-    if (!container) {
-        alert(msg);
-        return;
-    }
-    
-    const toast = document.createElement('div');
-    toast.textContent = msg;
-    toast.style.cssText = 'background:#333;color:#fff;padding:12px 18px;margin-top:10px;border-radius:8px;opacity:0;transition:0.3s;';
-    container.appendChild(toast);
-    
-    requestAnimationFrame(() => toast.style.opacity = '1');
-    
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        setTimeout(() => toast.remove(), 300);
-    }, 2500);
-}
-
 // Coupon
 function applyCoupon() {
     const couponInput = document.getElementById('coupon-code');

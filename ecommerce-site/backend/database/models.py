@@ -60,7 +60,11 @@ class Order(db.Model):
     tracking_number = db.Column(db.String(100))
     carrier = db.Column(db.String(50))
     
-    # MiniPay fields
+    # Payment method reference
+    payment_method_id = db.Column(db.Integer, db.ForeignKey('payment_method.id'), nullable=True)
+    payment_method_name = db.Column(db.String(50))  # Denormalized for display
+
+    # Legacy MiniPay fields (kept for backward compat)
     minipay_phone = db.Column(db.String(20), default=lambda: os.getenv('MINIPAY_PHONE', 'MINIPAY_WALLET'))
     minipay_qr_data = db.Column(db.Text)  # Base64 QR image
     payment_deadline = db.Column(db.DateTime)
@@ -85,7 +89,7 @@ class OrderItem(db.Model):
     product = db.relationship('Product', lazy=True)
 
 class PaymentConfirmation(db.Model):
-    \"\"\"Customer payment confirmation submissions\"\"\"
+    """Customer payment confirmation submissions"""
     id = db.Column(db.Integer, primary_key=True)
     order_id = db.Column(db.String(20), db.ForeignKey('order.id'), nullable=False)
     amount_sent = db.Column(db.Float)
@@ -95,25 +99,67 @@ class PaymentConfirmation(db.Model):
     status = db.Column(db.String(20), default='pending')  # pending/verified/rejected
 
 class AdminVerificationToken(db.Model):
-    \"\"\"Stores one-time verification tokens for admin login.\"\"\"
+    """Stores one-time verification tokens for admin login."""
     id = db.Column(db.Integer, primary_key=True)
     token = db.Column(db.String(36), unique=True, nullable=False)
     admin_email = db.Column(db.String(120), nullable=False)
     admin_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 class Message(db.Model):
-    \"\"\"Customer support messages from chat widget\"\"\"
+    """Customer support messages from chat widget"""
     id = db.Column(db.Integer, primary_key=True)
     customer_email = db.Column(db.String(120), nullable=False)
     customer_name = db.Column(db.String(100))
     message = db.Column(db.Text, nullable=False)
+    message_type = db.Column(db.String(30), default='text')  # text, order, payment_details, proof, bot, status_update
+    order_id = db.Column(db.String(20), db.ForeignKey('order.id'), nullable=True)  # Link to order
     status = db.Column(db.String(20), default='new')  # new, read, replied
     admin_reply = db.Column(db.Text)
+    screenshot_data = db.Column(db.Text)  # Base64 screenshot for proof messages
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     replied_at = db.Column(db.DateTime)
 
+class PaymentMethod(db.Model):
+    """Configurable payment methods (Venmo, Cash App, PayPal, Bank Transfer)"""
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)           # e.g. "Venmo"
+    slug = db.Column(db.String(30), unique=True, nullable=False)  # e.g. "venmo"
+    icon = db.Column(db.String(10))                           # emoji icon
+    account_details = db.Column(db.Text)                       # JSON: display fields for the method
+    instructions = db.Column(db.Text)                          # Bot message template
+    active = db.Column(db.Boolean, default=True)
+    sort_order = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class Middleman(db.Model):
+    """Middlemen assigned to payment methods for receiving payments"""
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)             # Display name e.g. "John D"
+    payment_method_id = db.Column(db.Integer, db.ForeignKey('payment_method.id'), nullable=False)
+    account_info = db.Column(db.Text)                            # JSON: cashtag, venmo_user, bank details, etc.
+    active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    payment_method = db.relationship('PaymentMethod', backref='middlemen', lazy=True)
+
+
+class AdminNotification(db.Model):
+    """Persistent notifications for the admin panel"""
+    id = db.Column(db.Integer, primary_key=True)
+    notification_type = db.Column(db.String(30), nullable=False)  # new_order, proof_upload, order_completed, payment_verified
+    title = db.Column(db.String(200), nullable=False)
+    body = db.Column(db.Text)
+    order_id = db.Column(db.String(20), db.ForeignKey('order.id'), nullable=True)
+    is_read = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    order = db.relationship('Order', backref='notifications', lazy=True)
+
+
 class PasswordResetToken(db.Model):
-    \"\"\"One-time password reset tokens\"\"\"
+    """One-time password reset tokens"""
     id = db.Column(db.Integer, primary_key=True)
     token = db.Column(db.String(36), unique=True, nullable=False)
     user_email = db.Column(db.String(120), nullable=False)
@@ -123,6 +169,5 @@ class PasswordResetToken(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def is_valid(self):
-        \"\"\"Check if token is valid (not expired and not used).\"\"\"
+        """Check if token is valid (not expired and not used)."""
         return not self.used and datetime.utcnow() < self.expires_at
-

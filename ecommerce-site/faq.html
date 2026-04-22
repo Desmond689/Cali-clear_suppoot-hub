@@ -101,71 +101,29 @@ body{
 
 <!-- Navbar -->
 <div id="navbar-placeholder"></div>
-<script>
-fetch('components/navbar.html').then(res=>res.text()).then(data=>{
-    document.getElementById('navbar-placeholder').innerHTML=data;
-    if (typeof setupNavbarToggle === 'function') setupNavbarToggle();
-});
-</script>
-
-<!-- Hero Section -->
-<section class="hero-faq">
-<h1>Frequently Asked Questions</h1>
-</section>
-
-<!-- FAQ Content -->
-<div class="faq-container">
-
-<div class="accordion">
-    <h3>How do I place an order?</h3>
-    <div class="panel">
-        <p>To place an order, browse products, add them to your cart, and proceed to checkout. Fill in your shipping and payment details, then confirm your order.</p>
-    </div>
-</div>
-
-<div class="accordion">
-    <h3>What payment methods do you accept?</h3>
-    <div class="panel">
-        <p>We accept Credit/Debit Cards, PayPal, Apple Pay, Google Pay, Crypto (BTC, ETH, USDT), and Bank Transfer.</p>
-    </div>
-</div>
-
-<div class="accordion">
-    <h3>Can I track my order?</h3>
-    <div class="panel">
-        <p>Yes! Once your order is confirmed, you will receive a tracking number via email to track your shipment.</p>
-    </div>
-</div>
-
-<div class="accordion">
-    <h3>What is your return policy?</h3>
-    <div class="panel">
-        <p>You can return products within 14 days of delivery. The items must be unused and in original packaging. Contact support for a return authorization.</p>
-    </div>
-</div>
-
-<div class="accordion">
-    <h3>Do you offer international shipping?</h3>
-    <div class="panel">
-        <p>Currently, we ship only within the USA. International shipping will be available soon.</p>
-    </div>
-</div>
-
-<div class="accordion">
-    <h3>How can I apply a coupon code?</h3>
-    <div class="panel">
-        <p>On checkout, enter your coupon code in the gift card/coupon field and click Apply. If valid, your discount will be applied to your order summary.</p>
-    </div>
-</div>
-
-</div>
-
-<!-- Footer -->
 <div id="footer-placeholder"></div>
 <script>
-fetch('components/footer.html').then(res=>res.text()).then(data=>{
-    document.getElementById('footer-placeholder').innerHTML=data;
-});
+  function loadFooterWithChat() {
+    fetch('components/footer.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('footer-placeholder').innerHTML = data;
+
+        // Ensure chat bootstrap script is loaded and initialized (works for injected footer)
+        if (!document.getElementById('chatbot-script')) {
+          const s = document.createElement('script');
+          s.id = 'chatbot-script';
+          s.src = 'assets/js/chatbot.js';
+          s.onload = () => { if (typeof initChat === 'function') initChat(); };
+          document.body.appendChild(s);
+        } else if (typeof initChat === 'function') {
+          initChat();
+        }
+      })
+      .catch(err => console.error('Error loading footer:', err));
+  }
+
+  document.addEventListener('DOMContentLoaded', loadFooterWithChat);
 </script>
 
 <script>
@@ -186,3 +144,4 @@ accordions.forEach(acc=>{
 
 </body>
 </html>
+

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MiniPay Payment - Cali Clear</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/responsive.css">
+<style>
+body{background:#121212;color:#eee;font-family:Poppins,Arial,sans-serif;}
+.copy-btn{background:#333;border:none;padding:4px 10px;border-radius:4px;color:#667eea;cursor:pointer;font-size:12px;margin-left:5px;}
+.copy-btn:hover{background:#444}
+.install-box{background:#1e1e1e;padding:20px;border-radius:12px;margin-bottom:25px;text-align:center;}
+.install-box a{color:#667eea;text-decoration:underline}
+.instructions{background:#1e1e1e;padding:20px;border-radius:12px;margin-bottom:25px;}
+.instructions li{color:#ccc;margin:10px 0;line-height:1.6}
+</style>
+</head>
+<body>
+  <!-- Navbar -->
+  <div id="navbar-placeholder"></div>
+  <script>
+  fetch('components/navbar.html').then(r=>r.text()).then(d=>document.getElementById('navbar-placeholder').innerHTML=d);
+  </script>
+
+  <div style="max-width:600px;margin:50px auto;padding:20px;">
+    
+    <!-- Header -->
+    <div style="text-align:center;margin-bottom:30px;">
+      <h1 style="color:#667eea;font-size:28px;margin-bottom:10px;">MiniPay Payment</h1>
+      <p style="color:#888;font-size:14px;">Complete your payment to process the order</p>
+    </div>
+
+    <!-- Order Details -->
+    <div id="order-details" style="background:#1e1e1e;padding:20px;border-radius:12px;margin-bottom:20px;display:none;">
+      <h3 style="color:#ff6f61;margin-bottom:15px;">Order Details</h3>
+      <div style="font-size:14px;">
+        <p><strong>Order ID:</strong> <span id="order-id">-</span> <button class="copy-btn" onclick="copyToClipboard(document.getElementById('order-id').textContent)">Copy</button></p>
+        <p><strong>Amount:</strong> $<span id="order-amount">-</span></p>
+        <p><strong>MiniPay Phone:</strong> <span id="minipay-phone">-</span> <button class="copy-btn" onclick="copyToClipboard(document.getElementById('minipay-phone').textContent)">Copy</button></p>
+        <p><strong>Deadline:</strong> <span id="deadline">-</span></p>
+      </div>
+    </div>
+
+    <!-- Install MiniPay (if needed) -->
+    <div class="install-box">
+      <h3 style="color:#667eea;margin-bottom:10px;">Don't have MiniPay?</h3>
+      <p style="color:#888;font-size:14px;">Download MiniPay to complete your payment</p>
+      <a href="https://play.google.com/store/apps/details?id=com.minipay.app" target="_blank" class="btn" style="display:inline-block;margin:10px 5px;background:#667eea;">Download for Android</a>
+      <a href="https://apps.apple.com/app/minipay" target="_blank" class="btn" style="display:inline-block;margin:10px 5px;background:#667eea;">Download for iOS</a>
+    </div>
+
+    <!-- QR Code -->
+    <div style="background:#1e1e1e;padding:25px;border-radius:12px;text-align:center;margin-bottom:20px;">
+      <h3 style="color:#667eea;margin-bottom:15px;">Scan QR Code</h3>
+      <img id="qr-code" src="" alt="MiniPay QR" style="width:200px;height:200px;border:1px solid #333;border-radius:8px;">
+    </div>
+
+    <!-- Instructions -->
+    <div class="instructions">
+      <h3 style="color:#667eea;margin-bottom:15px;">How to Pay</h3>
+      <ol style="color:#ccc;padding-left:20px;font-size:14px;">
+        <li>Open MiniPay app on your phone</li>
+        <li>Scan the QR code above</li>
+        <li>Enter the exact amount: <strong>$<span id="instr-amount">-</span></strong></li>
+        <li>Add <strong>Order ID: <span id="instr-order">-</span></strong> in the payment note</li>
+        <li>Send the payment</li>
+      </ol>
+    </div>
+
+    <!-- Timer -->
+    <div id="timer" style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:12px;border-radius:8px;text-align:center;font-size:18px;font-weight:600;margin-bottom:20px;display:none;"></div>
+
+    <!-- Confirmation Form -->
+    <div id="confirmation-section" style="display:none;">
+      <h3 style="color:#28a745;margin-bottom:15px;">I Have Paid</h3>
+      <p style="color:#888;font-size:14px;margin-bottom:20px;">Submit your payment confirmation below</p>
+      <form id="confirmation-form">
+        <input type="hidden" id="conf-order-id">
+        <div style="display:grid;gap:15px;">
+          <div>
+            <label>Amount Sent ($)</label>
+            <input type="number" id="conf-amount" step="0.01" required style="width:100%;padding:12px;background:#2a2a2a;border:none;border-radius:8px;color:#fff;">
+          </div>
+          <div>
+            <label>Transaction Reference/Note</label>
+            <input type="text" id="conf-ref" placeholder="Enter transaction ID or note" required style="width:100%;padding:12px;background:#2a2a2a;border:none;border-radius:8px;color:#fff;">
+          </div>
+          <div>
+            <label>Payment Time</label>
+            <input type="datetime-local" id="conf-time" required style="width:100%;padding:12px;background:#2a2a2a;border:none;border-radius:8px;color:#fff;">
+          </div>
+          <div>
+            <label>Screenshot (optional)</label>
+            <input type="file" id="conf-screenshot" accept="image/*" style="width:100%;padding:12px;background:#2a2a2a;border:none;border-radius:8px;color:#fff;">
+          </div>
+          <button type="submit" class="btn" style="background:#28a745;">I Have Paid</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Success/Error -->
+    <div id="status-message" style="text-align:center;padding:20px;border-radius:12px;display:none;"></div>
+  </div>
+
+  <script>
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Copied: ' + text);
+    });
+  }
+  </script>
+  <script src="assets/js/minipay.js"></script>
+</body>
+</html>
+

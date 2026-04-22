@@ -24,10 +24,10 @@ class Config:
     MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'smtp.gmail.com'
     MAIL_PORT = int(os.environ.get('MAIL_PORT') or 587)
     MAIL_USE_TLS = _get_bool('MAIL_USE_TLS', True)
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME') or 'caliclearsupport@gmail.com'
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or 'udpe inxr mucb jfcs'
     MAIL_FROM_ADDRESS = os.environ.get('MAIL_FROM_ADDRESS') or os.environ.get('MAIL_USERNAME')
-    MAIL_FROM_NAME = os.environ.get('MAIL_FROM_NAME') or 'E-commerce Shop'
+    MAIL_FROM_NAME = os.environ.get('MAIL_FROM_NAME') or 'Cali Clear Support'
     
     # Stripe settings
     STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')

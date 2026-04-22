@@ -548,133 +548,46 @@
 
 <!-- NAVBAR -->
 <div id="navbar-placeholder"></div>
-<script>
-fetch('components/navbar.html')
-  .then(res => res.text())
-  .then(data => {
-    document.getElementById('navbar-placeholder').innerHTML = data;
-    if (typeof updateAuthUI === 'function') updateAuthUI();
-    // Initialize navbar toggle after navbar is loaded
-    if (typeof setupNavbarToggle === 'function') {
-      setupNavbarToggle();
-    }
-  });
-</script>
-
-<!-- Page Container -->
-<div class="page-container">
-
-  <!-- Page Header -->
-  <div class="page-header">
-    <h1><i class="fas fa-box"></i> My Account</h1>
-    <div class="user-info" id="user-info-bar" style="display:none;">
-      <div class="user-avatar" id="user-avatar-letter">U</div>
-      <span class="user-email" id="user-email-display">Loading...</span>
-      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
-    </div>
-  </div>
-
-  <!-- Tabs -->
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('orders', this)">
-      <i class="fas fa-box"></i> My Orders
-    </button>
-    <button class="tab-btn" onclick="switchTab('track', this)">
-      <i class="fas fa-truck"></i> Track Order
-    </button>
-  </div>
-
-  <!-- ===== MY ORDERS TAB ===== -->
-  <div id="tab-orders" class="tab-panel active">
-
-    <!-- Loading -->
-    <div id="orders-loading" class="loading-state">
-      <div class="spinner"></div>
-      <p style="color:#888;">Loading your orders...</p>
-    </div>
-
-    <!-- Not logged in -->
-    <div id="orders-auth" class="auth-state hidden">
-      <i class="fas fa-lock"></i>
-      <h3>Please Log In</h3>
-      <p>You need to be logged in to view your orders.</p>
-      <a href="login.html" class="btn-primary-link">Login</a>
-    </div>
-
-    <!-- Empty -->
-    <div id="orders-empty" class="empty-state hidden">
-      <i class="fas fa-shopping-bag"></i>
-      <h3>No Orders Yet</h3>
-      <p>You haven't placed any orders yet.</p>
-      <a href="shop.html" class="btn-primary-link">Start Shopping</a>
-    </div>
-
-    <!-- Orders list -->
-    <div id="orders-list" class="orders-list hidden"></div>
-
-  </div>
-
-  <!-- ===== TRACK ORDER TAB ===== -->
-  <div id="tab-track" class="tab-panel">
-    <div class="track-panel">
-      <h2><i class="fas fa-map-marker-alt" style="color:#ff6f61;"></i> Track Your Order</h2>
-      <p>Enter your Order ID to see the current status and tracking information.</p>
-
-      <div class="track-form">
-        <input type="text" id="track-order-input" placeholder="e.g. ORD-20260221-XXXXXX" />
-        <button onclick="trackOrder()"><i class="fas fa-search"></i> Track</button>
-      </div>
-
-      <!-- Track result -->
-      <div id="track-result" class="track-result">
-        <div class="track-result-grid">
-          <div class="track-result-item">
-            <label>Order ID</label>
-            <span id="tr-order-id" style="color:#ff6f61;font-weight:600;"></span>
-          </div>
-          <div class="track-result-item">
-            <label>Status</label>
-            <span id="tr-status-badge"></span>
-          </div>
-          <div class="track-result-item">
-            <label>Carrier</label>
-            <span id="tr-carrier" style="text-transform:uppercase;color:#ff6f61;"></span>
-          </div>
-          <div class="track-result-item">
-            <label>Tracking Number</label>
-            <span id="tr-tracking" style="font-family:monospace;color:#4caf50;"></span>
-          </div>
-        </div>
-
-        <!-- Progress bar -->
-        <div class="progress-section">
-          <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">Shipment Progress</div>
-          <div class="progress-bar-wrap" id="tr-progress-bar"></div>
-        </div>
-
-        <div style="margin-top:20px;">
-          <a id="tr-full-link" href="#" target="_blank" class="btn-track">
-            <i class="fas fa-external-link-alt"></i> Full Tracking Page
-          </a>
-        </div>
-      </div>
-
-      <!-- Track error -->
-      <div id="track-error" style="display:none;background:rgba(244,67,54,0.1);border:1px solid #f44336;border-radius:8px;padding:14px 18px;color:#ff8a80;margin-top:16px;">
-        <i class="fas fa-exclamation-circle"></i> <span id="track-error-msg">Order not found.</span>
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<!-- Footer -->
 <div id="footer-placeholder"></div>
 <script>
-fetch('components/footer.html')
-  .then(res => res.text())
-  .then(data => document.getElementById('footer-placeholder').innerHTML = data);
+  function loadFooterWithChat() {
+    fetch('components/footer.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('footer-placeholder').innerHTML = data;
+
+        // Ensure chat bootstrap script is loaded and initialized (works for injected footer)
+        if (!document.getElementById('chatbot-script')) {
+          const s = document.createElement('script');
+          s.id = 'chatbot-script';
+          s.src = 'assets/js/chatbot.js';
+          s.onload = () => { if (typeof initChat === 'function') initChat(); };
+          document.body.appendChild(s);
+        } else if (typeof initChat === 'function') {
+          initChat();
+        }
+      })
+      .catch(err => console.error('Error loading footer:', err));
+  }
+
+  document.addEventListener('DOMContentLoaded', loadFooterWithChat);
 </script>
+
+<main class="page-container">
+  <div class="page-header">
+    <h1>My Orders</h1>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('orders', this)">Orders</button>
+    <button class="tab-btn" onclick="switchTab('track', this)">Track Order</button>
+  </div>
+  <div id="tab-orders" class="tab-panel active">
+    <div id="orders-list" class="orders-list"></div>
+  </div>
+  <div id="tab-track" class="tab-panel">
+    <div id="track-panel" class="track-panel">Track order status by ID</div>
+  </div>
+</main>
 
 <!-- Toast -->
 <div id="toast-container" style="position:fixed;top:20px;right:20px;z-index:9999;"></div>
@@ -959,3 +872,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
+

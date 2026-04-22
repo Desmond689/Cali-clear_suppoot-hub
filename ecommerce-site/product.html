@@ -218,105 +218,59 @@ input {
 
 <div id="navbar-placeholder"></div>
 <script>
-fetch('components/navbar.html')
-  .then(r => r.text())
-  .then(d => {
-    document.getElementById('navbar-placeholder').innerHTML = d;
-    // Initialize navbar toggle after navbar is loaded
-    if (typeof setupNavbarToggle === 'function') {
-      setupNavbarToggle();
-    }
-  });
+  function loadFooterWithChat() {
+    fetch('components/footer.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('footer-placeholder').innerHTML = data;
+
+        // Ensure chat bootstrap script is loaded and initialized (works for injected footer)
+        if (!document.getElementById('chatbot-script')) {
+          const s = document.createElement('script');
+          s.id = 'chatbot-script';
+          s.src = 'assets/js/chatbot.js';
+          s.onload = () => { if (typeof initChat === 'function') initChat(); };
+          document.body.appendChild(s);
+        } else if (typeof initChat === 'function') {
+          initChat();
+        }
+      })
+      .catch(err => console.error('Error loading footer:', err));
+  }
+
+  document.addEventListener('DOMContentLoaded', loadFooterWithChat);
 </script>
 
-
-<div id="toast-container"></div>
-
-<!-- PRODUCT -->
-<div class="product-container">
+<main class="product-container">
   <div class="product-images">
-    <img id="main-product-img" class="main" src="" alt="">
-    <!-- Optionally, add a gallery here -->
+    <img id="main-product-img" class="main" src="assets/images/logo.png" alt="Product">
   </div>
   <div class="card">
-    <h1 id="product-name"></h1>
-    <div class="price" id="product-price"></div>
-    <div id="product-rating"></div>
-    <div id="product-stock"></div>
-    <p class="description" id="product-desc"></p>
-    <div class="form-grid">
-      <div>
-        <label>Qty</label>
-        <input type="number" id="qty" value="1" min="1">
-      </div>
-    </div>
+    <h1 id="product-name">Product Name</h1>
+    <div class="product-price" id="product-price">$0.00</div>
+    <p class="product-desc" id="product-desc">Product description will appear here.</p>
+    <p id="product-specs"></p>
+    <p id="product-stock"></p>
     <div class="actions">
-      <button class="add-cart" id="add-to-cart">Add to Cart</button>
-      <button class="add-wishlist" id="add-to-wishlist">Add to Wishlist</button>
+      <input id="qty" type="number" value="1" min="1" max="99" style="width:70px;">
+      <button id="add-to-cart" class="add-cart">Add to Cart</button>
+      <button id="add-to-wishlist" class="add-wishlist">Wishlist</button>
     </div>
-    <div id="product-specs"></div>
   </div>
-</div>
+</main>
 
-
-<!-- RELATED -->
-<div class="related-products">
+<section class="related-products">
   <h2>Related Products</h2>
-  <div class="related-grid" id="related-products-grid">
-    <!-- Related products will be rendered here -->
-  </div>
-</div>
+  <div id="related-products-grid" class="related-grid"></div>
+</section>
 
+<div id="footer-placeholder"></div>
+
+<script src="assets/js/toast.js"></script>
 <script src="assets/js/products.js"></script>
-
-<script>
-// Load footer with chat
-document.addEventListener('DOMContentLoaded', () => {
-  fetch('components/footer.html')
-    .then(res => res.text())
-    .then(html => {
-      const footer = document.createElement('footer');
-      footer.innerHTML = html;
-      document.body.appendChild(footer);
-      initChat();
-    })
-    .catch(err => console.error('Error loading footer:', err));
-});
-
-function initChat() {
-  const bubble = document.getElementById('chat-bubble');
-  const panel = document.getElementById('chat-panel');
-  const input = document.getElementById('chat-input');
-  const messages = document.getElementById('chat-messages');
-
-  if (!bubble || !panel || !input || !messages) return;
-
-  bubble.addEventListener('click', () => {
-    panel.classList.toggle('hidden');
-    if (!panel.classList.contains('hidden')) {
-      input.focus();
-    }
-  });
-
-  input.addEventListener('keydown', e => {
-    if (e.key !== 'Enter') return;
-    const text = e.target.value.trim();
-    if (!text) return;
-    messages.innerHTML += `<div class="user-msg">${text}</div>`;
-    e.target.value = '';
-    let reply = "Sorry, I didn't understand that. Type \"agent\" to contact us.";
-    const lc = text.toLowerCase();
-    if (lc.includes('return')) reply = 'You can return items within 30 days. Check our FAQ for details.';
-    else if (lc.includes('shipping')) reply = 'Standard shipping takes 5–7 business days.';
-    else if (lc.includes('order')) reply = 'Your order is being processed. Use the tracking page with your order number.';
-    else if (lc.includes('agent') || lc.includes('human')) {
-      reply = 'Click here to email support: <a href="mailto:support@caliclear.shop">support@caliclear.shop</a>';
-    }
-    messages.innerHTML += `<div class="bot-msg">${reply}</div>`;
-    messages.scrollTop = messages.scrollHeight;
-  });
-}
-</script>
+<script src="assets/js/cart.js"></script>
+<script src="assets/js/wishlist.js"></script>
 
 </body>
 </html>
+

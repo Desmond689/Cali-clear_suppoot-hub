@@ -1,9 +1,29 @@
 // Universal Toast Notification
-function showToast(message, duration = 2000) {
+// Supports: showToast(message) or showToast(message, showCartLink)
+function showToast(message, showCartLinkOrDuration = false, duration = 2000) {
+	// Handle case where second arg is duration (backwards compatibility)
+	if (typeof showCartLinkOrDuration === 'number') {
+		duration = showCartLinkOrDuration;
+		showCartLinkOrDuration = false;
+	}
+	
 	const container = document.getElementById('toast-container');
-	if (!container) return;
+	if (!container) {
+		// Create container if not exists
+		const toastContainer = document.createElement('div');
+		toastContainer.id = 'toast-container';
+		toastContainer.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;';
+		document.body.appendChild(toastContainer);
+		return showToast(message, showCartLinkOrDuration, duration);
+	}
+	
 	const toast = document.createElement('div');
-	toast.textContent = message;
+	// Support HTML content for cart link
+	if (showCartLinkOrDuration && typeof showCartLinkOrDuration === 'boolean') {
+		toast.innerHTML = message + '<br><a href="cart.html" style="color:#ff6f61;text-decoration:underline;cursor:pointer;margin-top:5px;display:inline-block;">View Cart</a>';
+	} else {
+		toast.textContent = message;
+	}
 	toast.style.background = '#222';
 	toast.style.color = '#fff';
 	toast.style.padding = '10px 20px';

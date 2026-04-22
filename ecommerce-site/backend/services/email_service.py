@@ -4,7 +4,7 @@ from config import Config
 mail = Mail()
 
 # Admin email for all order notifications
-ADMIN_EMAIL = "dh7799792@gmail.com"
+ADMIN_EMAIL = "caliclearsupportsupport@gmail.com"
 
 
 def _get_sender():
@@ -360,3 +360,55 @@ def send_admin_verification_email(email, token):
         print(f"Admin verification email sent to: {email}")
     except Exception as e:
         print(f"Failed to send admin verification email: {e}")
+
+
+def send_payment_confirmation_email(order_id, customer_email, amount, transaction_ref):
+    """Send payment confirmation email to customer."""
+    subject = f"Payment Received - Order #{order_id} - Cali Clear"
+    body = f"""
+We have received your payment confirmation for order #{order_id}.
+
+Order ID: {order_id}
+Amount: ${amount}
+Transaction Reference: {transaction_ref}
+
+Our team is reviewing your payment. You'll receive another email once verified.
+"""
+    try:
+        send_email(customer_email, subject, body)
+    except Exception as e:
+        print(f"Failed to send payment confirmation email: {e}")
+
+
+def send_payment_verified_email(order_id, customer_email, order_total):
+    """Send payment verified email to customer."""
+    subject = f"Payment Verified - Order #{order_id} - Cali Clear"
+    body = f"""
+Your payment for order #{order_id} has been verified!
+
+Order ID: {order_id}
+Total Amount: ${order_total}
+
+Your order is now being processed and will be shipped soon.
+"""
+    try:
+        send_email(customer_email, subject, body)
+    except Exception as e:
+        print(f"Failed to send payment verified email: {e}")
+
+
+def send_payment_rejected_email(order_id, customer_email, reason):
+    """Send payment rejected email to customer."""
+    subject = f"Payment Issue - Order #{order_id} - Cali Clear"
+    body = f"""
+We were unable to verify your payment for order #{order_id}.
+
+Order ID: {order_id}
+Reason: {reason}
+
+Please contact our support team or try again.
+"""
+    try:
+        send_email(customer_email, subject, body)
+    except Exception as e:
+        print(f"Failed to send payment rejected email: {e}")

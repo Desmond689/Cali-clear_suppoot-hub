@@ -135,58 +135,52 @@ body {
 
 <!-- Navbar -->
 <div id="navbar-placeholder"></div>
-<script>
-fetch('components/navbar.html').then(res=>res.text()).then(data=>{
-  document.getElementById('navbar-placeholder').innerHTML=data;
-  if (typeof setupNavbarToggle === 'function') setupNavbarToggle();
-});
-</script>
-
-<!-- Hero Section -->
-<section class="hero-contact">
-  <h1>Contact Us</h1>
-</section>
-
-<!-- Contact Section -->
-<div class="contact-container">
-
-  <!-- Form -->
-  <div class="contact-form">
-    <h2>Send Us a Message</h2>
-    <form id="contactForm">
-      <label for="name">Full Name</label>
-      <input type="text" id="name" required>
-
-      <label for="email">Email</label>
-      <input type="email" id="email" required>
-
-      <label for="subject">Subject</label>
-      <input type="text" id="subject" required>
-
-      <label for="message">Message</label>
-      <textarea id="message" required></textarea>
-
-      <button type="submit">Send Message</button>
-    </form>
-  </div>
-
-  <!-- Info -->
-  <div class="contact-info">
-    <h2>Contact Information</h2>
-    <p><strong>Cali Clear LLC</strong></p>
-    <p>Email: support@caliclear.shop</p>
-    <p>Phone: (555) 123-4567</p>
-    <p>Address: 123 Main Street, Los Angeles, CA 90001</p>
-    <p>Business Hours: Monday to Friday, 9:00 AM – 6:00 PM PST</p>
-    <p>We aim to respond to all inquiries within 24–48 hours.<br>For faster assistance, please include your order details when contacting us.</p>
-  </div>
-
-</div>
-
-<!-- Footer -->
 <div id="footer-placeholder"></div>
 <script>
-fetch('components/footer.html').then(res=>res.text()).then(data=>document.getElementById('footer-placeholder').innerHTML=data);
+  function loadFooterWithChat() {
+    fetch('components/footer.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('footer-placeholder').innerHTML = data;
+
+        // Ensure chat bootstrap script is loaded and initialized (works for injected footer)
+        if (!document.getElementById('chatbot-script')) {
+          const s = document.createElement('script');
+          s.id = 'chatbot-script';
+          s.src = 'assets/js/chatbot.js';
+          s.onload = () => { if (typeof initChat === 'function') initChat(); };
+          document.body.appendChild(s);
+        } else if (typeof initChat === 'function') {
+          initChat();
+        }
+      })
+      .catch(err => console.error('Error loading footer:', err));
+  }
+
+  document.addEventListener('DOMContentLoaded', loadFooterWithChat);
+</script>
+
+<main class="contact-main" style="max-width: 900px; margin: 40px auto; padding: 20px;">
+  <h1>Contact Us</h1>
+  <p>Need help? Get in touch with our support team and we’ll respond within 24h.</p>
+  <form id="contactForm" style="display:grid;gap:14px;">
+    <input type="text" id="contactName" placeholder="Full Name" required style="padding:10px;border-radius:8px;border:1px solid #ccc;">
+    <input type="email" id="contactEmail" placeholder="Email Address" required style="padding:10px;border-radius:8px;border:1px solid #ccc;">
+    <textarea id="contactMessage" rows="6" placeholder="How can we help?" required style="padding:10px;border-radius:8px;border:1px solid #ccc;"></textarea>
+    <button type="submit" style="background:#ff6f61;color:#fff;padding:12px 18px;border:none;border-radius:8px;cursor:pointer;">Send Message</button>
+  </form>
+  <div id="contactFeedback" style="margin-top:10px;color:#4caf50;display:none;">Thank you! We’ll be in touch soon.</div>
+</main>
+
+<script>
+const contactForm = document.getElementById('contactForm');
+if (contactForm) {
+  contactForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    document.getElementById('contactFeedback').style.display = 'block';
+    contactForm.reset();
+  });
+}
 </script>
 
 <!-- JS -->
@@ -200,3 +194,4 @@ document.getElementById('contactForm').addEventListener('submit', function(e){
 
 </body>
 </html>
+
