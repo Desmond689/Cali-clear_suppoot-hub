@@ -213,11 +213,16 @@ function initChat() {
     }
 
     // Send to backend via socket
-    socket.emit('send_message', {
-      email: chatEmail,
-      name: chatName,
-      message: text
-    });
+    if (socket) {
+      socket.emit('send_message', {
+        email: chatEmail,
+        name: chatName,
+        message: text
+      });
+    } else {
+      // Fallback: append locally so user still sees their message
+      appendUserMessage(text);
+    }
     e.target.value = '';
   });
 

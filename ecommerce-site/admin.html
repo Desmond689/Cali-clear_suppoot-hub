@@ -3789,6 +3789,14 @@
         panel.style.display = 'block';
       } catch (e) {
         console.error('Error loading order panel:', e);
+        var panel = document.getElementById('order-detail-panel');
+        var content = document.getElementById('order-panel-content');
+        content.innerHTML = `<div style="padding:20px;text-align:center;color:#888;">
+          <i class="fas fa-exclamation-circle" style="font-size:24px;margin-bottom:8px;display:block;"></i>
+          <div>Order not found</div>
+          <div style="font-size:11px;margin-top:4px;">${escapeHtml(currentConversationOrderId || '')}</div>
+        </div>`;
+        panel.style.display = 'block';
       }
     }
 
@@ -3965,14 +3973,26 @@
         return;
       }
       
-      // Find the last message from this customer
-      const messages = allMessages.filter(m => m.customer_email === currentConversationEmail);
-      if (messages.length === 0) {
-        showNotification('No messages to reply to', 'error');
+      // Find the last unreplied customer message (not bot messages)
+      const allCustomerMessages = allMessages.filter(m =>
+        m.customer_email === currentConversationEmail &&
+        m.customer_name !== 'Bot' &&
+        m.message_type !== 'bot'
+      );
+
+      if (allCustomerMessages.length === 0) {
+        showNotification('No customer messages to reply to', 'error');
         return;
       }
-      
-      const lastMsg = messages[messages.length - 1];
+
+      // Prefer the last unreplied message
+      const unreplied = allCustomerMessages.filter(m => !m.admin_reply);
+      const lastMsg = unreplied.length > 0 ? unreplied[unreplied.length - 1] : allCustomerMessages[allCustomerMessages.length - 1];
+
+      if (unreplied.length === 0) {
+        showNotification('All messages already replied. Replying to last message.', 'info');
+      }
+
       
       // Clear input immediately for better UX
       replyInput.value = '';

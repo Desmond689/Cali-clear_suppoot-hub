@@ -1,7 +1,14 @@
 // Main JavaScript - Navbar and common functionality
 
 // Global error handler to avoid entire site JS failure
+var _globalErrorFired = false;
 window.onerror = function(message, source, lineno, colno, error) {
+	// Only handle actual runtime errors, not programmatic console.error calls
+	// "Object" string appears when something throws an object
+	if (message === 'Object' || (typeof message === 'object' && message !== null)) return true;
+	// Prevent recursive error handling
+	if (_globalErrorFired) return true;
+	_globalErrorFired = true;
 	console.error('Global JS error:', {message, source, lineno, colno, error});
 	// If critical code error, show user message at top
 	try {
@@ -19,6 +26,7 @@ window.onerror = function(message, source, lineno, colno, error) {
 		document.body.appendChild(warning);
 		setTimeout(() => warning.remove(), 4000);
 	} catch (_) {}
+	_globalErrorFired = false;
 	return false; // keep browser default behavior
 };
 

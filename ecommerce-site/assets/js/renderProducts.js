@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	const grid = document.getElementById('featured-products-grid');
 	if (!grid) return;
 
-	const API_URL = '/api';
+	var API_URL = typeof API_URL !== 'undefined' ? API_URL : '/api';
 
 	// Fetch products from API
 	async function fetchProducts() {

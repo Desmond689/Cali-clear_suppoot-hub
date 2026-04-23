@@ -1,5 +1,5 @@
 // Cart logic with backend API
-const API_URL = '/api';
+var API_URL = typeof API_URL !== 'undefined' ? API_URL : '/api';
 
 let cart = [];
 let coupon = null;

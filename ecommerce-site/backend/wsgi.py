@@ -1,4 +1,3 @@
-from app import app
+from app import socketio
 
-if __name__ == "__main__":
-    app.run()
+application = socketio.wsgi_app

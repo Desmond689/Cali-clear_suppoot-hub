@@ -1,5 +1,5 @@
 // MiniPay Page Logic
-const API_URL = '/api';
+var API_URL = typeof API_URL !== 'undefined' ? API_URL : '/api';
 
 let orderId = new URLSearchParams(window.location.search).get('order_id');
 let orderData = null;

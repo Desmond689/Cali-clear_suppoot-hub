@@ -21,7 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 app = Flask(__name__, static_folder=os.path.join(BASE_DIR, 'assets'))
 app.config.from_object(Config)
 # enable debug mode for development error visibility
-app.debug = True
+app.debug = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
 
 # Enable detailed error logging
 import logging
@@ -311,4 +311,5 @@ with app.app_context():
 
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True, host='0.0.0.0', port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    socketio.run(app, debug=app.debug, host='0.0.0.0', port=port)
