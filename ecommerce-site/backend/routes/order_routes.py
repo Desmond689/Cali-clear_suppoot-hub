@@ -73,8 +73,7 @@ def get_orders():
     email = request.args.get('email')
     if not email:
         return error_response('Email required'), 400
-    # Do not show payment-request-only orders until payment is verified (per user request)
-    orders = Order.query.filter_by(email=email).filter(Order.status != 'payment_requested').order_by(Order.created_at.desc()).all()
+    orders = Order.query.filter_by(email=email).order_by(Order.created_at.desc()).all()
     
     # Get item counts in bulk
     order_ids = [o.id for o in orders]

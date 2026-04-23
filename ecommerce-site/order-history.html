@@ -576,16 +576,38 @@
 <main class="page-container">
   <div class="page-header">
     <h1>My Orders</h1>
+    <div class="user-info" id="user-info-bar" style="display:none;">
+      <div style="width:36px;height:36px;border-radius:50%;background:#ff6f61;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;" id="user-avatar-letter">U</div>
+      <span style="font-size:13px;">Logged in as <strong id="user-email-display">user@email.com</strong></span>
+    </div>
   </div>
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('orders', this)">Orders</button>
     <button class="tab-btn" onclick="switchTab('track', this)">Track Order</button>
   </div>
   <div id="tab-orders" class="tab-panel active">
+    <div id="orders-loading" class="loading-state"><div class="spinner"></div><p>Loading your orders...</p></div>
+    <div id="orders-auth" class="auth-state hidden"><i class="fas fa-envelope"></i><h3>Sign In</h3><p>Please sign in to view your orders.</p><a href="login.html" class="btn-primary-link">Go to Login</a></div>
+    <div id="orders-empty" class="empty-state hidden"><i class="fas fa-inbox"></i><h3>No Orders Yet</h3><p>You haven't placed any orders yet.</p></div>
     <div id="orders-list" class="orders-list"></div>
   </div>
   <div id="tab-track" class="tab-panel">
-    <div id="track-panel" class="track-panel">Track order status by ID</div>
+    <div id="track-panel" class="track-panel">
+      <div style="max-width:400px;margin:0 auto;">
+        <div style="margin-bottom:16px;">
+          <label style="display:block;font-size:13px;color:#888;text-transform:uppercase;margin-bottom:6px;">Order ID</label>
+          <div style="display:flex;gap:10px;">
+            <input type="text" id="track-order-input" placeholder="e.g. ORD-20240101-001" style="flex:1;padding:12px 16px;background:#252525;border:1px solid #333;border-radius:8px;color:#fff;font-size:14px;">
+            <button onclick="trackOrder()" style="padding:12px 20px;background:#ff6f61;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;">Track</button>
+          </div>
+        </div>
+        <div id="track-error-msg" style="color:#f44336;font-size:13px;margin-top:12px;"></div>
+        <div id="track-result" class="track-result">
+          <div id="tr-progress-bar" style="display:flex;justify-content:space-around;margin-bottom:20px;"></div>
+          <div id="tr-details"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </main>
 
@@ -843,8 +865,37 @@ async function trackOrder() {
 }
 
 // Allow pressing Enter in track input
+var ordersPollInterval = null;
+
+function startOrdersPolling() {
+  // Stop any existing polling
+  if (ordersPollInterval) clearInterval(ordersPollInterval);
+  // Poll every 5 seconds
+  ordersPollInterval = setInterval(loadOrders, 5000);
+}
+
+function stopOrdersPolling() {
+  if (ordersPollInterval) {
+    clearInterval(ordersPollInterval);
+    ordersPollInterval = null;
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   loadOrders();
+  
+  // Start polling for order updates when page loads
+  startOrdersPolling();
+  
+  // Stop polling when switching to track tab, start when back to orders
+  const orderBtn = document.querySelector('.tab-btn:nth-child(1)');
+  const trackBtn = document.querySelector('.tab-btn:nth-child(2)');
+  if (orderBtn) {
+    orderBtn.addEventListener('click', startOrdersPolling);
+  }
+  if (trackBtn) {
+    trackBtn.addEventListener('click', stopOrdersPolling);
+  }
 
   const trackInput = document.getElementById('track-order-input');
   if (trackInput) {
