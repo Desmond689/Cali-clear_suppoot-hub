@@ -3,6 +3,7 @@ from database.models import Message, Order, Product, PaymentMethod, AdminNotific
 from utils.responses import success_response, error_response
 from middleware.admin_required import admin_required
 from services.email_service import send_email
+from flask_socketio import emit
 from datetime import datetime
 import json
 import base64
@@ -298,6 +299,14 @@ def reply_message(msg_id):
         f'Hello {msg.customer_name},\n\nWe received your message: "{msg.message}"\n\n'
         f'Our response:\n{reply}\n\nThank you for contacting us!'
     )
+    
+    # Emit real-time message to user via SocketIO
+    emit('new_message', {
+        'id': msg.id,
+        'message': reply,
+        'sender': 'admin',
+        'timestamp': msg.replied_at.isoformat()
+    }, room=msg.customer_email)
     
     return success_response(message='Reply sent to customer')
 

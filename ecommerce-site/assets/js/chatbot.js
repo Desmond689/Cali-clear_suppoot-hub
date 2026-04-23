@@ -4,6 +4,7 @@ let chatName = null;
 let chatPollInterval = null;
 let lastMessageCount = -1; // use -1 to ensure first load is always processed
 let firstLoadDone = false;
+let socket = null;
 
 function openChatPanel() {
   const panel = document.getElementById('chat-panel');
@@ -15,10 +16,13 @@ function openChatPanel() {
   }
   if (input) input.focus();
 
-  // Initialize poll loop when panel is visible
-  if (chatPollInterval) clearInterval(chatPollInterval);
+  // Join chat room if email available
+  if (chatEmail && socket) {
+    socket.emit('join_chat', { email: chatEmail });
+  }
+
+  // Load chat history initially
   loadChatHistory();
-  chatPollInterval = setInterval(loadChatHistory, 3000);
 }
 
 function notifyAdmin(orderInfo) {
@@ -99,6 +103,62 @@ function initChat() {
 
   if (!bubble || !panel || !input || !messages) return;
 
+  // Initialize SocketIO connection
+  if (!socket) {
+    socket = io();
+    
+    socket.on('connect', () => {
+      console.log('[CHAT] Socket connected');
+      // Join room if we have email
+      if (chatEmail) {
+        socket.emit('join_chat', { email: chatEmail });
+      }
+    });
+    
+    socket.on('disconnect', () => {
+      console.log('[CHAT] Socket disconnected');
+    });
+    
+    // Listen for new messages from admin
+    socket.on('new_message', (data) => {
+      console.log('[CHAT] New message received:', data);
+      if (data.sender === 'admin' && chatEmail) {
+        // Create message object for rendering
+        const msg = {
+          admin_reply: data.message,
+          replied_at: data.timestamp
+        };
+        
+        // Append the admin reply directly to chat
+        const messages = document.getElementById('chat-messages');
+        if (messages) {
+          messages.innerHTML += renderAdminReply(msg);
+          messages.scrollTop = messages.scrollHeight;
+          lastMessageCount++; // Increment count to avoid unnecessary reloads
+        }
+        
+        // Show notification if chat is closed
+        const panel = document.getElementById('chat-panel');
+        if (panel && panel.classList.contains('hidden')) {
+          if (typeof showToast === 'function') {
+            showToast('💬 New message from admin!');
+          }
+          // Request notification permission if not already granted
+          if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+          }
+          // Show browser notification
+          if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('Cali Clear Support', {
+              body: 'You have a new message from our support team.',
+              icon: '/favicon.ico'
+            });
+          }
+        }
+      }
+    });
+  }
+
   // Restore identity from localStorage
   chatEmail = chatEmail || localStorage.getItem('user_email') || null;
   chatName = chatName || localStorage.getItem('user_name') || null;
@@ -120,26 +180,17 @@ function initChat() {
         localStorage.setItem('user_email', chatEmail);
         localStorage.setItem('user_name', chatName);
       }
-      loadChatHistory();
-      if (chatPollInterval) clearInterval(chatPollInterval);
-      chatPollInterval = setInterval(loadChatHistory, 3000);
-      input.focus();
-    } else {
-      // Closing chat
-      if (chatPollInterval) {
-        clearInterval(chatPollInterval);
-        chatPollInterval = null;
+      // Join chat room if socket is connected
+      if (socket && chatEmail) {
+        socket.emit('join_chat', { email: chatEmail });
       }
+      openChatPanel();
     }
   });
 
   if (closeButton) {
     closeButton.addEventListener('click', () => {
       panel.classList.add('hidden');
-      if (chatPollInterval) {
-        clearInterval(chatPollInterval);
-        chatPollInterval = null;
-      }
     });
   }
 
@@ -153,33 +204,19 @@ function initChat() {
       chatName = prompt('What is your name?') || 'Guest';
       localStorage.setItem('user_email', chatEmail);
       localStorage.setItem('user_name', chatName);
+      // Join chat room
+      if (socket && chatEmail) {
+        socket.emit('join_chat', { email: chatEmail });
+      }
     }
 
-    // Show immediately
-    appendUserMessage(text);
-    e.target.value = '';
-
-    // Send to backend
-    const orderId = window._chatOrderId || localStorage.getItem('last_order_id') || null;
-    fetch('/api/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: chatEmail,
-        name: chatName,
-        message: text,
-        message_type: 'text',
-        order_id: orderId
-      })
-    })
-    .then(r => r.json())
-    .then(() => {
-      setTimeout(loadChatHistory, 500);
-    })
-    .catch(err => {
-      console.error('Chat send error:', err);
-      appendBotMessage('Network error. Please try again.');
+    // Send to backend via socket
+    socket.emit('send_message', {
+      email: chatEmail,
+      name: chatName,
+      message: text
     });
+    e.target.value = '';
   });
 
   // Attach quick triggers to common checkout/buy buttons

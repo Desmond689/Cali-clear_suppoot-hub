@@ -5,6 +5,7 @@ from flask_mail import Mail
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token
+from flask_socketio import SocketIO, emit, join_room, leave_room
 from datetime import timedelta
 from dotenv import load_dotenv
 from config import Config
@@ -31,6 +32,7 @@ app.config['MAIL_FROM_NAME'] = Config.MAIL_FROM_NAME
 app.config['MAIL_FROM_ADDR'] = Config.MAIL_FROM_ADDRESS
 
 CORS(app, supports_credentials=True)
+socketio = SocketIO(app, cors_allowed_origins="*")
 db.init_app(app)
 mail = Mail(app)
 limiter = Limiter(key_func=get_remote_address)
@@ -90,6 +92,36 @@ app.register_blueprint(minipay_bp, url_prefix='/api/minipay')
 app.register_blueprint(pm_bp, url_prefix='/api')
 app.register_blueprint(notif_bp)
 app.register_blueprint(mm_bp)
+
+# SocketIO event handlers for real-time chat
+@socketio.on('join_chat')
+def handle_join_chat(data):
+    email = data.get('email')
+    if email:
+        join_room(email)
+        emit('joined', {'status': 'success'})
+
+@socketio.on('send_message')
+def handle_send_message(data):
+    email = data.get('email')
+    message = data.get('message')
+    name = data.get('name', 'Guest')
+    if email and message:
+        # Save message to DB (similar to create_message)
+        from database.models import Message
+        msg = Message(
+            customer_email=email,
+            customer_name=name,
+            message=message,
+            message_type='text',
+            status='new'
+        )
+        db.session.add(msg)
+        db.session.commit()
+        # Emit to admin room or something, but for now, just acknowledge
+        emit('message_sent', {'id': msg.id})
+
+# For admin replies, we'll emit from the route
 
 # Serve HTML pages
 HTML_PAGES = [
@@ -279,4 +311,4 @@ with app.app_context():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000, use_reloader=False)
+    socketio.run(app, debug=True, host='0.0.0.0', port=5000)
