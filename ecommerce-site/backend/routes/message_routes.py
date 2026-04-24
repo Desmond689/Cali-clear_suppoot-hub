@@ -314,6 +314,13 @@ def reply_message(msg_id):
     msg.replied_at = datetime.utcnow()
     db.session.commit()
 
+    # Emit real-time notification to user
+    emit('new_message', {
+        'sender': 'admin',
+        'message': reply,
+        'timestamp': msg.replied_at.isoformat()
+    }, room=msg.customer_email)
+
     # Send reply email to customer (best-effort, don't fail on email error)
     try:
         body = (

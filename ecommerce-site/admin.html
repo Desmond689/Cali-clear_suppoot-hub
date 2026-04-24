@@ -3574,6 +3574,24 @@
     var currentConversationOrderId = null;
     var allMessages = [];
     var messagesPollInterval = null;
+    var socket = null;
+
+    // Initialize socket for real-time messages
+    if (typeof io !== 'undefined') {
+      socket = io();
+      socket.on('connect', () => {
+        console.log('[ADMIN SOCKET] Connected');
+        socket.emit('join_admin'); // Join admin room
+      });
+      socket.on('disconnect', () => {
+        console.log('[ADMIN SOCKET] Disconnected');
+      });
+      socket.on('new_user_message', (data) => {
+        console.log('[ADMIN SOCKET] New user message:', data);
+        // Refresh messages to show new message
+        loadMessages();
+      });
+    }
 
     async function loadMessages() {
       try {
@@ -4054,5 +4072,6 @@
       return `${hours}:${mins}`;
     }
   </script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </body>
 </html>

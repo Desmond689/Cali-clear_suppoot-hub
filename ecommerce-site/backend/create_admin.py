@@ -4,10 +4,14 @@ from app import app
 from database.db import db
 from database.models import User
 
+print("Starting admin creation...")
+
 with app.app_context():
-    email = 'desmondhenry446@gmail.com'
-    password = 'desmond12345$'
+    print("App context activated")
+    email = 'caliclearsupport@gmail.com'
+    password = 'Desmond12345$$'
     
+    print(f"Creating admin: {email}")
     user = User.query.filter_by(email=email).first()
     if user:
         user.is_admin = True

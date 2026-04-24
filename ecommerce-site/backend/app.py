@@ -101,6 +101,11 @@ def handle_join_chat(data):
         join_room(email)
         emit('joined', {'status': 'success'})
 
+@socketio.on('join_admin')
+def handle_join_admin():
+    join_room('admin')
+    emit('joined_admin', {'status': 'success'})
+
 @socketio.on('send_message')
 def handle_send_message(data):
     email = data.get('email')
@@ -118,7 +123,15 @@ def handle_send_message(data):
         )
         db.session.add(msg)
         db.session.commit()
-        # Emit to admin room or something, but for now, just acknowledge
+        # Emit to admin for real-time notification
+        emit('new_user_message', {
+            'email': email,
+            'name': name,
+            'message': message,
+            'timestamp': msg.created_at.isoformat(),
+            'id': msg.id
+        }, room='admin')
+        # Acknowledge to user
         emit('message_sent', {'id': msg.id})
 
 # For admin replies, we'll emit from the route
